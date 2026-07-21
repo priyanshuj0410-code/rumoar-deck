@@ -4,27 +4,21 @@ A self-contained HTML slide deck (49 slides) for **RUMOAR**, a men's fashion-acc
 styling engine for India. Built in the "Engine" brand system (Clash Display / General Sans /
 Space Mono; porcelain-ink monochrome + Dusk accent + Voltage flash).
 
-## View locally
-Open `index.html` in any browser. Navigate with **← / →** or click; **F** for fullscreen.
+## The deployed site
+`index.html` is the whole site (no build step). Navigate with the arrow keys or click; F for fullscreen.
+It's live on Vercel; every `git push` redeploys it.
 
-## Deploy to Vercel
-It's a pure static site (`index.html`, no build step).
+## Editing the deck
+Don't hand-edit `index.html` (it's generated). Edit the content in **`build_deck.js`**, then:
 
-**Easiest — Vercel dashboard:** push to GitHub (below), then vercel.com → *Add New → Project →
-Import* the repo → **Deploy**. Zero config.
+    node build_deck.js      # regenerates index.html
 
-**Or the Vercel CLI**, from inside this folder:
+Commit and push to redeploy.
 
-    npx vercel --prod
+## Repo layout
+    index.html        the deployed deck (generated)
+    build_deck.js     the deck source — edit this
+    vercel.json       static config
+    project/          internal strategy materials (git-ignored, local only)
 
-## Push to GitHub
-
-    git remote add origin https://github.com/<your-username>/rumoar-deck.git
-    git branch -M main
-    git push -u origin main
-
-…or with the GitHub CLI, in one line:
-
-    gh repo create rumoar-deck --public --source=. --push
-
-> Fonts load from Fontshare/Google, so a live view needs internet.
+> Brand fonts load from Fontshare/Google, so the live view needs internet.

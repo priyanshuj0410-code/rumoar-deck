@@ -2,6 +2,7 @@
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <style>
 :root{--porcelain:#ECEBE7;--chalk:#F6F5F2;--ink:#17171B;--carbon:#202028;--graphite:#5C5C64;--mist:#9A9AA4;--hair:#DEDDD8;--hairdk:#33333C;--dusk:#4B4673;--peri:#B3ACEF;--volt:#6152F0;--ok:#3E7D5A;--att:#B0842E;--crit:#C0453C;
 --display:'Clash Display','Space Grotesk',system-ui,sans-serif;--sans:'General Sans',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;}
@@ -15,11 +16,10 @@ html,body{margin:0;height:100%;background:#0d0d10;font-family:var(--sans);overfl
 .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--dusk);z-index:60;transition:width .25s var(--ease)}
 .hud{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:rgba(23,23,27,.82);backdrop-filter:blur(6px);border:1px solid var(--hairdk);border-radius:999px;padding:7px 12px;font-family:var(--mono);font-size:12px;color:var(--mist);opacity:.8;transition:opacity .3s}
 .hud:hover{opacity:1}
-.hud button{background:none;border:0;color:var(--porcelain);cursor:pointer;font-size:18px;line-height:1;padding:2px 8px;border-radius:8px}
+.hud button{background:none;border:0;color:var(--porcelain);cursor:pointer;line-height:1;padding:4px 6px;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .hud button:hover{background:var(--carbon);color:var(--peri)}
 .hud .ct{letter-spacing:.08em;min-width:58px;text-align:center}.hud .ct b{color:var(--porcelain)}
-.hud .ff{font-size:14px}
-.hint{position:fixed;bottom:22px;right:24px;z-index:60;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#565663;text-transform:uppercase}
+.material-symbols-rounded{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;font-size:22px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
 .slide.chalk{background:var(--chalk)}
 .slide.dark{background:var(--ink);color:var(--porcelain)}
 .body{position:absolute;left:72px;right:72px;top:88px;bottom:64px}
@@ -371,12 +371,11 @@ html,body{margin:0;height:100%;background:#0d0d10;font-family:var(--sans);overfl
     <div class="codestrip"><span>PRI · RUMOAR ROUND TWO · <b class="v">SS27</b></span></div>
    </div></div></section></div></div>
 <div class="hud">
-<button id="prev" title="Previous (left arrow)">&#8249;</button>
+<button id="prev" title="Previous"><span class="material-symbols-rounded">chevron_left</span></button>
 <span class="ct"><b id="cur">01</b> / 49</span>
-<button id="next" title="Next (right arrow)">&#8250;</button>
-<button id="fs" class="ff" title="Fullscreen (F)">&#10530;</button>
+<button id="next" title="Next"><span class="material-symbols-rounded">chevron_right</span></button>
+<button id="fs" title="Fullscreen"><span class="material-symbols-rounded" id="fsicon">fullscreen</span></button>
 </div>
-<div class="hint">&#8592; &#8594; navigate &nbsp;&middot;&nbsp; F fullscreen</div>
 <script>
 (function(){
   var slides=[].slice.call(document.querySelectorAll('.slide'));
@@ -388,6 +387,7 @@ html,body{margin:0;height:100%;background:#0d0d10;font-family:var(--sans);overfl
   document.getElementById('next').addEventListener('click',function(e){e.stopPropagation();show(i+1);});
   document.getElementById('prev').addEventListener('click',function(e){e.stopPropagation();show(i-1);});
   document.getElementById('fs').addEventListener('click',function(e){e.stopPropagation(); if(!document.fullscreenElement){ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); } });
+  document.addEventListener('fullscreenchange',function(){ var ic=document.getElementById('fsicon'); if(ic) ic.textContent=document.fullscreenElement?'fullscreen_exit':'fullscreen'; });
   window.addEventListener('keydown',function(e){
     if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ show(i+1); e.preventDefault(); }
     else if(e.key==='ArrowLeft'||e.key==='PageUp'){ show(i-1); e.preventDefault(); }

@@ -1,3 +1,12 @@
+# internal strategy materials — never pushed (canonical copies live in project/)
+project/
+_local/
+RUMOAR_Brand_Guide_*.html
+RUMOAR_Financial_Model_*.xlsx
+Track0*.md
+kb/
+# archives / tooling / os
+*.zip
 .vercel
-.DS_Store
 node_modules
+.DS_Store
