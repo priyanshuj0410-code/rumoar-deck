@@ -468,7 +468,7 @@ function hideSheet(){ sheet.classList.remove("show"); sheet.innerHTML=""; }
 /* ---------------- DATA ---------------- */
 const WARDROBE_GUESSES=[
   {l:"Olive linen shirt",s:"olive-shirt"},{l:"Rust linen shirt",s:"rust-shirt"},
-  {l:"Navy linen shirt",s:"navy-shirt"},{l:"White linen shirt",s:"white-shirt"},
+  {l:"Navy linen shirt",s:"navy-shirt"},{l:"Ecru linen shirt",s:"white-shirt"},
   {l:"Cream trousers",s:"cream-trousers"},{l:"Olive trousers",s:"olive-trousers"},
   {l:"Brown trousers",s:"brown-trousers"},{l:"Plain white tee",s:"white-tee"},
   {l:"Black sneakers",s:"black-sneakers"},{l:"Metal-frame glasses",s:"glasses"},
@@ -571,7 +571,7 @@ function stageWardrobe(){
       const t=el("button","wtile"); t.dataset.l=w.l;
       const th=el("div","th",'<span class="mi">checkroom</span>');
       const im=new Image(); im.onload=()=>{ th.innerHTML=""; im.style.width="100%"; im.style.height="100%"; im.style.objectFit="cover"; th.appendChild(im); };
-      im.src="assets/wardrobe/"+w.s+".png";
+      im.src="assets/wardrobe/"+w.s+".jpg";
       t.appendChild(th); t.appendChild(el("div","lb",w.l)); t.appendChild(el("div","ck",'<span class="mi">add</span>'));
       t.onclick=()=>{ const on=t.classList.toggle("sel"); t.querySelector(".ck .mi").textContent=on?"check":"add"; };
       wrap.appendChild(t);
@@ -652,7 +652,7 @@ function renderShop(){
   const g=$("#shopGrid"); g.innerHTML="";
   CATALOG.forEach(p=>{ const c=el("div","card");
     const th=el("div","thumb",'<span class="mi">apparel</span>');
-    const im=new Image(); im.onload=()=>{ th.innerHTML=""; im.style.width="100%"; im.style.height="100%"; im.style.objectFit="cover"; th.appendChild(im); }; im.src="assets/catalog/"+p.s+".png";
+    const im=new Image(); im.onload=()=>{ th.innerHTML=""; im.style.width="100%"; im.style.height="100%"; im.style.objectFit="cover"; th.appendChild(im); }; im.src="assets/catalog/"+p.s+".jpg";
     c.appendChild(th);
     c.appendChild(el("div","meta",`<b>${p.n}</b><div class="pr">${p.p}</div>`));
     g.appendChild(c); });
