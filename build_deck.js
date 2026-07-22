@@ -15,7 +15,7 @@ const slides = [];
 let PGN=0;
 function S(inner, o={}){
   PGN++;
-  const cls = "slide" + (o.dark?" dark":"") + (o.chalk?" chalk":"");
+  const cls = "slide" + (o.dark?" dark":"") + (o.chalk?" chalk":"") + (o.black?" blackbg":"");
   const left = o.code || "RUMOAR";
   const right = o.track || "ROUND TWO · SS27";
   const meta = "";
@@ -510,7 +510,7 @@ S(`<div class="cov">
     <div class="cov-mark" style="font-size:100px;line-height:.92">The stylist<br>men belong to.</div>
     <div class="cov-sub" style="margin-top:22px">Not another accessories brand, but the trusted source men have been outsourcing to their girlfriends for years, built capital-light because both the product category and the styling category kill everyone who plays them the normal way. Proven in ninety days, before the capital is at risk.</div>
     <div class="codestrip"><span>RUMOAR · <b class="v">VIBE-CODE YOUR LOOK</b></span><span>PRI · SS27</span></div>
-   </div>`, {dark:true, nofoot:true});
+   </div>`, {dark:true, nofoot:true, black:true});
 
 function DOC(sl){ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RUMOAR · Vibe-code your look</title>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
@@ -532,7 +532,7 @@ function DOC(sl){ return `<!doctype html><html lang="en"><head><meta charset="ut
 </body></html>`; }
 
 const CSS = `
-:root{--porcelain:${C.porcelain};--chalk:${C.chalk};--ink:${C.ink};--carbon:${C.carbon};--graphite:${C.graphite};--mist:${C.mist};--hair:${C.hair};--hairdk:${C.hairdk};--dusk:${C.dusk};--peri:${C.peri};--volt:${C.volt};--ok:${C.ok};--att:${C.att};--crit:${C.crit};--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(300px,calc(21vw + 26px),560px);
+:root{--porcelain:${C.porcelain};--chalk:${C.chalk};--ink:${C.ink};--carbon:${C.carbon};--graphite:${C.graphite};--mist:${C.mist};--hair:${C.hair};--hairdk:${C.hairdk};--dusk:${C.dusk};--peri:${C.peri};--volt:${C.volt};--ok:${C.ok};--att:${C.att};--crit:${C.crit};--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(300px,calc(21vw + 10px),560px);
 --display:'Clash Display','Space Grotesk',system-ui,sans-serif;--sans:'General Sans',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{margin:0;height:100%;background:#0d0d10;font-family:var(--sans);overflow:hidden}
@@ -693,9 +693,10 @@ a.cite:hover,.cpop:hover{color:var(--volt)}
 .app-open:hover{opacity:1}.app-open:active{transform:scale(.95)}
 .app-open .material-symbols-rounded{font-size:17px;color:var(--peri)}
 .scaler{transition:transform .42s cubic-bezier(.2,.7,.2,1)}
-body.docked .stage{right:var(--dockw)}
+body.docked .stage{left:8px;right:var(--dockw)}
+body.docked .scaler{border-radius:22px}
 body.docked .app-open{display:none}
-.app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}
+.app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:16px 8px}
 .app-dock.show{display:flex;animation:dockin .42s cubic-bezier(.2,.7,.2,1)}
 @keyframes dockin{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
 .app-dock iframe{height:var(--deckh,100%);aspect-ratio:398/846;width:auto;max-width:100%;margin:auto;border:0;background:transparent}
@@ -706,6 +707,26 @@ body.docked .app-open{display:none}
 .app-close{position:fixed;top:16px;right:16px;z-index:95;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:0;color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background .2s,transform .16s cubic-bezier(.2,.7,.2,1)}
 body.docked .app-close{display:flex}
 .app-close:hover{background:rgba(255,255,255,.22)}.app-close:active{transform:scale(.92)}
+/* slide 28 black */
+.slide.blackbg{background:#000}
+/* chart animations (slides 5 & 22) — replay each time the slide becomes active */
+.slide.active .chart rect{transform-box:fill-box;transform-origin:50% 100%;animation:barGrow .6s cubic-bezier(.2,.75,.25,1) both}
+.slide.active .chart rect:nth-of-type(2){animation-delay:.07s}
+.slide.active .chart rect:nth-of-type(3){animation-delay:.14s}
+.slide.active .chart rect:nth-of-type(4){animation-delay:.21s}
+.slide.active .chart rect:nth-of-type(5){animation-delay:.28s}
+@keyframes barGrow{from{transform:scaleY(0);opacity:.3}to{transform:scaleY(1);opacity:1}}
+.slide.active .chart polyline{stroke-dasharray:1600;stroke-dashoffset:1600;animation:drawLine 1s ease .34s both}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+.slide.active .chart circle{opacity:0;animation:cFade .38s ease both}
+.slide.active .chart circle:nth-of-type(1){animation-delay:.52s}
+.slide.active .chart circle:nth-of-type(2){animation-delay:.64s}
+.slide.active .chart circle:nth-of-type(3){animation-delay:.76s}
+.slide.active .chart circle:nth-of-type(4){animation-delay:.88s}
+.slide.active .chart circle:nth-of-type(5){animation-delay:1s}
+.slide.active .chart text{opacity:0;animation:cFade .5s ease .4s both}
+@keyframes cFade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.slide.active .chart rect,.slide.active .chart polyline,.slide.active .chart circle,.slide.active .chart text{animation:none;opacity:1;stroke-dashoffset:0;transform:none}}
 `;
 const SCRIPT = `
 (function(){

@@ -4,7 +4,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <style>
-:root{--porcelain:#ECEBE7;--chalk:#F6F5F2;--ink:#17171B;--carbon:#202028;--graphite:#5C5C64;--mist:#9A9AA4;--hair:#DEDDD8;--hairdk:#33333C;--dusk:#4B4673;--peri:#B3ACEF;--volt:#6152F0;--ok:#3E7D5A;--att:#B0842E;--crit:#C0453C;--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(300px,calc(21vw + 26px),560px);
+:root{--porcelain:#ECEBE7;--chalk:#F6F5F2;--ink:#17171B;--carbon:#202028;--graphite:#5C5C64;--mist:#9A9AA4;--hair:#DEDDD8;--hairdk:#33333C;--dusk:#4B4673;--peri:#B3ACEF;--volt:#6152F0;--ok:#3E7D5A;--att:#B0842E;--crit:#C0453C;--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(300px,calc(21vw + 10px),560px);
 --display:'Clash Display','Space Grotesk',system-ui,sans-serif;--sans:'General Sans',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{margin:0;height:100%;background:#0d0d10;font-family:var(--sans);overflow:hidden}
@@ -165,9 +165,10 @@ a.cite:hover,.cpop:hover{color:var(--volt)}
 .app-open:hover{opacity:1}.app-open:active{transform:scale(.95)}
 .app-open .material-symbols-rounded{font-size:17px;color:var(--peri)}
 .scaler{transition:transform .42s cubic-bezier(.2,.7,.2,1)}
-body.docked .stage{right:var(--dockw)}
+body.docked .stage{left:8px;right:var(--dockw)}
+body.docked .scaler{border-radius:22px}
 body.docked .app-open{display:none}
-.app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}
+.app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:16px 8px}
 .app-dock.show{display:flex;animation:dockin .42s cubic-bezier(.2,.7,.2,1)}
 @keyframes dockin{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
 .app-dock iframe{height:var(--deckh,100%);aspect-ratio:398/846;width:auto;max-width:100%;margin:auto;border:0;background:transparent}
@@ -178,6 +179,26 @@ body.docked .app-open{display:none}
 .app-close{position:fixed;top:16px;right:16px;z-index:95;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:0;color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background .2s,transform .16s cubic-bezier(.2,.7,.2,1)}
 body.docked .app-close{display:flex}
 .app-close:hover{background:rgba(255,255,255,.22)}.app-close:active{transform:scale(.92)}
+/* slide 28 black */
+.slide.blackbg{background:#000}
+/* chart animations (slides 5 & 22) — replay each time the slide becomes active */
+.slide.active .chart rect{transform-box:fill-box;transform-origin:50% 100%;animation:barGrow .6s cubic-bezier(.2,.75,.25,1) both}
+.slide.active .chart rect:nth-of-type(2){animation-delay:.07s}
+.slide.active .chart rect:nth-of-type(3){animation-delay:.14s}
+.slide.active .chart rect:nth-of-type(4){animation-delay:.21s}
+.slide.active .chart rect:nth-of-type(5){animation-delay:.28s}
+@keyframes barGrow{from{transform:scaleY(0);opacity:.3}to{transform:scaleY(1);opacity:1}}
+.slide.active .chart polyline{stroke-dasharray:1600;stroke-dashoffset:1600;animation:drawLine 1s ease .34s both}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+.slide.active .chart circle{opacity:0;animation:cFade .38s ease both}
+.slide.active .chart circle:nth-of-type(1){animation-delay:.52s}
+.slide.active .chart circle:nth-of-type(2){animation-delay:.64s}
+.slide.active .chart circle:nth-of-type(3){animation-delay:.76s}
+.slide.active .chart circle:nth-of-type(4){animation-delay:.88s}
+.slide.active .chart circle:nth-of-type(5){animation-delay:1s}
+.slide.active .chart text{opacity:0;animation:cFade .5s ease .4s both}
+@keyframes cFade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.slide.active .chart rect,.slide.active .chart polyline,.slide.active .chart circle,.slide.active .chart text{animation:none;opacity:1;stroke-dashoffset:0;transform:none}}
 </style></head><body>
 <div class="progress" id="prog"></div>
 <div class="stage" id="stage"><div class="scaler" id="scaler"><section class="slide active"><div class="body"><div class="cov">
@@ -284,7 +305,7 @@ body.docked .app-close{display:flex}
 <section class="slide"><div class="body"><div class="kick">The horizon</div><h2 class="title ">Not a category ladder. An engine that enters any category.</h2><div class="cols c3"><div class="col"><div class="ck">THE SHIFT</div><div class="ct">Demand-sensed, not sequenced</div><div class="cb">The engine watches what each man wants and can't find, then drops the keystone that fills it, in whatever category ranks highest. The roadmap is dynamic, not a fixed list.</div></div><div class="col"><div class="ck">THE EXPRESSIONS</div><div class="ct">Fragrance, gifting, jewellery</div><div class="cb">AW27 fragrance, the LTV consumable. Monogram gifting on the card holder. Men's jewellery as the SS28 pre-swarm frontier, entered as a keystone, not a bet.</div></div><div class="col d"><div class="ck">THE LINE</div><div class="ct">Never luggage</div><div class="cb">The wall stays on the body, off the carousel, out of the category the graveyard died in.</div></div></div><div class="take">Every mature category, bags, caps, jewellery, fragrance, becomes supply the engine routes, not a fight we have to win. The relationship is the durable asset; the product rotates through it.</div></div><div class="pg">25</div></section>
 <section class="slide"><div class="body"><div class="kick">The bear case</div><h2 class="title ">The strongest argument that this fails.</h2><div class="sub">Five ways RUMOAR does not become a venture outcome.</div><div class="cols c3"><div class="col d"><div class="ck">01 · THE MOAT NEVER CONVERTS</div><div class="ct">No Indian precedent</div><div class="cb">No Indian brand has scaled on genuinely zero marketing. Comet spent ~32% of revenue on ads<a class='cite' href='https://www.indianretailer.com/news/comet-accelerates-growth-303-pc-revenue-jump-fy25' target='_blank' rel='noopener'>[38]</a>; Urban Monkey took five years to reach ~₹5 crore<a class='cite' href='https://yourstory.com/smbstory/urban-monkey-street-wear-hip-hop-brand-underground-artists-rappers-athletes' target='_blank' rel='noopener'>[39]</a>. If community doesn't convert, this is a nice niche brand.</div></div><div class="col"><div class="ck">02 · THE RAMP IS BORROWED</div><div class="ct">Mokobara's curve, without the fuel</div><div class="cb">₹6 to 160 crore is a Mokobara-shaped climb bought with ~₹190 crore raised and 20% ad ratios<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>. Pairing that curve with a community budget is the plan's biggest leap.</div></div><div class="col"><div class="ck">03 · THE TRUST TIGHTROPE</div><div class="ct">We sell product too</div><div class="cb">The moment the engine only ever points at our own shelf, we rebuild the exact inventory-captive distrust that killed every styling business before us. The buy-nothing tier has to stay real.</div></div></div><div class="take">Two more, named: a ₹2,200 wallet meets Gen Z's half-price reflex on a discount-trained shelf; and Myntra or Google could bolt styling on as a feature. Each is a measurable gate, and the cheapest, community CAC, is tested first for ₹2.3 lakh.</div></div><div class="pg">26</div></section>
 <section class="slide"><div class="body"><div class="kick">The register</div><h2 class="title ">Five things have to be true.</h2><table class="tbl"><thead><tr><th style="width:6%">#</th><th style="width:42%">The load-bearing assumption</th><th style="width:26%">Base</th><th style="width:26%">Breaks if</th></tr></thead><tbody><tr><td>1</td><td class="b">Community CAC converts below the gate</td><td>Hypothesis, not in the base P&L</td><td>Marginal CAC > ₹900 in the 90-day test</td></tr><tr><td>2</td><td class="b">Blended gross margin holds ~51%</td><td>Filed-comp cluster<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a></td><td>Discounting, marketplace mix, leather spikes</td></tr><tr><td>3</td><td class="b">Revenue ramps to ₹160 Cr by Year 5</td><td>Aggressive vs precedent</td><td>Growth caps at Urban Monkey pace</td></tr><tr><td>4</td><td class="b">The repeat / attach ladder lifts LTV</td><td>Directionally supported</td><td>One-and-done persists at premium prices</td></tr><tr><td>5</td><td class="b">Trust holds as we sell</td><td>The buy-nothing tier</td><td>Advice narrows to our own SKUs</td></tr></tbody></table><div class="take">Each is a measurable gate, every input a lever, and the cheapest one is tested first.</div></div><div class="pg">27</div></section>
-<section class="slide dark"><div class="body"><div class="cov">
+<section class="slide dark blackbg"><div class="body"><div class="cov">
     <div class="cov-mark" style="font-size:100px;line-height:.92">The stylist<br>men belong to.</div>
     <div class="cov-sub" style="margin-top:22px">Not another accessories brand, but the trusted source men have been outsourcing to their girlfriends for years, built capital-light because both the product category and the styling category kill everyone who plays them the normal way. Proven in ninety days, before the capital is at risk.</div>
     <div class="codestrip"><span>RUMOAR · <b class="v">VIBE-CODE YOUR LOOK</b></span><span>PRI · SS27</span></div>
