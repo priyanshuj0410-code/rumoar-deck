@@ -532,7 +532,7 @@ function DOC(sl){ return `<!doctype html><html lang="en"><head><meta charset="ut
 </body></html>`; }
 
 const CSS = `
-:root{--porcelain:${C.porcelain};--chalk:${C.chalk};--ink:${C.ink};--carbon:${C.carbon};--graphite:${C.graphite};--mist:${C.mist};--hair:${C.hair};--hairdk:${C.hairdk};--dusk:${C.dusk};--peri:${C.peri};--volt:${C.volt};--ok:${C.ok};--att:${C.att};--crit:${C.crit};--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(300px,calc(21vw + 10px),560px);
+:root{--porcelain:${C.porcelain};--chalk:${C.chalk};--ink:${C.ink};--carbon:${C.carbon};--graphite:${C.graphite};--mist:${C.mist};--hair:${C.hair};--hairdk:${C.hairdk};--dusk:${C.dusk};--peri:${C.peri};--volt:${C.volt};--ok:${C.ok};--att:${C.att};--crit:${C.crit};--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(328px,calc(23vw + 11px),612px);
 --display:'Clash Display','Space Grotesk',system-ui,sans-serif;--sans:'General Sans',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{margin:0;height:100%;background:#0d0d10;font-family:var(--sans);overflow:hidden}
@@ -699,7 +699,7 @@ body.docked .app-open{display:none}
 .app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:16px 8px}
 .app-dock.show{display:flex;animation:dockin .42s cubic-bezier(.2,.7,.2,1)}
 @keyframes dockin{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
-.app-dock iframe{height:var(--deckh,100%);aspect-ratio:398/846;width:auto;max-width:100%;margin:auto;border:0;background:transparent}
+.app-dock iframe{height:calc(var(--deckh,100%) * 1.13);max-height:calc(100vh - 32px);aspect-ratio:398/846;width:auto;max-width:100%;margin:auto;border:0;background:transparent}
 .colimg{display:block;width:calc(100% + 40px);height:200px;object-fit:cover;object-position:50% 12%;margin:-20px -20px 15px}
 .tbl tr.prow{cursor:pointer;transition:background .14s}
 .tbl tr.prow:hover td{background:var(--wash)}
