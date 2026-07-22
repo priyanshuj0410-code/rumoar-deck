@@ -26,15 +26,20 @@ body{font-family:var(--sans);background:#0b0b0d;color:var(--ink);display:flex;al
 .statusbar{flex:none;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 26px 0 28px;font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);z-index:5}
 .statusbar .sb-r{display:flex;align-items:center;gap:6px;color:var(--ink)}
 .statusbar .sb-r .mi{font-size:17px}
-.island{position:absolute;top:9px;left:50%;transform:translateX(-50%);height:30px;min-width:112px;background:#000;border-radius:16px;z-index:40;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;color:#fff;
-  transition:min-width .4s cubic-bezier(.2,.7,.2,1),height .4s cubic-bezier(.2,.7,.2,1)}
-.island.active{min-width:248px;height:36px}
-.island .isl-wave{display:none;align-items:center;gap:3px}
+.island{position:relative;flex:0 0 auto;height:30px;min-width:104px;max-width:calc(100% - 118px);border-radius:15px;z-index:40;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;color:#fff;
+  background:linear-gradient(180deg,rgba(52,52,62,.55),rgba(10,10,14,.72));
+  -webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),inset 0 -7px 14px rgba(0,0,0,.34),0 6px 16px rgba(0,0,0,.22);
+  transition:min-width .42s cubic-bezier(.2,.7,.2,1),height .42s cubic-bezier(.2,.7,.2,1)}
+.island.active{min-width:196px;height:34px}
+.island .isl-glow{position:absolute;top:-70%;left:-15%;width:62%;height:190%;background:radial-gradient(closest-side,rgba(255,255,255,.4),transparent);pointer-events:none;z-index:0}
+.island .isl-wave{display:none;align-items:center;gap:3px;position:relative;z-index:1}
 .island.active .isl-wave{display:flex}
 .island .isl-wave i{width:3px;height:9px;background:var(--peri);border-radius:2px;animation:eq 1s ease-in-out infinite}
 .island .isl-wave i:nth-child(2){animation-delay:.15s}.island .isl-wave i:nth-child(3){animation-delay:.3s}.island .isl-wave i:nth-child(4){animation-delay:.45s}
 @keyframes eq{0%,100%{height:6px}50%{height:15px}}
-.island .isl-text{display:none;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;white-space:nowrap}
+.island .isl-text{display:none;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;white-space:nowrap;position:relative;z-index:1}
 .island.active .isl-text{display:block}
 
 #stage{position:relative;flex:1;min-height:0;overflow:hidden}
@@ -115,6 +120,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .p-head h3{font-family:var(--display);font-weight:600;font-size:21px;margin:5px 0 0;letter-spacing:-.01em}
 .p-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px}
 .p-foot{flex:none;padding:12px 16px 16px;display:flex;gap:10px}
+.p-foot.col{flex-direction:column}
+.p-foot.col .btn{flex:0 0 auto;width:100%}
 .btn{flex:1;height:var(--btnh);background:var(--ink);color:#fff;font-weight:500;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
 .btn:active{opacity:.85}
 .btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
@@ -211,9 +218,9 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   <div class="screen">
     <div class="statusbar">
       <span id="clock">9:41</span>
+      <div class="island" id="island"><span class="isl-glow"></span><span class="isl-wave"><i></i><i></i><i></i><i></i></span><span class="isl-text" id="isltext">RUMOAR</span></div>
       <span class="sb-r"><span class="mi">signal_cellular_alt</span><span class="mi">wifi</span><span class="mi">battery_full</span></span>
     </div>
-    <div class="island" id="island"><span class="isl-wave"><i></i><i></i><i></i><i></i></span><span class="isl-text" id="isltext">RUMOAR</span></div>
 
     <div id="stage">
       <!-- CALL -->
@@ -445,7 +452,7 @@ function stagePhotos(){
   return new Promise(resolve=>{
     openPanel(`<div class="p-head"><div><p class="k">Step 1 · your photos</p><h3>Upload a few of you</h3></div></div>
       <div class="p-body"><div class="uploads" id="ups"></div></div>
-      <div class="p-foot" style="flex-direction:column">
+      <div class="p-foot col">
         <button class="btn ghost" id="usesample"><span class="mi">auto_awesome</span> Use the sample set</button>
         <button class="btn hidden" id="upnext"><span class="mi">arrow_forward</span> Read my photos</button></div>`);
     const ups=$("#ups"); const cells=[];
