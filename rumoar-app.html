@@ -27,7 +27,7 @@ body{font-family:var(--sans);background:#0b0b0d;color:var(--ink);display:flex;al
 .statusbar{flex:none;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 26px 0 28px;font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);z-index:5}
 .statusbar .sb-r{display:flex;align-items:center;gap:6px;color:var(--ink)}
 .statusbar .sb-r .mi{font-size:17px}
-.island{position:absolute;top:8px;left:50%;transform:translateX(-50%);height:30px;min-width:116px;max-width:calc(100% - 20px);border-radius:999px;z-index:40;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;color:#fff;
+.island{position:absolute;top:18px;left:50%;transform:translateX(-50%);height:30px;min-width:116px;max-width:calc(100% - 40px);border-radius:999px;z-index:40;display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;color:#fff;
   background:linear-gradient(180deg,rgba(52,52,62,.58),rgba(10,10,14,.74));
   -webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%);
   border:1px solid rgba(255,255,255,.16);
@@ -258,7 +258,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   <div class="screen">
     <div class="statusbar">
       <span id="clock">9:41</span>
-      <div class="island" id="island"><span class="isl-glow"></span><span class="isl-wave"><i></i><i></i><i></i><i></i></span><span class="isl-text" id="isltext">RUMOAR</span></div>
       <span class="sb-r"><span class="mi">signal_cellular_alt</span><span class="mi">wifi</span><span class="mi">battery_full</span></span>
     </div>
 
@@ -338,6 +337,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     <div class="toast" id="toast"><span class="mi">check_circle</span><span id="toasttext"></span></div>
     <input type="file" id="wardUpload" accept="image/*" class="hidden">
   </div>
+  <div class="island" id="island"><span class="isl-glow"></span><span class="isl-wave"><i></i><i></i><i></i><i></i></span><span class="isl-text" id="isltext">RUMOAR</span></div>
 </div>
 
 <script>
@@ -625,8 +625,11 @@ let productBack="shop";
 function openProduct(slug,back){
   const p=byslug(slug); if(!p)return; productBack=back||"shop";
   $("#pdpName").textContent=p.n; $("#pdpPrice").textContent=p.p; $("#pdpDesc").textContent=p.d;
-  const holder=$("#pdpImg").parentElement; $("#pdpImg").removeAttribute("src"); holder.classList.add("skel");
-  loadImg(holder,"assets/catalog/"+p.s+".jpg",ok=>{ if(!ok){ holder.classList.remove("skel"); } });
+  const img=$("#pdpImg"), holder=img.parentElement; holder.classList.add("skel"); img.classList.remove("fadein"); img.removeAttribute("src");
+  const tmp=new Image();
+  tmp.onload=()=>{ holder.classList.remove("skel"); img.src=tmp.src; img.classList.add("fadein"); };
+  tmp.onerror=()=>{ holder.classList.remove("skel"); };
+  tmp.src="assets/catalog/"+p.s+".jpg";
   showView("product");
 }
 $("#pdpBack").onclick=()=>showView(productBack==="agent"?"agent":productBack);
