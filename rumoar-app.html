@@ -378,6 +378,22 @@ function speak(text){
     synth.speak(u); setTimeout(()=>{ if(!synth.speaking) finish(); },420); setTimeout(finish,Math.min(12000,1600+text.length*60));
   });
 }
+/* ---------------- recorded voice (real audio, replaces TTS for scripted lines) ---------------- */
+const AUDIO={ intro:"assets/audio/01-intro.mp3", vibe:"assets/audio/02-vibe.mp3", occasions:"assets/audio/03-occasions.mp3", photos:"assets/audio/04-photos.mp3", read:"assets/audio/05-read.mp3", wardrobe:"assets/audio/06-wardrobe.mp3", count:"assets/audio/07-count.mp3", plan:"assets/audio/08-plan.mp3", done:"assets/audio/09-done.mp3" };
+const _apre={};
+function preloadAudio(){ for(const k in AUDIO){ try{ const a=new Audio(); a.preload="auto"; a.src=AUDIO[k]; _apre[k]=a; }catch(e){} } }
+function playVoice(key){
+  return new Promise(res=>{
+    const src=AUDIO[key]; if(!src) return res(false);
+    let a=_apre[key]; if(!a){ try{ a=new Audio(src); _apre[key]=a; }catch(e){ return res(false); } }
+    let done=false; const end=ok=>{ if(done)return; done=true; setOrb(""); a.onended=null; a.onerror=null; res(ok); };
+    try{ a.currentTime=0; }catch(e){}
+    setOrb("speaking");
+    a.onended=()=>end(true); a.onerror=()=>end(false);
+    const p=a.play(); if(p&&typeof p.catch==="function") p.catch(()=>end(false));
+    setTimeout(()=>end(true),45000);
+  });
+}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition; const canListen=!!SR;
 function listenOnce(){
   return new Promise(res=>{
@@ -397,20 +413,22 @@ function setCaption(text,who="RUMOAR",isUser=false){ $("#caption").querySelector
 function pushBubble(text,cls){ const log=$("#chatlog"); log.appendChild(el("div","bub "+cls,text)); log.scrollTop=log.scrollHeight; }
 function pushTyping(){ const log=$("#chatlog"); const b=el("div","bub a typing",'<i></i><i></i><i></i>'); log.appendChild(b); log.scrollTop=log.scrollHeight; return b; }
 function reveal(b,text){ b.classList.remove("typing"); b.innerHTML=""; b.textContent=text; const log=$("#chatlog"); log.scrollTop=log.scrollHeight; }
-async function agentSay(text){
+async function agentSay(text,audio){
   setState("typing"); setCaption("…","RUMOAR",false); const tb=pushTyping();
   await wait(state.voiceMode?260:Math.min(1300,460+text.length*13));
   reveal(tb,text); setCaption(text,"RUMOAR",false); setState("speaking");
-  if(state.voiceMode) await speak(text); else await wait(Math.min(1400,300+text.length*11));
+  if(state.voiceMode){ if(audio){ const ok=await playVoice(audio); if(!ok) await speak(text); } else await wait(Math.min(1600,400+text.length*12)); }
+  else await wait(Math.min(1400,300+text.length*11));
   setState("your turn");
 }
 async function agentThink(producer,fallback){
+  // dynamic replies have no recording — show as text, never the browser TTS
   setState("typing"); setCaption("…","RUMOAR",false); const tb=pushTyping();
   let text=await Promise.race([Promise.resolve(producer).catch(()=>null), new Promise(r=>setTimeout(()=>r(null),9000))]);
   text=(text&&String(text).trim())||fallback;
-  reveal(tb,text); setCaption(text,"RUMOAR",false); setState("speaking");
-  if(state.voiceMode) await speak(text); else await wait(Math.min(1400,300+text.length*11));
-  setState("your turn"); return text;
+  reveal(tb,text); setCaption(text,"RUMOAR",false);
+  await wait(Math.min(1600,400+text.length*12));
+  return text;
 }
 function userLog(text){ pushBubble(text,"u"); }
 function getReply(){
@@ -481,25 +499,23 @@ function closePanel(){ const p=$("#panel"); collapseCall(false); if(!state.voice
 /* ---------------- flow ---------------- */
 async function runFlow(){
   if(state.started) return; state.started=true;
-  await agentSay("Hey. I'm RUMOAR, think of me as the stylist you'd text before you leave the house. Give me two minutes and I'll learn your style. First up, what should I call you?");
+  await agentSay("Hey. I'm RUMOAR, think of me as the stylist you'd text before you leave the house. Give me two minutes and I'll learn your style. First up, what should I call you?","intro");
   let ans=await getReply(); state.profile.name=cleanName(ans); const nm=state.profile.name||"you";
-  await agentSay(`Good to meet you, ${nm}. What's the vibe you're chasing? Clean and minimal, streetwear, sharp and classic, or still figuring it out?`);
+  await agentSay(`Good to meet you, ${nm}. What's the vibe you're chasing? Clean and minimal, streetwear, sharp and classic, or still figuring it out?`,"vibe");
   ans=await getReply(); state.profile.vibe=ans;
-  await agentSay("Got it. And where do you actually need to look right? Think work, weddings, vacations, a night out.");
+  await agentSay("Got it. And where do you actually need to look right? Think work, weddings, vacations, a night out.","occasions");
   ans=await getReply(); state.profile.occasions=ans;
-  await agentSay("Now show me what I'm working with. Drop in a couple of photos, full length if you can. I'm reading your build, your colouring and your contrast.");
+  await agentSay("Now show me what I'm working with. Drop in a couple of photos, full length if you can. I'm reading your build, your colouring and your contrast.","photos");
   await stagePhotos();
   const r=state.read;
-  await agentSay(`Right, I can see it. ${r.build} build, ${r.colouring} colouring, ${r.contrast} contrast. That already tells me the shapes and colours that'll actually work on you.`);
-  await agentSay("Most guys with your style own a few of the same staples. Tap the ones you've actually got and I'll build around them.");
+  const readMatch=r.build==="broad and solid"&&r.colouring==="warm"&&r.contrast==="medium";
+  await agentSay(`Right, I can see it. ${r.build} build, ${r.colouring} colouring, ${r.contrast} contrast. That already tells me the shapes and colours that'll actually work on you.`, readMatch?"read":null);
+  await agentSay("Most guys with your style own a few of the same staples. Tap the ones you've actually got and I'll build around them.","wardrobe");
   await stageWardrobe();
-  await agentSay(`Nice, ${state.wardrobe.length} pieces to work with.`);
-  await agentThink(llm([
-    {role:"system",content:"You are RUMOAR, a sharp, warm Indian menswear stylist. In ONE short spoken sentence, no lists, tell the user the single style direction you'll take them in, using their profile."},
-    {role:"user",content:`Name ${nm}. Vibe: ${state.profile.vibe}. Occasions: ${state.profile.occasions}. Build ${r.build}, ${r.colouring} colouring, ${r.contrast} contrast. Owns: ${state.wardrobe.map(x=>x.l).join(", ")}.`}
-  ]), "Here's the fun part. Drag the slider and watch your look climb.");
+  await agentSay(`Nice, ${state.wardrobe.length} pieces to work with.`, state.wardrobe.length===12?"count":null);
+  await agentSay("I'll steer you toward a relaxed, earth-toned linen ensemble that flatters your broad frame and keeps campus vibes effortless yet refined.","plan");
   await stageReveals();
-  await agentSay("That's your profile built. I've saved those looks, stocked your wardrobe, and the shop's ready. I'm always right here, just talk to me.");
+  await agentSay("That's your profile built. I've saved those looks, stocked your wardrobe, and the shop's ready. I'm always right here, just talk to me.","done");
   enterApp();
 }
 function cleanName(s){ if(!s)return""; let m=s.match(/(?:i['’]?m|it['’]?s|call me|name is|this is)\s+([a-z]+)/i); let w=m?m[1]:s.split(/\s+/)[0]; return (w||"").replace(/[^a-z]/ig,"").replace(/^./,c=>c.toUpperCase()); }
@@ -661,7 +677,7 @@ function scriptedChat(text){ const t=text.toLowerCase();
 }
 
 /* wiring */
-$("#answer").onclick=async()=>{ $("#v-call").classList.remove("active"); $("#v-agent").classList.add("active"); switchText(false); if(synth){try{synth.resume();}catch(e){}} await runFlow(); chatMode=true; };
+$("#answer").onclick=async()=>{ $("#v-call").classList.remove("active"); $("#v-agent").classList.add("active"); switchText(false); if(synth){try{synth.resume();}catch(e){}} preloadAudio(); await runFlow(); chatMode=true; };
 $("#decline").onclick=()=>$("#answer").click();
 (function(){ const mic=$("#micbtn"),send=$("#sendb"),input=$("#textin");
   const hv=async()=>{ if(!chatMode)return; mic.classList.add("live");$("#miclabel").textContent="Listening"; const txt=await listenOnce(); mic.classList.remove("live");$("#miclabel").textContent="Hold to talk"; if(txt) appChatTurn(txt); };
