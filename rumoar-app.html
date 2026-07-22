@@ -119,6 +119,15 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .chip .mi{font-size:16px;color:var(--mist)}
 .chip.sel{background:var(--ink);color:var(--chalk);border-color:var(--ink)}
 .chip.sel .mi{color:var(--peri)}
+.wgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.wtile{position:relative;border:1px solid var(--hair);border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column;padding:0;text-align:left}
+.wtile .th{aspect-ratio:1;background:linear-gradient(140deg,#e9e6df,#dcd9d2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.wtile .th .mi{font-size:24px;color:var(--mist)}
+.wtile .lb{font-size:11px;line-height:1.2;padding:6px 7px 8px;color:var(--ink)}
+.wtile .ck{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;color:var(--mist)}
+.wtile .ck .mi{font-size:14px}
+.wtile.sel{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.wtile.sel .ck{background:var(--volt);border-color:var(--volt);color:#fff}
 .btn{height:50px;border-radius:14px;background:var(--volt);color:#fff;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--hair)}
 .btn .mi{font-size:20px}
@@ -458,16 +467,23 @@ function hideSheet(){ sheet.classList.remove("show"); sheet.innerHTML=""; }
 
 /* ---------------- DATA ---------------- */
 const WARDROBE_GUESSES=[
-  "White tee","Black tee","Oxford shirt","Blue jeans","Black jeans","Chinos",
-  "White sneakers","Chelsea boots","Denim jacket","Overshirt","Hoodie","Bomber"
+  {l:"Olive linen shirt",s:"olive-shirt"},{l:"Rust linen shirt",s:"rust-shirt"},
+  {l:"Navy linen shirt",s:"navy-shirt"},{l:"White linen shirt",s:"white-shirt"},
+  {l:"Cream trousers",s:"cream-trousers"},{l:"Olive trousers",s:"olive-trousers"},
+  {l:"Brown trousers",s:"brown-trousers"},{l:"Plain white tee",s:"white-tee"},
+  {l:"Black sneakers",s:"black-sneakers"},{l:"Metal-frame glasses",s:"glasses"},
+  {l:"Everyday watch",s:"watch"},{l:"Canvas tote bag",s:"canvas-bag"}
 ];
 const CATALOG=[
-  {n:"Leather sling, full-grain",p:"₹3,000"},
-  {n:"Clip pouch (the motif)",p:"₹1,499"},
-  {n:"Bifold wallet, full-grain",p:"₹2,200"},
-  {n:"Cap, structured minimal",p:"₹1,100"},
-  {n:"Card holder, full-grain",p:"₹1,299"},
-  {n:"Canvas + leather tote",p:"₹2,499"}
+  {n:"Leather sling, full-grain",p:"₹3,000",s:"leather-sling"},
+  {n:"Canvas roll-top sling",p:"₹2,499",s:"canvas-sling"},
+  {n:"Clip pouch (the motif)",p:"₹1,499",s:"clip-pouch"},
+  {n:"Bifold wallet, full-grain",p:"₹2,200",s:"bifold-wallet"},
+  {n:"Card holder, full-grain",p:"₹1,299",s:"card-holder"},
+  {n:"Cap, structured minimal",p:"₹1,100",s:"cap-minimal"},
+  {n:"Cap, Luminous Blue",p:"₹1,300",s:"cap-blue"},
+  {n:"Canvas + leather tote",p:"₹2,499",s:"canvas-tote"},
+  {n:"Backpack, second-line",p:"₹4,500",s:"backpack"}
 ];
 
 /* =========================================================
@@ -537,7 +553,7 @@ function stagePhotos(){
       $("#upnext").innerHTML='<span class="mi">hourglass_top</span> Reading…';
       let read=null;
       if(state._lastPhoto){ read=await withTimeout(visionRead(state._lastPhoto), 15000, null); }
-      state.read = read || { build:"lean-athletic", colouring:"warm", contrast:"medium", note:"mid-tones and texture over high-contrast blocks" };
+      state.read = read || { build:"broad and solid", colouring:"warm", contrast:"medium", note:"earthy, muted tones and relaxed tailoring that skims, not clings" };
       hideSheet(); switchFromStageMode(); resolve();
     };
   });
@@ -547,15 +563,22 @@ function stagePhotos(){
 function stageWardrobe(){
   return new Promise(resolve=>{
     switchToStageMode();
-    showSheet(`<p class="k">Step 2 · your wardrobe</p><h3>Which do you own?</h3>
-      <div class="chips" id="wchips"></div>
+    showSheet(`<p class="k">Step 2 · your wardrobe</p><h3>Which of these do you own?</h3>
+      <div class="wgrid" id="wchips"></div>
       <button class="btn" id="wnext"><span class="mi">check</span> That's my wardrobe</button>`);
-    const wrap=$("#wchips"); const sel=new Set();
-    WARDROBE_GUESSES.forEach(w=>{ const c=el("button","chip",'<span class="mi">add</span>'+w);
-      c.onclick=()=>{ if(sel.has(w)){sel.delete(w);c.classList.remove("sel");c.querySelector(".mi").textContent="add";}
-        else{sel.add(w);c.classList.add("sel");c.querySelector(".mi").textContent="check";} };
-      wrap.appendChild(c); });
-    $("#wnext").onclick=()=>{ state.wardrobe=[...sel]; if(state.wardrobe.length===0)state.wardrobe=["White tee","Blue jeans","White sneakers"];
+    const wrap=$("#wchips");
+    WARDROBE_GUESSES.forEach(w=>{
+      const t=el("button","wtile"); t.dataset.l=w.l;
+      const th=el("div","th",'<span class="mi">checkroom</span>');
+      const im=new Image(); im.onload=()=>{ th.innerHTML=""; im.style.width="100%"; im.style.height="100%"; im.style.objectFit="cover"; th.appendChild(im); };
+      im.src="assets/wardrobe/"+w.s+".png";
+      t.appendChild(th); t.appendChild(el("div","lb",w.l)); t.appendChild(el("div","ck",'<span class="mi">add</span>'));
+      t.onclick=()=>{ const on=t.classList.toggle("sel"); t.querySelector(".ck .mi").textContent=on?"check":"add"; };
+      wrap.appendChild(t);
+    });
+    $("#wnext").onclick=()=>{
+      state.wardrobe=[...wrap.querySelectorAll(".wtile.sel")].map(t=>t.dataset.l);
+      if(state.wardrobe.length===0) state.wardrobe=["Olive linen shirt","Cream trousers","Black sneakers"];
       renderWardrobe(); hideSheet(); switchFromStageMode(); resolve(); };
   });
 }
@@ -628,7 +651,9 @@ function renderSaved(){
 function renderShop(){
   const g=$("#shopGrid"); g.innerHTML="";
   CATALOG.forEach(p=>{ const c=el("div","card");
-    c.appendChild(el("div","thumb",'<span class="mi">apparel</span>'));
+    const th=el("div","thumb",'<span class="mi">apparel</span>');
+    const im=new Image(); im.onload=()=>{ th.innerHTML=""; im.style.width="100%"; im.style.height="100%"; im.style.objectFit="cover"; th.appendChild(im); }; im.src="assets/catalog/"+p.s+".png";
+    c.appendChild(th);
     c.appendChild(el("div","meta",`<b>${p.n}</b><div class="pr">${p.p}</div>`));
     g.appendChild(c); });
 }
