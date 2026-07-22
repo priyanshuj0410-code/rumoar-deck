@@ -166,6 +166,7 @@ a.cite:hover,.cpop:hover{color:var(--volt)}
 .app-open .material-symbols-rounded{font-size:17px;color:var(--peri)}
 .scaler{transition:transform .42s cubic-bezier(.2,.7,.2,1)}
 body.docked .stage{left:8px;right:var(--dockw)}
+body.docked .scaler{border-radius:22px}
 body.docked .app-open{display:none}
 .app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:16px 8px}
 .app-dock.show{display:flex;animation:dockin .42s cubic-bezier(.2,.7,.2,1)}
@@ -322,7 +323,7 @@ body.docked .app-close{display:flex}
   var slides=[].slice.call(document.querySelectorAll('.slide'));
   var scaler=document.getElementById('scaler'), prog=document.getElementById('prog'), curEl=document.getElementById('cur');
   var i=0, N=slides.length;
-  function fit(){ var st=document.getElementById('stage'); var w=(st?st.clientWidth:window.innerWidth), h=(st?st.clientHeight:window.innerHeight); var docked=document.body.classList.contains('docked'); var s=Math.min(w/1280, h/720); if(docked) s*=0.94; scaler.style.transform='scale('+s+')'; document.documentElement.style.setProperty('--deckh', Math.round(720*s)+'px'); scaler.style.borderRadius = docked ? (Math.round(480/s)/10)+'px' : '0px'; }
+  function fit(){ var st=document.getElementById('stage'); var w=(st?st.clientWidth:window.innerWidth), h=(st?st.clientHeight:window.innerHeight); var s=Math.min(w/1280, h/720); scaler.style.transform='scale('+s+')'; document.documentElement.style.setProperty('--deckh', Math.round(720*s)+'px'); }
   window.__deckFit=fit;
   function pad(n){ return (n<10?'0':'')+n; }
   function show(n){ slides[i].classList.remove('active'); i=Math.max(0,Math.min(N-1,n)); slides[i].classList.add('active'); curEl.textContent=pad(i+1); prog.style.width=((i+1)/N*100)+'%'; }
