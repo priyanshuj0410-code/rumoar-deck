@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0b0d">
+<script>try{if(location.search.indexOf('embed')>=0)document.documentElement.classList.add('embed');}catch(e){}</script>
 <title>RUMOAR — your stylist</title>
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
@@ -256,6 +257,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .in-app .composer{margin-bottom:var(--tabh)}
 #tabbar.hidetab{display:none}
 .pdp-top button{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.16)}
+/* embedded (in deck iframe): transparent bg so only the phone silhouette shows */
+html.embed,html.embed body{background:transparent!important}
+html.embed body{padding:0}
+html.embed .device{max-height:94vh}
 </style>
 </head>
 <body>
