@@ -260,7 +260,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 /* embedded (in deck iframe): transparent bg so only the phone silhouette shows */
 html.embed,html.embed body{background:transparent!important}
 html.embed body{padding:0}
-html.embed .device{max-height:94vh}
+html.embed .device{max-width:none;max-height:none;width:100%;height:100%;margin:0}
 </style>
 </head>
 <body>
@@ -668,6 +668,19 @@ function openProduct(slug,back){
   tmp.src="assets/catalog/"+p.s+".jpg";
   showView("product");
 }
+/* open a product directly (from the deck's catalogue), entering the app if needed */
+function directProduct(slug){
+  if(!window.__entered){ window.__entered=true;
+    state.started=true; chatMode=true;
+    if(!state.wardrobe.length) state.wardrobe=WARDROBE_GUESSES.slice(0,6);
+    document.querySelector(".screen").classList.add("in-app");
+    $("#tabbar").classList.add("show");
+    try{ renderWardrobe(); renderSaved(); renderShop(); }catch(e){}
+    setCaption("I'm right here, just talk to me.","RUMOAR",false); setState("always here");
+  }
+  openProduct(slug,"shop");
+}
+window.addEventListener("message",function(e){ var d=e&&e.data; if(d&&d.type==="rumoar:product"&&d.slug){ try{ directProduct(d.slug); }catch(err){} } });
 $("#pdpBack").onclick=()=>showView(productBack==="agent"?"agent":productBack);
 $("#pdpBuy").onclick=()=>toast("Reserved. We'll hold it for you.");
 function showView(id){
@@ -706,6 +719,7 @@ $("#decline").onclick=()=>$("#answer").click();
   mic.addEventListener("click",()=>{ if(chatMode) hv(); }); send.addEventListener("click",()=>{ if(chatMode) ht(); }); input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&chatMode) ht(); });
 })();
 if(!canListen){ $("#voicehint").textContent="Voice replies aren't supported here, tap the keyboard to type."; }
+(function(){ var m=location.search.match(/[?&]product=([^&#]+)/); if(m){ try{ directProduct(decodeURIComponent(m[1])); }catch(e){} } })();
 </script>
 </body>
 </html>

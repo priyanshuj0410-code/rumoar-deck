@@ -34,12 +34,12 @@ function tiles(arr){
 }
 function cols(arr){
   return `<div class="cols c${arr.length}">`+arr.map(c=>
-    `<div class="col${c.dark?" d":""}${c.volt?" v":""}">${c.k?`<div class="ck">${c.k}</div>`:""}${c.title?`<div class="ct">${c.title}</div>`:""}<div class="cb">${c.body}</div></div>`
+    `<div class="col${c.dark?" d":""}${c.volt?" v":""}">${c.img?`<img class="colimg" src="${c.img}" alt="">`:""}${c.k?`<div class="ck">${c.k}</div>`:""}${c.title?`<div class="ct">${c.title}</div>`:""}<div class="cb">${c.body}</div></div>`
   ).join("")+`</div>`;
 }
-function table(headers, rows, colw){
+function table(headers, rows, colw, slugs){
   const th = headers.map((h,i)=>`<th style="width:${colw[i]}%">${h}</th>`).join("");
-  const tb = rows.map(r=>`<tr>${r.map((c,i)=>`<td${typeof c==="object"&&c.b?' class="b"':""}>${typeof c==="object"?c.t:c}</td>`).join("")}</tr>`).join("");
+  const tb = rows.map((r,ri)=>`<tr${slugs&&slugs[ri]?` class="prow" data-prod="${slugs[ri]}"`:""}>${r.map((c,i)=>`<td${typeof c==="object"&&c.b?' class="b"':""}>${typeof c==="object"?c.t:c}</td>`).join("")}</tr>`).join("");
   return `<table class="tbl"><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table>`;
 }
 function take(t){ return `<div class="take">${t}</div>`; }
@@ -212,11 +212,11 @@ S(
 S(
   kick("The answer")+
   H("The stylist he belongs to, not a store.")+
-  `<div class="posbox">For the man who knows the look he wants but not how to build it, <b style="color:var(--peri)">RUMOAR turns his vibe into his look, starting with what he already owns.</b> A stylist he belongs to, not a store that sells at him.</div>`+
+  sub("For the man who knows the look he wants but not how to build it — <b style=\"color:var(--dusk)\">RUMOAR turns his vibe into his look, starting with what he already owns.</b>")+
   cols([
-    {k:"01 / YOUR CLOSET", title:"Buy nothing.", body:"A complete look from what he already owns. Proof before purchase, and the structural sign we're advising, not selling."},
-    {k:"02 / THE ELEVATE", title:"One keystone.", body:"“You're ninety percent there, this sling is the ten.” One confident add, never a cart."},
-    {k:"03 / THE CEILING", title:"The peak look.", body:"Including pieces we don't sell. Every gap we can't fill becomes a ranked, pre-validated product request.", dark:true}
+    {img:"assets/styled/you.jpg", k:"01 / YOUR CLOSET", title:"Buy nothing.", body:"A complete look from what he already owns — proof before purchase. We're advising, not selling."},
+    {img:"assets/styled/catalog.jpg", k:"02 / THE ELEVATE", title:"One keystone.", body:"“You're ninety percent there, this sling is the ten.” One confident add, never a cart."},
+    {img:"assets/styled/peak.jpg", k:"03 / THE CEILING", title:"The peak look.", body:"Including pieces we don't sell. Every gap becomes a ranked product request.", dark:true}
   ])+
   take("Styling gets him to ninety. The keystone is the last ten, sold only once we have earned it."),
   {});
@@ -328,7 +328,7 @@ S(
     [{t:"Cap, Luminous Blue (Drop 2)",b:1},{t:"₹1,300",b:1},"The Colour of the Year worn as a flash"],
     [{t:"Canvas + leather tote",b:1},{t:"₹2,499",b:1},"No masculine canvas-leather tote under Mokobara's ₹6,499"],
     [{t:"Backpack, second-line (Drop 3)",b:1},{t:"₹4,500",b:1},"The contested ladder; it follows demand, never leads"]
-  ],[38,12,50])+
+  ],[38,12,50],["leather-sling","canvas-sling","clip-pouch","bifold-wallet","card-holder","cap-minimal","cap-blue","canvas-tote","backpack"])+
   take("The wall is what the engine recommends once it knows his taste, every style where a real need meets a piece worth standing behind. <b>Rumour 001</b> ships the sling, the wallet and the cap: the exact first purchase order<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>; 002 and 003 are cut only against waitlists. Full-grain leather and canvas, made in India, released as drops."),
   {});
 
@@ -532,7 +532,7 @@ function DOC(sl){ return `<!doctype html><html lang="en"><head><meta charset="ut
 </body></html>`; }
 
 const CSS = `
-:root{--porcelain:${C.porcelain};--chalk:${C.chalk};--ink:${C.ink};--carbon:${C.carbon};--graphite:${C.graphite};--mist:${C.mist};--hair:${C.hair};--hairdk:${C.hairdk};--dusk:${C.dusk};--peri:${C.peri};--volt:${C.volt};--ok:${C.ok};--att:${C.att};--crit:${C.crit};--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(340px,33vw,470px);
+:root{--porcelain:${C.porcelain};--chalk:${C.chalk};--ink:${C.ink};--carbon:${C.carbon};--graphite:${C.graphite};--mist:${C.mist};--hair:${C.hair};--hairdk:${C.hairdk};--dusk:${C.dusk};--peri:${C.peri};--volt:${C.volt};--ok:${C.ok};--att:${C.att};--crit:${C.crit};--paper:#FFFFFF;--wash:#F4F3EF;--line:#E9E8E3;--dockw:clamp(300px,calc(47vh + 16px),620px);
 --display:'Clash Display','Space Grotesk',system-ui,sans-serif;--sans:'General Sans',system-ui,sans-serif;--mono:'Space Mono',ui-monospace,monospace;}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{margin:0;height:100%;background:#0d0d10;font-family:var(--sans);overflow:hidden}
@@ -695,10 +695,14 @@ a.cite:hover,.cpop:hover{color:var(--volt)}
 .scaler{transition:transform .42s cubic-bezier(.2,.7,.2,1)}
 body.docked .stage{right:var(--dockw)}
 body.docked .app-open{display:none}
-.app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:14px 16px}
+.app-dock{position:fixed;top:0;right:0;bottom:0;width:var(--dockw);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}
 .app-dock.show{display:flex;animation:dockin .42s cubic-bezier(.2,.7,.2,1)}
 @keyframes dockin{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
-.app-dock iframe{height:100%;max-height:940px;aspect-ratio:410/880;width:auto;max-width:100%;border:0;background:transparent}
+.app-dock iframe{height:100%;aspect-ratio:398/846;width:auto;max-width:100%;margin:auto;border:0;background:transparent}
+.colimg{display:block;width:calc(100% + 40px);height:200px;object-fit:cover;object-position:50% 12%;margin:-20px -20px 15px}
+.tbl tr.prow{cursor:pointer;transition:background .14s}
+.tbl tr.prow:hover td{background:var(--wash)}
+.tbl tr.prow:hover td.b{color:var(--volt)}
 .app-close{position:fixed;top:16px;right:16px;z-index:95;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:0;color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background .2s,transform .16s cubic-bezier(.2,.7,.2,1)}
 body.docked .app-close{display:flex}
 .app-close:hover{background:rgba(255,255,255,.22)}.app-close:active{transform:scale(.92)}
@@ -708,7 +712,7 @@ const SCRIPT = `
   var slides=[].slice.call(document.querySelectorAll('.slide'));
   var scaler=document.getElementById('scaler'), prog=document.getElementById('prog'), curEl=document.getElementById('cur');
   var i=0, N=slides.length;
-  function fit(){ var st=document.getElementById('stage'); var w=(st?st.clientWidth:window.innerWidth), h=(st?st.clientHeight:window.innerHeight); var s=Math.min(w/1300, h/740); scaler.style.transform='scale('+s+')'; }
+  function fit(){ var st=document.getElementById('stage'); var w=(st?st.clientWidth:window.innerWidth), h=(st?st.clientHeight:window.innerHeight); var s=Math.min(w/1280, h/720); scaler.style.transform='scale('+s+')'; }
   window.__deckFit=fit;
   function pad(n){ return (n<10?'0':'')+n; }
   function show(n){ slides[i].classList.remove('active'); i=Math.max(0,Math.min(N-1,n)); slides[i].classList.add('active'); curEl.textContent=pad(i+1); prog.style.width=((i+1)/N*100)+'%'; }
@@ -746,8 +750,10 @@ const SCRIPT = `
   function refit(){ if(window.__deckFit) window.__deckFit(); }
   function openApp(){ if(!loaded){ frame.src='rumoar-app.html?embed=1'; loaded=true; } document.body.classList.add('docked'); dock.classList.add('show'); refit(); }
   function closeApp(){ document.body.classList.remove('docked'); dock.classList.remove('show'); refit(); }
+  function showProduct(slug){ var was=document.body.classList.contains('docked'); if(!was){ document.body.classList.add('docked'); dock.classList.add('show'); refit(); } if(!loaded){ frame.src='rumoar-app.html?embed=1&product='+encodeURIComponent(slug); loaded=true; } else { try{ frame.contentWindow.postMessage({type:'rumoar:product',slug:slug},'*'); }catch(e){} } }
   openB.addEventListener('click',function(e){ e.stopPropagation(); openApp(); });
   if(closeB) closeB.addEventListener('click',function(e){ e.stopPropagation(); closeApp(); });
+  document.addEventListener('click',function(e){ var row=e.target.closest?e.target.closest('.prow'):null; if(row&&row.getAttribute('data-prod')){ e.stopPropagation(); showProduct(row.getAttribute('data-prod')); } },true);
   window.addEventListener('keydown',function(e){ if(document.body.classList.contains('docked')&&e.key==='Escape'){ closeApp(); } }, false);
 })();
 `;
