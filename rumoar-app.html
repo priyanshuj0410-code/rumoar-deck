@@ -3,187 +3,154 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="theme-color" content="#17171B">
+<meta name="theme-color" content="#ffffff">
 <title>RUMOAR — your stylist</title>
 <link rel="preconnect" href="https://api.fontshare.com">
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <style>
 :root{
-  --ink:#17171B; --carbon:#202028; --chalk:#F6F5F2; --porcelain:#ECEBE7;
-  --graphite:#5C5C64; --mist:#9A9AA4; --hair:#DEDDD8; --hairdk:#33333C;
-  --dusk:#4B4673; --peri:#B3ACEF; --volt:#6152F0;
-  --ok:#3E7D5A; --att:#B0842E; --crit:#C0453C;
+  --ink:#17171B; --paper:#FFFFFF; --wash:#F4F3EF; --line:#E9E8E3;
+  --mute:#8C8B85; --volt:#6152F0; --ok:#3E7D5A; --peri:#B3ACEF;
   --display:'Clash Display',sans-serif; --sans:'General Sans',sans-serif; --mono:'Space Mono',monospace;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
-body{
-  font-family:var(--sans); background:#0d0d10; color:var(--ink);
-  display:flex; align-items:center; justify-content:center;
-}
-/* When embedded in an iframe we fill it; standalone we center a phone. */
-#app{
-  position:relative; width:100%; max-width:420px; height:100dvh; max-height:900px;
-  background:var(--porcelain); overflow:hidden; display:flex; flex-direction:column;
-}
-.mi{font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;
-  text-transform:none;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;
-  width:1.18em;height:1.18em;overflow:hidden;flex:none;vertical-align:middle;
-  -webkit-font-feature-settings:'liga';font-feature-settings:'liga';}
+body{font-family:var(--sans);background:#111;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:15px}
+#app{position:relative;width:100%;max-width:420px;height:100dvh;max-height:900px;background:var(--paper);overflow:hidden;display:flex;flex-direction:column}
+.mi{font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300,'opsz' 24;font-weight:normal;font-style:normal;
+  display:inline-flex;align-items:center;justify-content:center;width:1.25em;height:1.25em;overflow:hidden;flex:none;line-height:1;vertical-align:middle;font-feature-settings:'liga'}
 #stage{position:relative;flex:1;min-height:0;overflow:hidden}
-.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--porcelain)}
+.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--paper)}
 .view.active{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.k{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);margin:0}
 
-/* ---------- CALL SCREEN ---------- */
-#v-call{background:radial-gradient(120% 80% at 50% 10%,#26233a 0%,var(--ink) 55%);color:var(--chalk);
-  align-items:center;justify-content:space-between;padding:64px 28px 48px;text-align:center}
-#v-call .who{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:36px}
-.callorb{width:118px;height:118px;border-radius:50%;background:conic-gradient(from 210deg,var(--volt),var(--peri),var(--dusk),var(--volt));
-  display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 8px rgba(179,172,239,.12);animation:breathe 2.6s ease-in-out infinite}
-.callorb b{font-family:var(--display);font-weight:600;font-size:40px;color:#fff}
-@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-#v-call .mark{font-family:var(--mono);font-size:12px;letter-spacing:.28em;color:var(--peri);text-transform:uppercase}
-#v-call h1{font-family:var(--display);font-weight:600;font-size:26px;margin:6px 0 2px}
-#v-call .subttl{color:var(--mist);font-size:14px;max-width:260px;line-height:1.5}
-.callbtns{display:flex;gap:56px;align-items:center}
-.rbtn{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff}
-.rbtn.dec{background:var(--crit)} .rbtn.ans{background:var(--ok);animation:jiggle 1.4s ease-in-out infinite}
-.rbtn .mi{font-size:32px}
-.rlabel{font-size:12px;color:var(--mist);margin-top:10px}
-@keyframes jiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+/* ---------- CALL ---------- */
+#v-call{background:var(--paper);color:var(--ink);align-items:center;justify-content:space-between;padding:76px 34px 60px;text-align:center}
+#v-call .who{display:flex;flex-direction:column;align-items:center;gap:22px;margin-top:30px}
+.callorb{width:92px;height:92px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;animation:breathe 3s ease-in-out infinite}
+.callorb b{font-family:var(--display);font-weight:600;font-size:34px;color:#fff}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+#v-call h1{font-family:var(--display);font-weight:600;font-size:32px;letter-spacing:-.01em;margin:8px 0 0}
+#v-call .subttl{color:var(--mute);font-size:14px;max-width:250px;line-height:1.55;margin-top:6px}
+.callbtns{display:flex;gap:60px;align-items:flex-start}
+.rbtn{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.rbtn.dec{background:var(--paper);border:1px solid var(--line);color:var(--ink)}
+.rbtn.ans{background:var(--ink);color:#fff;animation:nudge 1.6s ease-in-out infinite}
+.rbtn .mi{font-size:26px}
+.rlabel{font-size:12px;color:var(--mute);margin-top:12px}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 
-/* ---------- AGENT / CHAT ---------- */
-#v-agent{background:var(--porcelain)}
-.topbar{display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--hair);background:var(--porcelain)}
-.topbar .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(62,125,90,.16)}
-.topbar .nm{font-family:var(--display);font-weight:600;font-size:17px}
-.topbar .st{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist)}
+/* ---------- AGENT ---------- */
+.topbar{display:flex;align-items:center;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.topbar .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.topbar .nm{font-family:var(--display);font-weight:600;font-size:16px}
+.topbar .st{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin-top:1px}
 .topbar .grow{flex:1}
-.iconbtn{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:var(--ink);background:#fff;border:1px solid var(--hair)}
-.iconbtn .mi{font-size:20px}
-.iconbtn.on{background:var(--ink);color:var(--peri);border-color:var(--ink)}
+.seg{display:flex;border:1px solid var(--line)}
+.iconbtn{width:38px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--mute);background:var(--paper)}
+.iconbtn+.iconbtn{border-left:1px solid var(--line)}
+.iconbtn .mi{font-size:19px}
+.iconbtn.on{background:var(--ink);color:#fff}
 
-/* voice stage */
-#voicestage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:20px 26px}
-.orb{width:150px;height:150px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(60% 60% at 50% 40%,var(--peri),var(--dusk) 78%);transition:transform .25s}
-.orb::before,.orb::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:2px solid var(--peri);opacity:0}
-.orb.speaking{animation:orbpulse 1.1s ease-in-out infinite}
-.orb.speaking::before{animation:ring 1.6s ease-out infinite}
-.orb.speaking::after{animation:ring 1.6s ease-out .8s infinite}
-.orb.listening{background:radial-gradient(60% 60% at 50% 40%,#fff,var(--peri) 88%);box-shadow:0 0 0 10px rgba(97,82,240,.10)}
-.orb .mi{font-size:52px;color:#fff}
-@keyframes orbpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-@keyframes ring{0%{opacity:.5;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
-.caption{min-height:76px;text-align:center;font-size:18px;line-height:1.5;max-width:320px;color:var(--ink);font-weight:500}
-.caption .who{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);margin-bottom:8px}
-.hint{font-size:12.5px;color:var(--mist)}
+#voicestage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:24px 30px}
+.orb{width:184px;height:184px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;
+  background:radial-gradient(circle at 50% 44%,rgba(97,82,240,.24),rgba(179,172,239,.12) 46%,transparent 70%)}
+.orb .mi{font-size:44px;color:var(--volt);opacity:.85}
+.orb.speaking{animation:pulse 1.5s ease-in-out infinite}
+.orb.listening{background:radial-gradient(circle at 50% 44%,rgba(62,125,90,.24),rgba(62,125,90,.10) 46%,transparent 70%)}
+.orb.listening .mi{color:var(--ok)}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:.85}}
+.caption{min-height:80px;text-align:center;font-size:19px;line-height:1.5;max-width:320px;color:var(--ink);font-weight:500}
+.caption .who{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+.hint{font-size:12px;color:var(--mute)}
 
-/* chat log */
-#chatlog{flex:1;overflow-y:auto;padding:18px 16px 8px;display:none;flex-direction:column;gap:10px}
-.bub{max-width:82%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.45}
-.bub.a{align-self:flex-start;background:#fff;border:1px solid var(--hair);border-bottom-left-radius:5px}
-.bub.u{align-self:flex-end;background:var(--ink);color:var(--chalk);border-bottom-right-radius:5px}
-.bub.sys{align-self:center;background:transparent;color:var(--mist);font-family:var(--mono);font-size:11px;letter-spacing:.04em}
+#chatlog{flex:1;overflow-y:auto;padding:20px 16px 8px;display:none;flex-direction:column;gap:8px}
+.bub{max-width:84%;padding:12px 15px;font-size:15px;line-height:1.5}
+.bub.a{align-self:flex-start;background:var(--wash);color:var(--ink)}
+.bub.u{align-self:flex-end;background:var(--ink);color:#fff}
+.bub.sys{align-self:center;background:transparent;color:var(--mute);font-family:var(--mono);font-size:10px;letter-spacing:.06em}
 
-/* composer */
-.composer{padding:12px 14px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--hair);background:var(--porcelain);display:flex;gap:10px;align-items:center}
-.mic{flex:1;height:52px;border-radius:14px;background:var(--ink);color:var(--chalk);display:flex;align-items:center;justify-content:center;gap:10px;font-weight:600;font-size:15px}
-.mic .mi{font-size:22px;color:var(--peri)}
-.mic.live{background:var(--volt);color:#fff}.mic.live .mi{color:#fff}
-.textrow{flex:1;display:none;gap:8px}
-.textrow input{flex:1;height:52px;border:1px solid var(--hair);border-radius:14px;padding:0 16px;font-family:inherit;font-size:15px;background:#fff;color:var(--ink)}
-.textrow input:focus{outline:none;border-color:var(--dusk)}
-.sendb{width:52px;height:52px;border-radius:14px;background:var(--ink);color:var(--peri);display:flex;align-items:center;justify-content:center}
-.sendb .mi{font-size:22px}
+.composer{padding:12px 16px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--paper);display:flex;gap:10px;align-items:center}
+.mic{flex:1;height:54px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:500;font-size:15px}
+.mic .mi{font-size:21px}
+.mic.live{background:var(--volt)}
+.textrow{flex:1;display:none;gap:10px}
+.textrow input{flex:1;height:54px;border:1px solid var(--line);padding:0 16px;font-family:inherit;font-size:15px;background:var(--paper);color:var(--ink)}
+.textrow input:focus{outline:none;border-color:var(--ink)}
+.sendb{width:54px;height:54px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center}
+.sendb .mi{font-size:21px}
 
-/* stage UI (upload / chips / reveal) sheets */
-.sheet{border-top:1px solid var(--hair);background:#fff;padding:16px 16px calc(18px + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:12px;max-height:64%;overflow-y:auto}
+/* ---------- SHEETS ---------- */
+.sheet{border-top:1px solid var(--line);background:var(--paper);padding:20px 18px calc(20px + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:14px;max-height:70%;overflow-y:auto}
 .sheet.show{display:flex}
-.sheet h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0}
-.sheet p.k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);margin:0}
-.uploads{display:flex;gap:10px;flex-wrap:wrap}
-.upcell{width:84px;height:110px;border-radius:12px;border:1.5px dashed var(--hair);display:flex;align-items:center;justify-content:center;color:var(--mist);overflow:hidden;background:var(--porcelain);position:relative}
+.sheet h3{font-family:var(--display);font-weight:600;font-size:19px;margin:2px 0 0;letter-spacing:-.01em}
+.uploads{display:flex;gap:10px}
+.upcell{flex:1;aspect-ratio:3/4;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--mute);overflow:hidden;background:var(--wash);position:relative}
 .upcell img{width:100%;height:100%;object-fit:cover}
-.upcell .mi{font-size:26px}
-.readout{background:var(--porcelain);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
-.readrow{display:flex;justify-content:space-between;font-size:13.5px}
-.readrow b{font-weight:600}
-.readrow .v{font-family:var(--mono);color:var(--dusk)}
+.upcell .mi{font-size:24px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:9px 13px;border-radius:999px;border:1px solid var(--hair);background:var(--porcelain);font-size:13.5px;display:flex;align-items:center;gap:6px;transition:all .15s}
-.chip .mi{font-size:16px;color:var(--mist)}
-.chip.sel{background:var(--ink);color:var(--chalk);border-color:var(--ink)}
-.chip.sel .mi{color:var(--peri)}
-.wgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
-.wtile{position:relative;border:1px solid var(--hair);border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column;padding:0;text-align:left}
-.wtile .th{aspect-ratio:1;background:linear-gradient(140deg,#e9e6df,#dcd9d2);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.wtile .th .mi{font-size:24px;color:var(--mist)}
-.wtile .lb{font-size:11px;line-height:1.2;padding:6px 7px 8px;color:var(--ink)}
-.wtile .ck{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;color:var(--mist)}
-.wtile .ck .mi{font-size:14px}
-.wtile.sel{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
-.wtile.sel .ck{background:var(--volt);border-color:var(--volt);color:#fff}
-.btn{height:50px;border-radius:14px;background:var(--volt);color:#fff;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--hair)}
-.btn .mi{font-size:20px}
+.chip{padding:9px 13px;border:1px solid var(--line);background:var(--paper);font-size:13px;display:flex;align-items:center;gap:6px}
+.chip .mi{font-size:15px;color:var(--mute)}
+.chip.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+.wgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.wtile{position:relative;border:1px solid var(--line);overflow:hidden;background:var(--paper);display:flex;flex-direction:column;padding:0;text-align:left}
+.wtile .th{aspect-ratio:1;background:var(--wash);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.wtile .th .mi{font-size:22px;color:var(--mute)}
+.wtile .lb{font-size:10.5px;line-height:1.2;padding:6px 7px 8px;color:var(--ink)}
+.wtile .ck{position:absolute;top:5px;right:5px;width:20px;height:20px;background:rgba(255,255,255,.9);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--mute)}
+.wtile .ck .mi{font-size:13px}
+.wtile.sel{box-shadow:inset 0 0 0 2px var(--ink);border-color:var(--ink)}
+.wtile.sel .ck{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn{height:52px;background:var(--ink);color:#fff;font-weight:500;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+.btn .mi{font-size:19px}
 .hidden{display:none!important}
 
-/* reveal cards */
-.reveal{display:flex;flex-direction:column;gap:0}
-.rlevel{position:relative;border-radius:16px;overflow:hidden;background:var(--carbon);aspect-ratio:4/5}
-.rlevel img{width:100%;height:100%;object-fit:cover;display:block}
-.rlevel .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:
-  linear-gradient(140deg,var(--dusk),var(--ink));color:var(--peri);font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;text-align:center;padding:20px}
-.rlevel .tag{position:absolute;left:12px;top:12px;background:rgba(23,23,27,.82);backdrop-filter:blur(6px);color:#fff;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
-.rlevel .cap{position:absolute;left:0;right:0;bottom:0;padding:16px 14px;background:linear-gradient(transparent,rgba(23,23,27,.9));color:#fff}
-.rlevel .cap b{font-family:var(--display);font-weight:600;font-size:17px;display:block}
-.rlevel .cap span{font-size:12.5px;color:#d8d5ea}
-.dots{display:flex;gap:6px;justify-content:center;padding:12px 0 2px}
-.dots i{width:7px;height:7px;border-radius:50%;background:var(--hair)}
-.dots i.on{background:var(--volt);width:20px;border-radius:6px}
+/* ---------- REVEAL SLIDER ---------- */
+.rimg{position:relative;aspect-ratio:4/5;background:var(--wash);overflow:hidden}
+.rimg img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+.rimg img.on{opacity:1}
+.rimg .rtag{position:absolute;left:0;right:0;bottom:0;padding:18px 16px 16px;background:linear-gradient(transparent,rgba(23,23,27,.82));color:#fff}
+.rimg .rtag b{font-family:var(--display);font-weight:600;font-size:19px;display:block}
+.rimg .rtag span{font-size:12.5px;color:#e4e2f2}
+.ratingrow{display:flex;align-items:flex-end;justify-content:space-between}
+.ratingnum{font-family:var(--display);font-weight:600;font-size:44px;line-height:.9;letter-spacing:-.02em}
+.ratingnum small{font-size:20px;font-weight:500}
+.slider{-webkit-appearance:none;appearance:none;width:100%;height:2px;background:var(--line);outline:none;margin:4px 0}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:24px;background:var(--ink);cursor:pointer;border-radius:0}
+.slider::-moz-range-thumb{width:14px;height:24px;background:var(--ink);cursor:pointer;border:0;border-radius:0}
+.ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
 
 /* ---------- TAB VIEWS ---------- */
-.vhead{padding:18px 18px 8px}
-.vhead .k{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mist)}
-.vhead h2{font-family:var(--display);font-weight:600;font-size:24px;margin:4px 0 0}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px 24px}
-.card{background:#fff;border:1px solid var(--hair);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-.card .thumb{aspect-ratio:1;background:linear-gradient(140deg,var(--porcelain),#e2e0da);display:flex;align-items:center;justify-content:center;color:var(--mist);overflow:hidden}
+.vhead{padding:22px 18px 10px}
+.vhead h2{font-family:var(--display);font-weight:600;font-size:26px;margin:5px 0 0;letter-spacing:-.01em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 28px}
+.card{background:var(--paper);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column}
+.card .thumb{aspect-ratio:1;background:var(--wash);display:flex;align-items:center;justify-content:center;color:var(--mute);overflow:hidden}
 .card .thumb img{width:100%;height:100%;object-fit:cover}
-.card .thumb .mi{font-size:34px}
-.card .meta{padding:10px 12px}
-.card .meta b{font-size:14px;font-weight:600;display:block}
-.card .meta .pr{font-family:var(--mono);font-size:12px;color:var(--dusk);margin-top:2px}
-.owned{padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px}
-.savedlook{margin:12px 16px;border-radius:16px;overflow:hidden;position:relative;aspect-ratio:4/5;background:var(--carbon)}
+.card .thumb .mi{font-size:30px}
+.card .meta{padding:11px 12px}
+.card .meta b{font-size:13.5px;font-weight:600;display:block}
+.card .meta .pr{font-family:var(--mono);font-size:12px;color:var(--mute);margin-top:3px}
+.owned{padding:12px 16px 28px;display:flex;flex-wrap:wrap;gap:8px}
+.savedlook{margin:12px 16px 0;overflow:hidden;position:relative;aspect-ratio:4/5;background:var(--wash)}
+.savedlook:last-child{margin-bottom:28px}
 .savedlook img{width:100%;height:100%;object-fit:cover}
-.savedlook .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,var(--dusk),var(--ink));color:var(--peri);font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
-.savedlook .cap{position:absolute;left:0;right:0;bottom:0;padding:14px;background:linear-gradient(transparent,rgba(23,23,27,.88));color:#fff}
-.savedlook .cap b{font-family:var(--display);font-size:16px;display:block}
-.emptymsg{padding:40px 24px;text-align:center;color:var(--mist);font-size:14px;line-height:1.5}
+.savedlook .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#4B4673,#17171B);color:var(--peri);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.savedlook .cap{position:absolute;left:0;right:0;bottom:0;padding:16px;background:linear-gradient(transparent,rgba(23,23,27,.82));color:#fff}
+.savedlook .cap b{font-family:var(--display);font-weight:600;font-size:17px;display:block}
+.emptymsg{padding:44px 24px;text-align:center;color:var(--mute);font-size:14px;line-height:1.6}
 
 /* ---------- TABBAR ---------- */
-#tabbar{display:none;flex:none;border-top:1px solid var(--hair);background:var(--porcelain);padding:8px 6px calc(8px + env(safe-area-inset-bottom));justify-content:space-around}
+#tabbar{display:none;flex:none;border-top:1px solid var(--line);background:var(--paper);padding:9px 6px calc(9px + env(safe-area-inset-bottom));justify-content:space-around}
 #tabbar.show{display:flex}
-.tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mist);font-size:10px;font-weight:500;padding:4px 12px;border-radius:12px}
-.tab .mi{font-size:24px}
-.tab.on{color:var(--ink)} .tab.on .mi{color:var(--volt)}
-
-/* config gear */
-.gearmini{position:absolute;top:16px;right:14px;z-index:40;width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:var(--mist)}
-.gearmini .mi{font-size:18px}
-#cfg{position:absolute;inset:0;z-index:50;background:rgba(13,13,16,.55);display:none;align-items:flex-end}
-#cfg.show{display:flex}
-.cfgcard{width:100%;background:var(--porcelain);border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
-.cfgcard h3{font-family:var(--display);margin:0 0 2px;font-size:18px}
-.cfgcard label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mist)}
-.cfgcard input{height:44px;border:1px solid var(--hair);border-radius:11px;padding:0 12px;font-family:var(--mono);font-size:12px;background:#fff}
-.small{font-size:11.5px;color:var(--graphite);line-height:1.5}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mute);font-size:10px;font-weight:500;padding:3px 12px}
+.tab .mi{font-size:23px}
+.tab.on{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -192,8 +159,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
   <!-- CALL -->
   <section id="v-call" class="view active">
-    <button id="gearCall" class="gearmini"><span class="mi">settings</span></button>
-    <div class="mark">Incoming · your stylist</div>
+    <div class="k">Incoming · your stylist</div>
     <div class="who">
       <div class="callorb"><b>R</b></div>
       <div>
@@ -207,15 +173,16 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     </div>
   </section>
 
-  <!-- AGENT + CHAT -->
+  <!-- AGENT -->
   <section id="v-agent" class="view">
     <div class="topbar">
       <span class="dot"></span>
       <div><div class="nm">RUMOAR</div><div class="st" id="agentstate">on the call</div></div>
       <div class="grow"></div>
-      <button class="iconbtn" id="gearBtn" title="Agent settings"><span class="mi">settings</span></button>
-      <button class="iconbtn on" id="modeVoice" title="Voice"><span class="mi">graphic_eq</span></button>
-      <button class="iconbtn" id="modeText" title="Text"><span class="mi">keyboard</span></button>
+      <div class="seg">
+        <button class="iconbtn on" id="modeVoice" title="Voice"><span class="mi">graphic_eq</span></button>
+        <button class="iconbtn" id="modeText" title="Text"><span class="mi">keyboard</span></button>
+      </div>
     </div>
 
     <div id="voicestage">
@@ -225,14 +192,12 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     </div>
 
     <div id="chatlog"></div>
-
-    <!-- dynamic stage sheet -->
     <div class="sheet" id="sheet"></div>
 
     <div class="composer" id="composer">
       <button class="mic" id="micbtn"><span class="mi">mic</span><span id="miclabel">Hold to talk</span></button>
       <div class="textrow" id="textrow">
-        <input id="textin" placeholder="Type your reply…" autocomplete="off">
+        <input id="textin" placeholder="Type your reply" autocomplete="off">
         <button class="sendb" id="sendb"><span class="mi">arrow_upward</span></button>
       </div>
     </div>
@@ -258,79 +223,34 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
   </div><!-- /stage -->
 
-  <!-- TABBAR -->
   <nav id="tabbar">
     <button class="tab on" data-tab="agent"><span class="mi">graphic_eq</span>Stylist</button>
     <button class="tab" data-tab="wardrobe"><span class="mi">checkroom</span>Wardrobe</button>
     <button class="tab" data-tab="saved"><span class="mi">bookmark</span>Saved</button>
     <button class="tab" data-tab="shop"><span class="mi">shopping_bag</span>Shop</button>
   </nav>
-
-  <!-- CONFIG SHEET -->
-  <div id="cfg">
-    <div class="cfgcard">
-      <h3>Agent settings</h3>
-      <div class="small">Deployed, this runs through a proxy that holds the key server-side, so leave these blank. Fill them only to call Ollama directly from the browser for local testing.</div>
-      <label>Endpoint (direct, optional)</label>
-      <input id="c-endpoint" placeholder="https://ollama.com/api/chat">
-      <label>Chat model</label>
-      <input id="c-chat" placeholder="gpt-oss:120b">
-      <label>Vision model</label>
-      <input id="c-vision" placeholder="qwen3-vl:235b-cloud">
-      <label>API key (direct only)</label>
-      <input id="c-key" placeholder="ollama key" type="password">
-      <button class="btn" id="c-save" style="margin-top:6px">Save</button>
-      <button class="btn ghost" id="c-close">Close</button>
-    </div>
-  </div>
 </div>
 
 <script>
-/* =========================================================
-   RUMOAR stylist — demo
-   Voice via Web Speech API. Brain via Ollama (optional) with a
-   scripted fallback so the flow always completes. Images are
-   supplied by you: drop files at the ASSETS paths below.
-   ========================================================= */
-
 const CONFIG = { endpoint:"", chatModel:"", visionModel:"", key:"" };
-try{ Object.assign(CONFIG, JSON.parse(localStorage.getItem("rmr_cfg")||"{}")); }catch(e){}
 const DEFAULT_CHAT="gpt-oss:120b", DEFAULT_VISION="qwen3-vl:235b-cloud", PROXY="/api/ollama";
 const withTimeout=(p,ms,fb)=>Promise.race([Promise.resolve(p).catch(()=>fb), new Promise(r=>setTimeout(()=>r(fb),ms))]);
 
-/* ---- ASSETS: replace these files and the demo uses them ----
-   Raw "feed" photos (what the user uploads) and the three styled looks.
-   If a file is missing, a branded placeholder shows instead. */
 const ASSETS = {
   feed: ["assets/feed/1.jpg","assets/feed/2.jpg","assets/feed/3.jpg"],
-  styled: {
-    you:     "assets/styled/you.jpg",
-    catalog: "assets/styled/catalog.jpg",
-    peak:    "assets/styled/peak.jpg"
-  }
+  styled: { you:"assets/styled/you.jpg", catalog:"assets/styled/catalog.jpg", peak:"assets/styled/peak.jpg" }
 };
 
 const $ = s=>document.querySelector(s);
 const el = (t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
 const wait = ms=>new Promise(r=>setTimeout(r,ms));
-
-/* ---------------- state ---------------- */
-const state = {
-  voiceMode:true,
-  profile:{ name:"", vibe:"", occasions:"" },
-  read:null,
-  wardrobe:[],
-  started:false
-};
+const state = { voiceMode:true, profile:{name:"",vibe:"",occasions:""}, read:null, wardrobe:[], started:false };
 
 /* ---------------- speech ---------------- */
-const synth = window.speechSynthesis;
-let voice=null;
-function pickVoice(){
-  const vs=synth?synth.getVoices():[];
+const synth = window.speechSynthesis; let voice=null;
+function pickVoice(){ const vs=synth?synth.getVoices():[];
   voice = vs.find(v=>/en[-_](GB|US|IN)/i.test(v.lang)&&/male|daniel|arthur|google uk english male|rishi/i.test(v.name))
-       || vs.find(v=>/en[-_](GB|IN)/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || vs[0]||null;
-}
+       || vs.find(v=>/en[-_](GB|IN)/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || vs[0]||null; }
 if(synth){ pickVoice(); synth.onvoiceschanged=pickVoice; }
 function speak(text){
   return new Promise(res=>{
@@ -341,24 +261,20 @@ function speak(text){
     let done=false; const finish=()=>{ if(done)return; done=true; setOrb(""); res(); };
     u.onstart=()=>setOrb("speaking"); u.onend=finish; u.onerror=finish;
     synth.speak(u);
-    // if TTS never actually starts (headless / no voices), don't hang the flow
     setTimeout(()=>{ if(!synth.speaking) finish(); }, 420);
-    // absolute safety cap
     setTimeout(finish, Math.min(12000, 1600 + text.length*60));
   });
 }
-const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
-const canListen = !!SR;
+const SR = window.SpeechRecognition||window.webkitSpeechRecognition; const canListen=!!SR;
 function listenOnce(){
   return new Promise(res=>{
     if(!SR){ return res(null); }
     const r=new SR(); r.lang="en-GB"; r.interimResults=true; r.maxAlternatives=1; r.continuous=false;
-    let finalTxt=""; setOrb("listening"); setState("listening…");
+    let finalTxt=""; setOrb("listening"); setState("listening");
     r.onresult=e=>{ finalTxt=""; for(const res2 of e.results){ finalTxt+=res2[0].transcript; } setCaption(finalTxt,"you",true); };
     r.onerror=()=>{ setOrb(""); res(finalTxt||null); };
     r.onend=()=>{ setOrb(""); res(finalTxt.trim()||null); };
     try{ r.start(); }catch(e){ res(null); }
-    window._stopSR=()=>{ try{r.stop();}catch(e){} };
   });
 }
 
@@ -368,43 +284,31 @@ function setState(t){ $("#agentstate").textContent=t; }
 function setCaption(text,who="RUMOAR",isUser=false){
   $("#caption").querySelector(".who").textContent=who;
   $("#captiontext").textContent=text;
-  $("#caption").style.color = isUser? "var(--dusk)":"var(--ink)";
+  $("#caption").style.color = isUser? "var(--mute)":"var(--ink)";
 }
-function pushBubble(text,cls){ const log=$("#chatlog"); log.appendChild(el("div","bub "+cls,text)); log.scrollTop=log.scrollDetail=log.scrollHeight; }
+function pushBubble(text,cls){ const log=$("#chatlog"); log.appendChild(el("div","bub "+cls,text)); log.scrollTop=log.scrollHeight; }
 function agentLog(text){ pushBubble(text,"a"); }
 function userLog(text){ pushBubble(text,"u"); }
-
 async function agentSay(text){
-  setCaption(text,"RUMOAR",false);
-  agentLog(text);
-  setState("speaking");
+  setCaption(text,"RUMOAR",false); agentLog(text); setState("speaking");
   if(state.voiceMode) await speak(text); else await wait(Math.min(2200,500+text.length*22));
   setState("your turn");
 }
-
-/* get a free-text reply from the user. Voice (tap mic) OR text box are BOTH
-   live at every prompt, so switching modes mid-question just works. */
 function getReply(){
   return new Promise(res=>{
-    let fin=false;
-    const input=$("#textin"), send=$("#sendb"), mic=$("#micbtn");
+    let fin=false; const input=$("#textin"), send=$("#sendb"), mic=$("#micbtn");
     function cleanup(){ send.removeEventListener("click",submit); input.removeEventListener("keydown",onKey); mic.removeEventListener("click",onMic); }
     const done=v=>{ if(fin)return; fin=true; state.awaiting=false; cleanup(); userLog(v); setCaption(v,"you",true); res(v); };
     function submit(){ const v=input.value.trim(); if(!v)return; input.value=""; done(v); }
     function onKey(e){ if(e.key==="Enter"){ e.preventDefault(); submit(); } }
-    async function onMic(){ if(fin)return; mic.classList.add("live"); $("#miclabel").textContent="Listening…";
-      const txt=await listenOnce(); mic.classList.remove("live"); $("#miclabel").textContent="Hold to talk";
-      if(txt) done(txt); }
+    async function onMic(){ if(fin)return; mic.classList.add("live"); $("#miclabel").textContent="Listening"; const txt=await listenOnce(); mic.classList.remove("live"); $("#miclabel").textContent="Hold to talk"; if(txt) done(txt); }
     send.addEventListener("click",submit); input.addEventListener("keydown",onKey); mic.addEventListener("click",onMic);
-    state.awaiting=true;
-    if(!state.voiceMode) setTimeout(()=>input.focus(),30);
+    state.awaiting=true; if(!state.voiceMode) setTimeout(()=>input.focus(),30);
   });
 }
-
 function switchText(on){
   state.voiceMode=!on;
-  $("#modeVoice").classList.toggle("on",!on);
-  $("#modeText").classList.toggle("on",on);
+  $("#modeVoice").classList.toggle("on",!on); $("#modeText").classList.toggle("on",on);
   $("#voicestage").style.display = on?"none":"flex";
   $("#chatlog").style.display = on?"flex":"none";
   $("#micbtn").style.display = on?"none":"flex";
@@ -414,58 +318,36 @@ function switchText(on){
 $("#modeVoice").onclick=()=>switchText(false);
 $("#modeText").onclick=()=>switchText(true);
 
-/* ---------------- brain: Ollama (via proxy) or scripted ----------------
-   Default: POST /api/ollama, a Vercel function that adds the key server-side
-   (key never touches the browser, no CORS). Fill the gear settings to call
-   Ollama directly from the browser instead (handy for local testing). */
+/* ---------------- brain ---------------- */
 function endpoint(){ return (CONFIG.endpoint && CONFIG.key) ? {url:CONFIG.endpoint, direct:true} : {url:PROXY, direct:false}; }
 async function ollamaPost(body){
-  const {url,direct}=endpoint();
-  const headers={"Content-Type":"application/json"};
+  const {url,direct}=endpoint(); const headers={"Content-Type":"application/json"};
   if(direct) headers["Authorization"]="Bearer "+CONFIG.key;
   const r=await fetch(url,{method:"POST",headers,body:JSON.stringify({...body,stream:false})});
   if(!r.ok) throw new Error("HTTP "+r.status);
   const j=await r.json();
   return (j.message&&j.message.content) || (j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content) || "";
 }
-async function llm(messages,model){
-  try{ return (await ollamaPost({model:model||CONFIG.chatModel||DEFAULT_CHAT, messages}))||null; }
-  catch(e){ return null; }
-}
+async function llm(messages,model){ try{ return (await ollamaPost({model:model||CONFIG.chatModel||DEFAULT_CHAT, messages}))||null; }catch(e){ return null; } }
 async function visionRead(dataURL){
   const b64=(String(dataURL).split(",")[1])||dataURL;
   const messages=[
     {role:"system",content:"You are a menswear stylist. Reply ONLY as compact JSON: {\"build\":\"..\",\"colouring\":\"..\",\"contrast\":\"..\",\"note\":\"one short styling implication\"}"},
     {role:"user",content:"Read this person's build, colouring and contrast for styling.",images:[b64]}
   ];
-  try{ const c=await ollamaPost({model:CONFIG.visionModel||DEFAULT_VISION, messages});
-    const m=String(c).match(/\{[\s\S]*\}/); return m?JSON.parse(m[0]):null; }
-  catch(e){ return null; }
+  try{ const c=await ollamaPost({model:CONFIG.visionModel||DEFAULT_VISION, messages}); const m=String(c).match(/\{[\s\S]*\}/); return m?JSON.parse(m[0]):null; }catch(e){ return null; }
 }
 
-/* ---------------- image placeholder fallback ---------------- */
-function placeholder(label){
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500'>
-    <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-    <stop offset='0' stop-color='#4B4673'/><stop offset='1' stop-color='#17171B'/></linearGradient></defs>
-    <rect width='400' height='500' fill='url(#g)'/>
-    <text x='50%' y='50%' fill='#B3ACEF' font-family='monospace' font-size='16' letter-spacing='3'
-      text-anchor='middle' dominant-baseline='middle'>${label}</text></svg>`;
-  return "data:image/svg+xml;base64,"+btoa(svg);
-}
 function imgWithFallback(src,label,cls){
-  const wrap=el("div",cls);
-  const img=el("img"); img.alt=label;
+  const wrap=el("div",cls); const img=el("img"); img.alt=label;
   img.onerror=()=>{ img.remove(); wrap.appendChild(el("div","ph",label)); };
   img.src=src; wrap.appendChild(img); return wrap;
 }
-
-/* ---------------- sheet helper ---------------- */
 const sheet=$("#sheet");
 function showSheet(html){ sheet.innerHTML=html; sheet.classList.add("show"); }
 function hideSheet(){ sheet.classList.remove("show"); sheet.innerHTML=""; }
 
-/* ---------------- DATA ---------------- */
+/* ---------------- data ---------------- */
 const WARDROBE_GUESSES=[
   {l:"Olive linen shirt",s:"olive-shirt"},{l:"Rust linen shirt",s:"rust-shirt"},
   {l:"Navy linen shirt",s:"navy-shirt"},{l:"Ecru linen shirt",s:"white-shirt"},
@@ -486,31 +368,19 @@ const CATALOG=[
   {n:"Backpack, second-line",p:"₹4,500",s:"backpack"}
 ];
 
-/* =========================================================
-   THE ONBOARDING FLOW
-   ========================================================= */
+/* ---------------- flow ---------------- */
 async function runFlow(){
   if(state.started) return; state.started=true;
-  // intro
   await agentSay("Hey. I'm RUMOAR, think of me as the stylist you'd text before you leave the house. Give me two minutes and I'll learn your style. First up, what should I call you?");
-  let ans=await getReply();
-  state.profile.name = cleanName(ans);
-  const nm = state.profile.name||"you";
-
+  let ans=await getReply(); state.profile.name=cleanName(ans); const nm=state.profile.name||"you";
   await agentSay(`Good to meet you, ${nm}. What's the vibe you're chasing? Clean and minimal, streetwear, sharp and classic, or still figuring it out?`);
   ans=await getReply(); state.profile.vibe=ans;
-
   await agentSay("Got it. And where do you actually need to look right? Think work, weddings, vacations, a night out.");
   ans=await getReply(); state.profile.occasions=ans;
-
-  // photos
   await agentSay("Now show me what I'm working with. Drop in a couple of photos, full length if you can. I'm reading your build, your colouring and your contrast. Not judging the fits, promise.");
   await stagePhotos();
-
   const r=state.read;
   await agentSay(`Right, I can see it. ${r.build} build, ${r.colouring} colouring, ${r.contrast} contrast. That already tells me the shapes and colours that'll actually work on you.`);
-
-  // wardrobe
   await agentSay("Most guys with your style own a few of the same staples. Tap the ones you've actually got and I'll build around them.");
   await stageWardrobe();
   await agentSay(`Nice, ${state.wardrobe.length} pieces to work with.`);
@@ -518,19 +388,13 @@ async function runFlow(){
     {role:"system",content:"You are RUMOAR, a sharp, warm Indian menswear stylist. In ONE short spoken sentence, no lists, tell the user the single style direction you'll take them in, using their profile."},
     {role:"user",content:`Name ${nm}. Vibe: ${state.profile.vibe}. Occasions: ${state.profile.occasions}. Build ${r.build}, ${r.colouring} colouring, ${r.contrast} contrast. Owns: ${state.wardrobe.join(", ")}.`}
   ]), 7000, null);
-  await agentSay(plan || "Here's the fun part.");
-
-  // reveals
+  await agentSay(plan || "Here's the fun part. Drag the slider and watch your look climb.");
   await stageReveals();
-
-  // hand off to the app
   await agentSay("That's your profile built. I've saved those looks, stocked your wardrobe, and the shop's ready when you are. I'm always right here, just talk to me.");
   enterApp();
 }
-
 function cleanName(s){ if(!s)return""; let m=s.match(/(?:i['’]?m|it['’]?s|call me|name is|this is)\s+([a-z]+)/i); let w=m?m[1]:s.split(/\s+/)[0]; return (w||"").replace(/[^a-z]/ig,"").replace(/^./,c=>c.toUpperCase()); }
 
-/* ---- photos stage ---- */
 function stagePhotos(){
   return new Promise(resolve=>{
     switchToStageMode();
@@ -543,23 +407,17 @@ function stagePhotos(){
     for(let i=0;i<3;i++){ const c=el("div","upcell",'<span class="mi">add_a_photo</span>'); c.onclick=()=>$("#filein").click(); ups.appendChild(c); cells.push(c); }
     let filled=0;
     const setCell=(i,src)=>{ cells[i].innerHTML=""; const im=el("img"); im.src=src; im.onerror=()=>{cells[i].innerHTML='<span class="mi">image</span>';}; cells[i].appendChild(im); };
-    $("#filein").onchange=e=>{
-      [...e.target.files].slice(0,3).forEach((f,i)=>{ const rd=new FileReader(); rd.onload=()=>{ setCell(i,rd.result); state._lastPhoto=rd.result; }; rd.readAsDataURL(f); });
-      filled=Math.max(filled,Math.min(3,e.target.files.length)); reveal();
-    };
+    $("#filein").onchange=e=>{ [...e.target.files].slice(0,3).forEach((f,i)=>{ const rd=new FileReader(); rd.onload=()=>{ setCell(i,rd.result); state._lastPhoto=rd.result; }; rd.readAsDataURL(f); }); filled=Math.max(filled,Math.min(3,e.target.files.length)); reveal(); };
     $("#usesample").onclick=()=>{ ASSETS.feed.forEach((s,i)=>setCell(i,s)); state._lastPhoto=null; filled=3; reveal(); };
     function reveal(){ if(filled>0){ $("#upnext").classList.remove("hidden"); } }
     $("#upnext").onclick=async()=>{
-      $("#upnext").innerHTML='<span class="mi">hourglass_top</span> Reading…';
-      let read=null;
-      if(state._lastPhoto){ read=await withTimeout(visionRead(state._lastPhoto), 15000, null); }
+      $("#upnext").innerHTML='<span class="mi">hourglass_top</span> Reading';
+      let read=null; if(state._lastPhoto){ read=await withTimeout(visionRead(state._lastPhoto), 15000, null); }
       state.read = read || { build:"broad and solid", colouring:"warm", contrast:"medium", note:"earthy, muted tones and relaxed tailoring that skims, not clings" };
       hideSheet(); switchFromStageMode(); resolve();
     };
   });
 }
-
-/* ---- wardrobe stage ---- */
 function stageWardrobe(){
   return new Promise(resolve=>{
     switchToStageMode();
@@ -576,75 +434,59 @@ function stageWardrobe(){
       t.onclick=()=>{ const on=t.classList.toggle("sel"); t.querySelector(".ck .mi").textContent=on?"check":"add"; };
       wrap.appendChild(t);
     });
-    $("#wnext").onclick=()=>{
-      state.wardrobe=[...wrap.querySelectorAll(".wtile.sel")].map(t=>t.dataset.l);
+    $("#wnext").onclick=()=>{ state.wardrobe=[...wrap.querySelectorAll(".wtile.sel")].map(t=>t.dataset.l);
       if(state.wardrobe.length===0) state.wardrobe=["Olive linen shirt","Cream trousers","Black sneakers"];
       renderWardrobe(); hideSheet(); switchFromStageMode(); resolve(); };
   });
 }
 
-/* ---- reveals stage ---- */
+/* reveals as a rating slider: 75 owned -> 90 keystone -> 100 peak */
 function stageReveals(){
   return new Promise(resolve=>{
     switchToStageMode();
-    const levels=[
-      {key:"you",tag:"Level 1 · just you",b:"Styled with what you own",s:"No purchase. Your own pieces, actually put together."},
-      {key:"catalog",tag:"Level 2 · one keystone",b:"One piece from us",s:"The single add that lifts the whole thing."},
-      {key:"peak",tag:"Level 3 · your ceiling",b:"The peak look",s:"Everything working together, the full you."}
-    ];
-    let i=0;
-    showSheet(`<p class="k">Step 3 · how to style you</p><h3 id="rvh">Three looks</h3>
-      <div class="reveal" id="rv"></div>
-      <div class="dots" id="rvdots"></div>
-      <button class="btn" id="rvnext"><span class="mi">arrow_forward</span> Next look</button>`);
-    const rv=$("#rv"), dots=$("#rvdots");
-    levels.forEach(()=>dots.appendChild(el("i")));
-    function draw(){
-      rv.innerHTML="";
-      const L=levels[i];
-      const card=imgWithFallback(ASSETS.styled[L.key], L.tag.toUpperCase(), "rlevel");
-      card.appendChild(el("div","tag",L.tag));
-      card.appendChild(el("div","cap",`<b>${L.b}</b><span>${L.s}</span>`));
-      rv.appendChild(card);
-      [...dots.children].forEach((d,x)=>d.classList.toggle("on",x===i));
-      $("#rvnext").innerHTML = i<levels.length-1 ? '<span class="mi">arrow_forward</span> Next look' : '<span class="mi">check</span> Take me in';
-      narrate(L);
+    const stops={ you:{b:"Just you",s:"Your own pieces, styled properly. Nothing bought."},
+      catalog:{b:"One keystone",s:"Add the sling. One piece, the whole look lifts."},
+      peak:{b:"Peak",s:"Everything together. The full you."} };
+    const lookFor=v=> v>=98?"peak" : v>=85?"catalog" : "you";
+    showSheet(`<p class="k">Step 3 · how far you can go</p>
+      <div class="rimg" id="rimg">
+        <img data-key="you"><img data-key="catalog"><img data-key="peak">
+        <div class="rtag"><b id="rlab">Just you</b><span id="rsub"></span></div>
+      </div>
+      <div class="ratingrow"><div class="ratingnum" id="rnum">75<small>%</small></div><div class="k">Style rating</div></div>
+      <input type="range" min="75" max="100" value="75" class="slider" id="rslider">
+      <div class="ticks"><span>75 owned</span><span>90 keystone</span><span>100 peak</span></div>
+      <button class="btn" id="rvnext"><span class="mi">check</span> Take me in</button>`);
+    const imgs={}; ["you","catalog","peak"].forEach(k=>{ const im=$('#rimg img[data-key="'+k+'"]'); im.src=ASSETS.styled[k]; imgs[k]=im; });
+    let last=null;
+    function apply(v){
+      $("#rnum").innerHTML=v+"<small>%</small>";
+      const key=lookFor(v);
+      if(key!==last){ last=key; Object.keys(imgs).forEach(k=>imgs[k].classList.toggle("on",k===key));
+        $("#rlab").textContent=stops[key].b; $("#rsub").textContent=stops[key].s;
+        setState("styling");
+        if(state.voiceMode){ const lines={you:"Just what you already own, styled properly.",catalog:"Add one keystone, and watch the whole thing lift.",peak:"And this is your ceiling. The full look."}; speak(lines[key]); } }
     }
-    async function narrate(L){
-      const lines={ you:"Level one. This is just what you already own, styled properly. Costs you nothing.",
-        catalog:"Level two. Add one keystone from us, and see how far that single piece moves it.",
-        peak:"Level three. This is your ceiling. The full look once you're all in." };
-      setState("styling"); if(state.voiceMode) speak(lines[L.key]);
-    }
-    $("#rvnext").onclick=()=>{ if(i<levels.length-1){ i++; draw(); } else { renderSaved(); hideSheet(); switchFromStageMode(); resolve(); } };
-    draw();
+    $("#rslider").addEventListener("input",e=>apply(+e.target.value));
+    apply(75);
+    $("#rvnext").onclick=()=>{ renderSaved(); hideSheet(); switchFromStageMode(); resolve(); };
   });
 }
-
-/* stage mode hides the voice orb + composer, gives the sheet room */
-function switchToStageMode(){ $("#voicestage").style.opacity=".35"; $("#composer").style.display="none"; }
+function switchToStageMode(){ $("#voicestage").style.opacity=".3"; $("#composer").style.display="none"; }
 function switchFromStageMode(){ $("#voicestage").style.opacity="1"; if(!state.voiceMode) switchText(true); else $("#composer").style.display="flex"; }
 
-/* =========================================================
-   MAIN APP
-   ========================================================= */
-function enterApp(){
-  $("#tabbar").classList.add("show");
-  renderWardrobe(); renderSaved(); renderShop();
-  setState("always here");
-  // keep chat available; land on Stylist tab (already active)
-}
+/* ---------------- main app ---------------- */
+function enterApp(){ $("#tabbar").classList.add("show"); renderWardrobe(); renderSaved(); renderShop(); setState("always here"); }
 function renderWardrobe(){
   const w=$("#wardrobeList"); w.innerHTML="";
   if(!state.wardrobe.length){ w.appendChild(el("div","emptymsg","Your confirmed pieces will show up here.")); return; }
-  state.wardrobe.forEach(x=>{ const c=el("button","chip sel",'<span class="mi">check</span>'+x); w.appendChild(c); });
+  state.wardrobe.forEach(x=>{ w.appendChild(el("button","chip sel",'<span class="mi">check</span>'+x)); });
 }
 function renderSaved(){
   const s=$("#savedList"); s.innerHTML="";
-  const looks=[["you","Just you","Your own pieces, styled"],["catalog","One keystone","Your look + one add from us"],["peak","Your ceiling","The full look"]];
-  looks.forEach(([k,b,sub])=>{
+  [["you","Just you","Your own pieces, styled"],["catalog","One keystone","Your look plus one add from us"],["peak","Your ceiling","The full look"]].forEach(([k,b,sub])=>{
     const box=imgWithFallback(ASSETS.styled[k], b.toUpperCase(), "savedlook");
-    box.appendChild(el("div","cap",`<b>${b}</b><span style="font-size:12.5px;color:#d8d5ea">${sub}</span>`));
+    box.appendChild(el("div","cap",`<b>${b}</b><span style="font-size:12.5px;color:#e4e2f2">${sub}</span>`));
     s.appendChild(box);
   });
 }
@@ -653,12 +495,8 @@ function renderShop(){
   CATALOG.forEach(p=>{ const c=el("div","card");
     const th=el("div","thumb",'<span class="mi">apparel</span>');
     const im=new Image(); im.onload=()=>{ th.innerHTML=""; im.style.width="100%"; im.style.height="100%"; im.style.objectFit="cover"; th.appendChild(im); }; im.src="assets/catalog/"+p.s+".jpg";
-    c.appendChild(th);
-    c.appendChild(el("div","meta",`<b>${p.n}</b><div class="pr">${p.p}</div>`));
-    g.appendChild(c); });
+    c.appendChild(th); c.appendChild(el("div","meta",`<b>${p.n}</b><div class="pr">${p.p}</div>`)); g.appendChild(c); });
 }
-
-/* tab switching */
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   const id=t.dataset.tab;
   document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
@@ -666,61 +504,40 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   $("#v-"+id).classList.add("active");
 });
 
-/* free chat in the app (after onboarding) */
 let chatMode=false;
 async function appChatTurn(text){
   userLog(text);
-  const sys={role:"system",content:`You are RUMOAR, a warm, sharp men's fashion stylist in India. The user's profile: name ${state.profile.name}, vibe ${state.profile.vibe}, occasions ${state.profile.occasions}, build ${state.read?state.read.build:"?"}, wardrobe: ${state.wardrobe.join(", ")}. Give short, practical styling answers. Recommend across their own wardrobe first; only suggest buying a keystone when it clearly lifts the look. One or two sentences.`};
+  const sys={role:"system",content:`You are RUMOAR, a warm, sharp men's fashion stylist in India. The user: name ${state.profile.name}, vibe ${state.profile.vibe}, occasions ${state.profile.occasions}, build ${state.read?state.read.build:"?"}, wardrobe: ${state.wardrobe.join(", ")}. Give short, practical answers. Recommend from their own wardrobe first; only suggest buying a keystone when it clearly lifts the look. One or two sentences.`};
   let reply=await llm([sys,{role:"user",content:text}]);
-  if(!reply){ reply = scriptedChat(text); }
+  if(!reply){ reply=scriptedChat(text); }
   await agentSay(reply);
 }
 function scriptedChat(text){
   const t=text.toLowerCase();
-  if(/wedding/.test(t)) return "For a wedding, start with what you own: the oxford shirt and chinos. Add our full-grain sling in a warm tan and you're the best-dressed guest without trying.";
-  if(/work|office/.test(t)) return "Keep work quiet. Your oxford, dark denim, clean sneakers, and the bifold wallet doing the detail. Nothing shouting.";
-  if(/date|night|party/.test(t)) return "Night out, lean into contrast: black tee, dark jeans, boots, and the clip pouch as the one piece people notice.";
+  if(/wedding/.test(t)) return "For a wedding, start with the rust shirt and brown trousers you own. Add our full-grain sling and you're the best-dressed guest without trying.";
+  if(/work|office/.test(t)) return "Keep work quiet. Olive shirt over a tee, cream trousers, clean sneakers, and the bifold doing the detail. Nothing shouting.";
+  if(/date|night|party/.test(t)) return "Night out, lean earthy and sharp: navy shirt, dark trousers, and the clip pouch as the one piece people notice.";
   if(/buy|shop|need/.test(t)) return "Honestly, before you buy anything, the sling is the one keystone that changes the most looks for you. Everything else you already own.";
   return "Tell me the occasion and I'll build it from your wardrobe first, then add one keystone only if it earns its place.";
 }
 
-/* =========================================================
-   WIRING
-   ========================================================= */
 $("#answer").onclick=async()=>{
-  $("#v-call").classList.remove("active");
-  $("#v-agent").classList.add("active");
-  switchText(false);
-  // must resume audio context after a user gesture
+  $("#v-call").classList.remove("active"); $("#v-agent").classList.add("active"); switchText(false);
   if(synth){ try{ synth.resume(); }catch(e){} }
-  await runFlow();
-  chatMode=true;
+  await runFlow(); chatMode=true;
 };
-$("#decline").onclick=()=>{ $("#answer").click(); }; // demo: both start it
+$("#decline").onclick=()=>{ $("#answer").click(); };
 
-/* after onboarding, route replies to app chat */
 (function watchComposer(){
-  // The onboarding uses getReply(); after it finishes, chatMode is true and
-  // we re-arm the composer for free chat.
   const mic=$("#micbtn"), send=$("#sendb"), input=$("#textin");
-  const handleVoice=async()=>{ if(!chatMode)return; mic.classList.add("live");$("#miclabel").textContent="Listening…";
-    const txt=await listenOnce(); mic.classList.remove("live");$("#miclabel").textContent="Hold to talk"; if(txt) appChatTurn(txt); };
+  const handleVoice=async()=>{ if(!chatMode)return; mic.classList.add("live");$("#miclabel").textContent="Listening"; const txt=await listenOnce(); mic.classList.remove("live");$("#miclabel").textContent="Hold to talk"; if(txt) appChatTurn(txt); };
   const handleText=()=>{ if(!chatMode)return; const v=input.value.trim(); if(!v)return; input.value=""; appChatTurn(v); };
   mic.addEventListener("click",()=>{ if(chatMode) handleVoice(); });
   send.addEventListener("click",()=>{ if(chatMode) handleText(); });
   input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&chatMode) handleText(); });
 })();
 
-/* config sheet */
-function openCfg(){ $("#c-endpoint").value=CONFIG.endpoint;$("#c-chat").value=CONFIG.chatModel;$("#c-vision").value=CONFIG.visionModel;$("#c-key").value=CONFIG.key; $("#cfg").classList.add("show"); }
-$("#gearBtn").onclick=openCfg; $("#gearCall").onclick=openCfg;
-$("#c-close").onclick=()=>$("#cfg").classList.remove("show");
-$("#c-save").onclick=()=>{ CONFIG.endpoint=$("#c-endpoint").value.trim();CONFIG.chatModel=$("#c-chat").value.trim();CONFIG.visionModel=$("#c-vision").value.trim();CONFIG.key=$("#c-key").value.trim();
-  try{localStorage.setItem("rmr_cfg",JSON.stringify(CONFIG));}catch(e){} $("#cfg").classList.remove("show"); };
-
-/* if speech recognition is unavailable (e.g. some Safari), default to text */
-if(!canListen){ /* voice playback still works; input falls to text */
-  $("#voicehint").textContent="Voice replies aren't supported here, tap the keyboard to type."; }
+if(!canListen){ $("#voicehint").textContent="Voice replies aren't supported here, tap the keyboard to type."; }
 </script>
 </body>
 </html>
