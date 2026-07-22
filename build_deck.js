@@ -119,7 +119,7 @@ S(`<div class="cov">
 S(
   kick("The unmet job")+
   H("He doesn't ask a store how to dress.<br>He asks his girlfriend.")+
-  sub("The fashion-first man buys his own clothes. What he can't do is compose the look, so he outsources the judgment to someone he trusts. No brand has ever been that someone.")+
+  sub("The fashion-first man can already buy every piece, every material, a search away. What he can't do is compose them into a look that is his, so he outsources that judgment to someone he trusts. No brand has ever been that someone.")+
   cols([
     {k:"THE MAN", title:"The vibe-coder", body:"23 to 28, metro, early-career. He recognises great style but can't yet generate it. Fluent in marketing, allergic to being sold to."},
     {k:"THE JOB", title:"Taste, not shopping", body:"He shops fine. What he hands to a girlfriend or a friend is the taste call, the “am I getting this right?” he has no trusted source for."},
@@ -217,7 +217,8 @@ S(
     {k:"01 / YOUR CLOSET", title:"Buy nothing.", body:"A complete look from what he already owns. Proof before purchase, and the structural sign we're advising, not selling."},
     {k:"02 / THE ELEVATE", title:"One keystone.", body:"“You're ninety percent there, this sling is the ten.” One confident add, never a cart."},
     {k:"03 / THE CEILING", title:"The peak look.", body:"Including pieces we don't sell. Every gap we can't fill becomes a ranked, pre-validated product request.", dark:true}
-  ]),
+  ])+
+  take("Styling gets him to ninety. The keystone is the last ten, sold only once we have earned it."),
   {});
 
 /* 09 BRAND CODES */
@@ -316,8 +317,8 @@ S(
 /* 15 THE WALL */
 S(
   kick("The wall")+
-  H("Nine styles, three drops, three shelf gaps.")+
-  table(["The style","MRP","The gap it fills, observed live 20 Jul 2026<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; competitor product copy quoted verbatim.'>[30]</sup>"],[
+  H("Nine styles, three drops. What the engine recommends.")+
+  table(["The style","MRP","Where the honest version is missing, 20 Jul 2026<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; competitor product copy quoted verbatim.'>[30]</sup>"],[
     [{t:"Leather sling, full-grain veg-tan",b:1},{t:"₹3,000",b:1},"No real-leather men's sling exists between ₹2.5 and 4K"],
     [{t:"Canvas roll-top sling",b:1},{t:"₹2,499",b:1},"Same void, lighter entry, monsoon-practical"],
     [{t:"Clip pouch (the motif)",b:1},{t:"₹1,499",b:1},"Prada's exact SS27 gesture; the attach-rate engine"],
@@ -328,13 +329,13 @@ S(
     [{t:"Canvas + leather tote",b:1},{t:"₹2,499",b:1},"No masculine canvas-leather tote under Mokobara's ₹6,499"],
     [{t:"Backpack, second-line (Drop 3)",b:1},{t:"₹4,500",b:1},"The contested ladder; it follows demand, never leads"]
   ],[38,12,50])+
-  take("The wall is what the engine recommends, every style where a Tier-3 gap meets a shelf void. <b>Rumour 001</b> ships the sling, the wallet and the cap: the exact first purchase order<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>; 002 and 003 are cut only against waitlists. Full-grain leather and canvas, made in India, released as drops."),
+  take("The wall is what the engine recommends once it knows his taste, every style where a real need meets a piece worth standing behind. <b>Rumour 001</b> ships the sling, the wallet and the cap: the exact first purchase order<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>; 002 and 003 are cut only against waitlists. Full-grain leather and canvas, made in India, released as drops."),
   {});
 
 /* 16 BOM */
 S(
   kick("What it's made of, and what it costs")+
-  H("Priced into the gap, not above it.")+
+  H("Priced with the shelf, not above it.")+
   `<div class="split7-5">
     <div>${table(["SKU","Landed COGS","MRP","GM"],[
       ["Cap, minimal","₹450","₹1,100",{t:"~54%",b:1}],
@@ -345,7 +346,7 @@ S(
     <div class="sidebox v">
       <div class="bignum" style="color:#fff;font-size:40px">~51%</div>
       <div class="bigcap" style="color:var(--peri)">blended, ~53% at the Rumour 001 mix.<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a lever.'>[18]</sup></div>
-      <div class="bigdesc" style="color:var(--mist)">Margins are on net revenue after discount. Landed-to-MRP runs 2.4 to 3.7× across the wall<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>, against a 4 to 6× industry convention<a class='cite' href='https://www.aims360.com/fashion-business-resources/apparel-industry-pricing-margin-calculator-wholesale-retail-erp' target='_blank' rel='noopener'>[31]</a>, which is why these prices sit inside the shelf gaps instead of above them. Seven named factory RFQs are out for firm quotes.</div>
+      <div class="bigdesc" style="color:var(--mist)">Margins are on net revenue after discount. Landed-to-MRP runs 2.4 to 3.7× across the wall<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>, against a 4 to 6× industry convention<a class='cite' href='https://www.aims360.com/fashion-business-resources/apparel-industry-pricing-margin-calculator-wholesale-retail-erp' target='_blank' rel='noopener'>[31]</a>, which is why these prices sit inside the shelf's own range, not above it. Seven named factory RFQs are out for firm quotes.</div>
     </div>
   </div>`,
   {});
