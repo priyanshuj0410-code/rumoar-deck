@@ -16,6 +16,8 @@
   --display:'Clash Display',sans-serif; --sans:'General Sans',sans-serif; --mono:'Space Mono',monospace;
   --btnh:52px;
   --ease:cubic-bezier(.2,.7,.2,1);
+  --tabh:62px;
+  --glass:rgba(255,255,255,.66);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
@@ -46,7 +48,7 @@ body{font-family:var(--sans);background:#0b0b0d;color:var(--ink);display:flex;al
 #stage{position:relative;flex:1;min-height:0;overflow:hidden}
 .view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--paper)}
 .view.active{display:flex;animation:viewin .36s var(--ease) both}
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:80px 0 calc(var(--tabh) + 12px)}
 button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 .k{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);margin:0}
 .mi{font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300,'opsz' 24;font-weight:normal;font-style:normal;
@@ -76,14 +78,13 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 
 /* ---------- AGENT ---------- */
-.aghead{display:flex;align-items:center;gap:10px;padding:6px 18px 14px;border-bottom:1px solid var(--line)}
+.aghead{position:absolute;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:10px;padding:12px 18px 12px;background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.8);backdrop-filter:blur(22px) saturate(1.8)}
 .aghead .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
 .aghead .nm{font-family:var(--display);font-weight:600;font-size:16px}
 .aghead .st{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin-top:1px}
 .aghead .grow{flex:1}
-.seg{display:flex;border:1px solid var(--line)}
-.iconbtn{width:38px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--mute);background:var(--paper);transition:background .2s,color .2s}
-.iconbtn+.iconbtn{border-left:1px solid var(--line)}
+.seg{display:flex;gap:3px;background:var(--wash);border-radius:12px;padding:3px}
+.iconbtn{width:36px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--mute);background:transparent;border-radius:9px;transition:background .2s,color .2s}
 .iconbtn .mi{font-size:19px}
 .iconbtn.on{background:var(--ink);color:#fff}
 
@@ -99,7 +100,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .caption .who{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
 .hint{font-size:12px;color:var(--mute)}
 
-#chatlog{flex:1;overflow-y:auto;padding:20px 16px 8px;display:none;flex-direction:column;gap:8px}
+#chatlog{flex:1;overflow-y:auto;padding:62px 16px 8px;display:none;flex-direction:column;gap:8px}
 .bub{max-width:84%;padding:12px 15px;font-size:15px;line-height:1.5;animation:fadein .3s ease both}
 .bub.a{align-self:flex-start;background:var(--wash);color:var(--ink)}
 .bub.u{align-self:flex-end;background:var(--ink);color:#fff}
@@ -108,13 +109,13 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .bub.typing i:nth-child(2){animation-delay:.16s}.bub.typing i:nth-child(3){animation-delay:.32s}
 @keyframes typebounce{0%,64%,100%{transform:translateY(0);opacity:.4}32%{transform:translateY(-5px);opacity:.95}}
 
-.composer{flex:none;padding:12px 16px 16px;border-top:1px solid var(--line);background:var(--paper);display:flex;gap:10px;align-items:center}
+.composer{flex:none;padding:12px 16px 16px;background:var(--paper);display:flex;gap:10px;align-items:center}
 .mic{flex:1;height:var(--btnh);background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:500;font-size:15px;transition:background .2s}
 .mic .mi{font-size:21px}
 .mic.live{background:var(--volt)}
 .textrow{flex:1;display:none;gap:10px}
-.textrow input{flex:1;height:var(--btnh);border:1px solid var(--line);padding:0 16px;font-family:inherit;font-size:15px;background:var(--paper);color:var(--ink)}
-.textrow input:focus{outline:none;border-color:var(--ink)}
+.textrow input{flex:1;height:var(--btnh);padding:0 16px;font-family:inherit;font-size:15px;background:var(--wash);color:var(--ink)}
+.textrow input:focus{outline:none;background:#ecebe5}
 .sendb{width:var(--btnh);height:var(--btnh);background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center}
 .sendb .mi{font-size:21px}
 
@@ -129,18 +130,18 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .p-foot.col .btn{flex:0 0 auto;width:100%}
 .btn{flex:1;height:var(--btnh);background:var(--ink);color:#fff;font-weight:500;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
 .btn:active{opacity:.85}
-.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+.btn.ghost{background:var(--wash);color:var(--ink)}
 .btn.sm{flex:none;height:38px;padding:0 14px;font-size:13px}
 .btn .mi{font-size:19px}
 .hidden{display:none!important}
 
 .uploads{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.upcell{aspect-ratio:3/4;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--mute);overflow:hidden;background:var(--wash);position:relative}
+.upcell{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:var(--mute);overflow:hidden;background:var(--wash);position:relative}
 .upcell img{width:100%;height:100%;object-fit:cover}
 .upcell .mi{font-size:24px}
 
 .wgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:10px}
-.wtile{position:relative;border:1px solid var(--line);overflow:hidden;background:var(--paper);display:flex;flex-direction:column;padding:0;text-align:left;transition:box-shadow .2s,border-color .2s}
+.wtile{position:relative;overflow:hidden;background:var(--wash);display:flex;flex-direction:column;padding:0;text-align:left;transition:box-shadow .2s,border-color .2s}
 .wtile .th{aspect-ratio:1;background:var(--wash);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
 .wtile .th img{width:100%;height:100%;object-fit:cover}
 .wtile .th .mi{font-size:22px;color:var(--mute)}
@@ -176,11 +177,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
 
 /* ---------- TAB VIEWS ---------- */
-.vhead{padding:14px 18px 10px}
+.vhead{position:absolute;top:0;left:0;right:0;z-index:40;padding:13px 18px 11px;background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.8);backdrop-filter:blur(22px) saturate(1.8)}
 .vhead.row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .vhead h2{font-family:var(--display);font-weight:600;font-size:26px;margin:5px 0 0;letter-spacing:-.01em}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 28px}
-.card{background:var(--paper);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;transition:transform .15s}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}
+.card{background:var(--wash);overflow:hidden;display:flex;flex-direction:column;transition:transform .15s}
 .card:active{transform:scale(.985)}
 .card .thumb{aspect-ratio:1;background:var(--wash);display:flex;align-items:center;justify-content:center;color:var(--mute);overflow:hidden}
 .card .thumb img{width:100%;height:100%;object-fit:cover}
@@ -189,7 +190,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .card .meta b{font-size:13.5px;font-weight:600;display:block}
 .card .meta .pr{font-family:var(--mono);font-size:12px;color:var(--mute);margin-top:3px}
 .savedlook{margin:12px 16px 0;overflow:hidden;position:relative;aspect-ratio:4/5;background:var(--wash)}
-.savedlook:last-child{margin-bottom:28px}
+.savedlook:last-child{margin-bottom:8px}
 .savedlook img{width:100%;height:100%;object-fit:cover}
 .savedlook .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#4B4673,#17171B);color:var(--peri);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
 .savedlook .cap{position:absolute;left:0;right:0;bottom:0;padding:16px;background:linear-gradient(transparent,rgba(23,23,27,.82));color:#fff}
@@ -198,21 +199,21 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
 /* ---------- PRODUCT PAGE ---------- */
 #v-product{z-index:30}
-.pdp-top{flex:none;display:flex;align-items:center;gap:12px;padding:8px 14px}
+.pdp-top{position:absolute;top:14px;left:16px;z-index:40;padding:0}
 .pdp-top .mi{font-size:24px}
-.pdp-img{position:relative;margin:0 16px;aspect-ratio:1;background:var(--wash);overflow:hidden}
+.pdp-img{position:relative;margin:8px 16px 0;aspect-ratio:1;background:var(--wash);overflow:hidden}
 .pdp-img img{width:100%;height:100%;object-fit:cover}
 .pdp-info{padding:18px}
 .pdp-info h2{font-family:var(--display);font-weight:600;font-size:24px;margin:6px 0 4px;letter-spacing:-.01em}
 .pdp-info .price{font-family:var(--mono);font-size:15px;color:var(--ink)}
 .pdp-info p{color:var(--mute);font-size:14px;line-height:1.6;margin:12px 0 0}
-.pdp-foot{flex:none;margin-top:auto;padding:14px 16px 16px;border-top:1px solid var(--line);display:flex}
+.pdp-foot{flex:none;margin-top:auto;padding:14px 16px 20px;display:flex;background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(20px) saturate(1.7);backdrop-filter:blur(20px) saturate(1.7)}
 .toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--ink);color:#fff;padding:14px 16px;font-size:14px;z-index:60;opacity:0;transform:translateY(8px);transition:.3s;display:flex;align-items:center;gap:8px;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
 .toast .mi{font-size:18px;color:var(--peri)}
 
 /* ---------- TABBAR ---------- */
-#tabbar{display:none;flex:none;border-top:1px solid var(--line);background:var(--paper);padding:9px 6px 12px;justify-content:space-around}
+#tabbar{display:none;position:absolute;left:0;right:0;bottom:0;z-index:50;padding:9px 6px 14px;justify-content:space-around;background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(24px) saturate(1.8);backdrop-filter:blur(24px) saturate(1.8);box-shadow:0 -0.5px 0 rgba(23,23,27,.08)}
 #tabbar.show{display:flex}
 .tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mute);font-size:10px;font-weight:500;padding:3px 12px;transition:color .2s}
 .tab .mi{font-size:23px}
@@ -251,6 +252,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 @keyframes mkin{from{opacity:0;transform:translate(-50%,-50%) scale(.5)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @keyframes pop{0%{transform:scale(.4)}55%{transform:scale(1.18)}100%{transform:scale(1)}}
 #panel.closing{animation:paneldown .26s var(--ease) both}
+/* glass + borderless helpers */
+.in-app .composer{margin-bottom:var(--tabh)}
+#tabbar.hidetab{display:none}
+.pdp-top button{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.16)}
 </style>
 </head>
 <body>
@@ -307,7 +312,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
       <section id="v-wardrobe" class="view">
         <div class="vhead row"><div><div class="k">Your wardrobe</div><h2>What you own</h2></div>
           <button class="btn ghost sm" id="wardAdd"><span class="mi">add</span> Add item</button></div>
-        <div class="scroll"><div class="wgrid" id="wardrobeList" style="padding:12px 16px 28px"></div></div>
+        <div class="scroll"><div class="wgrid" id="wardrobeList" style="padding:0 16px"></div></div>
       </section>
       <!-- SAVED -->
       <section id="v-saved" class="view">
@@ -608,9 +613,9 @@ function stageReveals(){
 }
 
 /* ---------------- main app ---------------- */
-function enterApp(){ $("#tabbar").classList.add("show"); renderWardrobe(); renderSaved(); renderShop(); setState("always here"); }
+function enterApp(){ document.querySelector(".screen").classList.add("in-app"); $("#tabbar").classList.add("show"); renderWardrobe(); renderSaved(); renderShop(); setState("always here"); }
 function renderWardrobe(){
-  const w=$("#wardrobeList"); w.className="wgrid"; w.style.padding="12px 16px 28px"; w.innerHTML="";
+  const w=$("#wardrobeList"); w.className="wgrid"; w.style.padding="0 16px"; w.innerHTML="";
   state.wardrobe.forEach(x=>{
     const t=el("div","wtile"); const th=el("div","th"); t.appendChild(th); t.appendChild(el("div","lb",x.l));
     if(x.img){ th.classList.add("skel"); const im=el("img"); im.onload=()=>{th.classList.remove("skel");th.innerHTML="";th.appendChild(im);}; im.src=x.img; }
@@ -654,6 +659,7 @@ function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   $("#v-"+id).classList.add("active");
   document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.tab===id));
+  $("#tabbar").classList.toggle("hidetab", id==="product");
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showView(t.dataset.tab));
 
