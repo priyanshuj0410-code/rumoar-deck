@@ -15,6 +15,7 @@
   --mute:#8C8B85; --volt:#6152F0; --ok:#3E7D5A; --peri:#B3ACEF;
   --display:'Clash Display',sans-serif; --sans:'General Sans',sans-serif; --mono:'Space Mono',monospace;
   --btnh:52px;
+  --ease:cubic-bezier(.2,.7,.2,1);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
@@ -43,10 +44,10 @@ body{font-family:var(--sans);background:#0b0b0d;color:var(--ink);display:flex;al
 .island.active .isl-text{display:block}
 
 #stage{position:relative;flex:1;min-height:0;overflow:hidden}
-.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--paper);opacity:0;transition:opacity .3s ease}
-.view.active{display:flex;opacity:1}
+.view{position:absolute;inset:0;display:none;flex-direction:column;background:var(--paper)}
+.view.active{display:flex;animation:viewin .36s var(--ease) both}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 .k{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);margin:0}
 .mi{font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300,'opsz' 24;font-weight:normal;font-style:normal;
   display:inline-flex;align-items:center;justify-content:center;width:1.25em;height:1.25em;overflow:hidden;flex:none;line-height:1;vertical-align:middle;font-feature-settings:'liga'}
@@ -216,6 +217,40 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mute);font-size:10px;font-weight:500;padding:3px 12px;transition:color .2s}
 .tab .mi{font-size:23px}
 .tab.on{color:var(--ink)}
+
+/* ---------- MOTION & PRESS FEEDBACK ---------- */
+.btn,.rbtn,.iconbtn,.mic,.sendb,.tab,.wtile,.card,.upcell,.pdp-top button{transition:transform .16s var(--ease),opacity .2s ease,background .22s ease,color .22s ease,box-shadow .2s ease,border-color .2s ease}
+.btn:active{transform:scale(.975);opacity:.92}
+.rbtn:active{transform:scale(.9)}
+.rbtn.ans:active{animation:none;transform:scale(.9)}
+.iconbtn:active{transform:scale(.92)}
+.mic:active{transform:scale(.985)}
+.sendb:active{transform:scale(.9)}
+.tab:active{transform:scale(.9)}
+.wtile:active{transform:scale(.97)}
+.card:active{transform:scale(.97)}
+.upcell:active{transform:scale(.97)}
+.pdp-top button:active{transform:scale(.86)}
+.mkdot{transition:transform .16s var(--ease)}
+.mk:active .mkdot{transform:scale(.82)}
+.slider::-webkit-slider-thumb{transition:transform .16s var(--ease)}
+.slider::-moz-range-thumb{transition:transform .16s var(--ease)}
+.slider:active::-webkit-slider-thumb{transform:scale(1.2)}
+.slider:active::-moz-range-thumb{transform:scale(1.2)}
+.textrow input{transition:border-color .2s ease}
+#chatlog{scroll-behavior:smooth}
+.bub{animation:bubin .34s var(--ease) both}
+.mk{animation:mkin .34s var(--ease) both}
+.wtile.sel .ck .mi{animation:pop .3s var(--ease)}
+.toast{transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
+#v-product.active{animation:pdpin .4s var(--ease) both}
+@keyframes viewin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pdpin{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes paneldown{from{opacity:1}to{opacity:0;transform:translateY(10px)}}
+@keyframes bubin{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@keyframes mkin{from{opacity:0;transform:translate(-50%,-50%) scale(.5)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes pop{0%{transform:scale(.4)}55%{transform:scale(1.18)}100%{transform:scale(1)}}
+#panel.closing{animation:paneldown .26s var(--ease) both}
 </style>
 </head>
 <body>
@@ -441,7 +476,7 @@ function collapseCall(on){
   $("#composer").style.display = on?"none":"flex";
 }
 function openPanel(html){ $("#panel").innerHTML=html; $("#panel").classList.add("show"); collapseCall(true); }
-function closePanel(){ $("#panel").classList.remove("show"); $("#panel").innerHTML=""; collapseCall(false); if(!state.voiceMode) switchText(true); }
+function closePanel(){ const p=$("#panel"); collapseCall(false); if(!state.voiceMode) switchText(true); p.classList.add("closing"); setTimeout(()=>{ p.classList.remove("show","closing"); p.innerHTML=""; },260); }
 
 /* ---------------- flow ---------------- */
 async function runFlow(){
