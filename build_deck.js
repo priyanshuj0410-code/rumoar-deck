@@ -111,53 +111,67 @@ function gbars(labels, s1, s2, o={}){
 S(`<div class="cov">
     <div class="cov-mark">RUMOAR</div>
     <div class="cov-tag"><em>Vibe-code</em> your look.</div>
-    <div class="cov-line">The styling engine for the fashion-first Indian man.</div>
+    <div class="cov-line">The stylist the fashion-first Indian man belongs to.</div>
     <div class="codestrip"><span>MEN'S FASHION ACCESSORIES · INDIA</span><span>PRI · <b class="v">SS27</b></span></div>
    </div>`, {nofoot:true});
 
-/* 02 · THE VIBE-CODER */
+/* 02 THE UNMET JOB */
 S(
-  kick("The man")+
-  H("Most men have the taste.<br>They don't have the translation.")+
-  sub("The category sells products and leaves the outfit to him. Nobody sells the translation, turning a feeling into a finished look for his build, his colouring, his occasion.")+
+  kick("The unmet job")+
+  H("He doesn't ask a store how to dress.<br>He asks his girlfriend.")+
+  sub("The fashion-first man buys his own clothes. What he can't do is compose the look, so he outsources the judgment to someone he trusts. No brand has ever been that someone.")+
   cols([
-    {k:"WHO HE IS", title:"The vibe-coder", body:"23 to 28, metro, early-career. He recognises great style but can't yet generate it. Fluent in marketing, allergic to being sold to."},
-    {k:"THE JOB", title:"Feeling to look", body:"He can pick the pieces. He can't compose the look. That job, turning taste into an outfit, is unowned by anyone on the shelf."},
-    {k:"THE WEDGE", title:"A stylist, not a store", body:"RUMOAR turns his vibe into his look, starting with what he already owns. He belongs to it; he isn't sold at.", dark:true}
+    {k:"THE MAN", title:"The vibe-coder", body:"23 to 28, metro, early-career. He recognises great style but can't yet generate it. Fluent in marketing, allergic to being sold to."},
+    {k:"THE JOB", title:"Taste, not shopping", body:"He shops fine. What he hands to a girlfriend or a friend is the taste call, the “am I getting this right?” he has no trusted source for."},
+    {k:"THE PROXY", title:"A person, not a brand", body:"She wins for one reason: no inventory to push, no reason to sell at him. That is the one thing no store has ever been.", dark:true}
   ]),
   {});
 
-/* 03 · THE EVIDENCE, AND IT'S RISING */
+/* 03 THE EVIDENCE */
 S(
   kick("The evidence")+
-  H("He already asks for help, where ads can't reach him.")+
+  H("The gap is real, large, and hiding in plain sight.")+
   tiles([
-    {n:"230K+", label:"r/IndianFashionAddicts members", desc:"~161K weekly visitors, core 18 to 34; a room that filters out anything that smells like an ad<a class='cite' href='https://thenodmag.com/content/reddit-online-fashion-communities-men-advice-style' target='_blank' rel='noopener'>[1]</a>"},
-    {n:"7.2B", label:"GRWM views in India, 2024", desc:"“how do I dress” is mass behaviour, not a niche<a class='cite' href='https://business.google.com/in/think/consumer-insights/fashion-beauty-influencer-marketing-india/' target='_blank' rel='noopener'>[2]</a>"},
-    {n:"8.5M", label:"subs, three men's-style channels", desc:"confident dressers don't consume how-to-style at this scale<sup class='cite cpop' data-pop='Live counts retrieved 19 to 20 July 2026: YouTube subscribers via SocialCounts (YouTube Data API); Instagram followers and engagement via HypeAuditor and Qoruz. Third-party tracker reads, dated, and expected to drift.'>[3]</sup>"}
+    {n:"25%", label:"of men would dress better “if they knew how”", desc:"the constraint is knowledge, not willingness<a class='cite' href='https://www.mintel.com/press-centre/a-quarter-of-male-shoppers-lack-fashion-sense/' target='_blank' rel='noopener'>[1]</a>"},
+    {n:"2×", label:"rise in accessory use among Gen Z men", desc:"the demand is arriving faster than the skill<a class='cite' href='https://redseer.com/articles/gen-z-defining-trends-influencing-spends/' target='_blank' rel='noopener'>[2]</a>"},
+    {n:"7×", label:"more spend from styled customers", desc:"the value of a trusted source is not in doubt<a class='cite' href='https://www.forbes.com/sites/sharonedelson/2023/01/31/nordstrom-launches-style-ambassador-program-for-best-customers/' target='_blank' rel='noopener'>[3]</a>"}
   ])+
-  take("Demand for translation is rising, and it gathers in the places advertising can't follow. Accessory use among Gen Z men has <b>doubled</b> (Redseer)<a class='cite' href='https://redseer.com/articles/gen-z-defining-trends-influencing-spends/' target='_blank' rel='noopener'>[4]</a>. The behaviour has arrived; the styling house hasn't."),
+  take("And the demand gathers where ads can't follow: r/IndianFashionAddicts 230K+<a class='cite' href='https://thenodmag.com/content/reddit-online-fashion-communities-men-advice-style' target='_blank' rel='noopener'>[4]</a>, r/malefashionadvice 6.3M<a class='cite' href='https://en.wikipedia.org/wiki/R/malefashionadvice' target='_blank' rel='noopener'>[5]</a>, GRWM 7.2B views in India<a class='cite' href='https://business.google.com/in/think/consumer-insights/fashion-beauty-influencer-marketing-india/' target='_blank' rel='noopener'>[6]</a>, men's-style creators past 8.5M subscribers<sup class='cite cpop' data-pop='Live counts retrieved 19 to 20 July 2026: YouTube subscribers via SocialCounts (YouTube Data API); Instagram followers and engagement via HypeAuditor and Qoruz. Third-party tracker reads, dated, and expected to drift.'>[7]</sup>. Men already trust a stylist, the creators. None of them closes the loop."),
   {});
 
-/* 04 · THE GRAVEYARD */
+/* 04 THE STYLING GRAVEYARD */
 S(
-  kick("The category")+
-  H("The winners and the graveyard run the same margins.")+
+  kick("Why it's open")+
+  H("Everyone who tried to be that source died.")+
+  table(["Who tried to style men","Raised","What happened"],[
+    [{t:"Trunk Club",b:1},"$350M (Nordstrom)","Written down, service killed 2022<a class='cite' href='https://www.retaildive.com/news/what-trunk-clubs-demise-says-about-apparel-subscriptions/624667/' target='_blank' rel='noopener'>[8]</a>"],
+    [{t:"Thread (UK)",b:1},"$40M+ incl. H&M","Collapsed 2022, IP to M&S<a class='cite' href='https://corporate.marksandspencer.com/newsroom/press-releases/ms-acquires-thread-ip-accelerate-its-personalisation-plans' target='_blank' rel='noopener'>[9]</a>"],
+    [{t:"Stitch Fix Men",b:1},"IPO'd","Awareness “de minimis,” shrinking<a class='cite' href='https://www.glossy.co/fashion/stitch-fix-is-under-pressure-to-increase-its-mens-business-as-a-public-company/' target='_blank' rel='noopener'>[10]</a>"],
+    [{t:"Mr Voonik (India)",b:1},"part of $34.5M","Distress-merged away, 2020<a class='cite' href='https://inc42.com/buzz/voonik-turns-profitable-in-fy20-after-merger-with-bangladeshs-shopup/' target='_blank' rel='noopener'>[11]</a>"],
+    [{t:"StyleCracker (India)",b:1},"~$3M","Boxes wound down, B2B pivot<a class='cite' href='https://www.cbinsights.com/company/stylecracker/financials' target='_blank' rel='noopener'>[12]</a>"]
+  ],[34,26,40])+
+  take("They didn't die of weak demand, styling drives 7× spend<a class='cite' href='https://www.forbes.com/sites/sharonedelson/2023/01/31/nordstrom-launches-style-ambassador-program-for-best-customers/' target='_blank' rel='noopener'>[3]</a>. They died because inventory-first styling is a salesperson men can smell. Each gated its advice to its own shelf and rebuilt the distrust it was selling against."),
+  {});
+
+/* 05 THE CATEGORY'S REAL PHYSICS */
+S(
+  kick("The other trap")+
+  H("And the product category kills on the balance sheet, not demand.")+
   `<div class="split6-6">
     <div>
-      <div class="chart-t">Marketing spend, % of revenue (FY25 filings)<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[5]</a></div>
+      <div class="chart-t">Marketing spend, % of revenue (filings)<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a></div>
       ${vbars(["DailyObjects","Mokobara","Uppercase","Zouk"],[17,20,25,45],{fmt:v=>v+"%",max:50,W:600,H:300})}
       <div class="chart-n">Where margins are filed, they cluster near 51%. One line item, marketing, separates a business from a bonfire.</div>
     </div>
     <div>${ul([
-      "Baggit went insolvent over a ₹1.11 Cr bill<a class='cite' href='https://www.freepressjournal.in/mumbai/mumbai-news-nclt-admits-insolvency-plea-against-baggit-india-over-111-crore-operational-debt' target='_blank' rel='noopener'>[6]</a>; VIP lost ₹338 Cr in FY26<a class='cite' href='https://www.screener.in/company/VIPIND/consolidated/' target='_blank' rel='noopener'>[7]</a>. Neither died of weak demand.",
-      "Zouk spent 45% of revenue on ads to lose ₹19.6 Cr. Mokobara lost ₹10 Cr at ~20%<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[5]</a>.",
-      "The category's killers are working capital and acquisition cost. So RUMOAR is engineered capital-light and community-led. Discipline is the product, not a virtue."
+      "Baggit went insolvent over a ₹1.11 Cr bill<a class='cite' href='https://www.freepressjournal.in/mumbai/mumbai-news-nclt-admits-insolvency-plea-against-baggit-india-over-111-crore-operational-debt' target='_blank' rel='noopener'>[14]</a>; VIP lost ₹338 Cr in FY26<a class='cite' href='https://www.screener.in/company/VIPIND/consolidated/' target='_blank' rel='noopener'>[15]</a>. Neither died of weak demand.",
+      "Zouk spent 45% of revenue on ads to lose ₹19.6 Cr<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>. The killers are working capital and acquisition cost.",
+      "Two traps, one conclusion: this can't be won as a product brand. It has to be won as something no one has built yet."
     ])}</div>
   </div>`,
   {});
 
-/* 05 · A WINNABLE SLICE (market sizing) */
+/* 06 THE MARKET */
 S(
   kick("The market")+
   H("A winnable slice, sized from people up.")+
@@ -165,82 +179,125 @@ S(
     <div>
       <div class="funnel">
         <div class="fr"><span class="fl">Urban men, 18 to 35</span><span class="fv">~80M</span></div>
-        <div class="fn">Worldometer / UN age structure, ±15% [A]<sup class='cite cpop' data-pop='Derived from UN and Worldometer age structure: urban Indian men 18 to 35 land at roughly 83 to 86M. Stated at plus or minus 15% to bracket migration skew (higher) against stricter urban definitions (lower).'>[8]</sup></div>
+        <div class="fn">Worldometer / UN age structure, ±15%<sup class='cite cpop' data-pop='Derived from UN and Worldometer age structure: urban Indian men 18 to 35 land near 80M. Stated at plus or minus 15% to bracket migration skew against stricter urban definitions.'>[16]</sup></div>
         <div class="fr"><span class="fl">Income-qualified (~15%)</span><span class="fv">~12M</span></div>
-        <div class="fn">Rebased from Goldman affluence, honest range 8 to 14M<sup class='cite cpop' data-pop='Rebased in our model from Goldman Sachs&#39; affluent-India base (60M to 100M by 2027). The 15% income-qualified share is the audited rebasing, down from a pre-audit 17.5% that over-applied all-adult affluence to a younger cohort. Honest range 8 to 14M.'>[9]</sup></div>
+        <div class="fn">Rebased from Goldman affluence, range 8 to 14M<sup class='cite cpop' data-pop='Rebased in our model from Goldman Sachs&#39; affluent-India base (60M to 100M by 2027). The 15% income-qualified share is the audited rebasing, down from a pre-audit 17.5% that over-applied all-adult affluence to a younger cohort. Range 8 to 14M.'>[17]</sup></div>
         <div class="fr"><span class="fl">Would buy premium accessories (~30%) × ₹4,000/yr</span><span class="fv">the base</span></div>
-        <div class="sambar">Serviceable market ≈ ₹1,400 Cr<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup></div>
+        <div class="sambar">Serviceable market ≈ ₹1,400 Cr<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a lever.'>[18]</sup></div>
       </div>
     </div>
     <div>${ul([
-      "A scoped range, not a point: ₹600 to 2,500 Cr as penetration and spend swing. We show the swing rather than pick the flattering number.",
-      "The Year-5 plan, ₹160 Cr, is ~11% of the base case. Winnable in a fragmented field, not trivial.",
-      "The category is being validated by fresh capital right now; the behaviour is arriving faster than the skill to style it."
+      "A scoped range, not a point: ₹600 to 2,500 Cr as penetration and spend swing.",
+      "The Year-5 plan, ₹160 Cr, is ~11% of the base. Winnable in a fragmented field, not trivial.",
+      "Capital is validating the category right now, so the behaviour is arriving faster than the house to serve it."
     ])}</div>
   </div>`,
   {});
 
-/* 06 · THE UNOWNED GAP */
+/* 07 WHO'S MOVING */
 S(
-  kick("The gap")+
-  H("No one owns men's-first, community-led, styling-led.")+
-  table(["Who's there","What they are","The blind spot"],[
-    [{t:"Mokobara",b:1},"Premium travel gear","Twelve colourways of one sling, no styling<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; the wallet-band vacancy was double-confirmed.'>[11]</sup>"],
-    [{t:"Uppercase",b:1},"Eco-luggage","A category, not a man's look"],
-    [{t:"Snitch",b:1},"Fast fashion at scale","Volume, not curation"],
-    [{t:"Urban Monkey",b:1},"Loud streetwear","The man who wants quiet has no one"],
-    [{t:"Zouk",b:1},"Premium slings, by their own copy “for women”","Not built for him at all"]
-  ],[20,42,38])+
-  take("Each is a good business. None is a men's-first styling house. The position is unoccupied, and the window is closing from above faster than from below, so speed matters more than the market's size."),
+  kick("Who's moving")+
+  H("Everyone is converging on it. Nobody owns it.")+
+  table(["Who's moving","Coming from","The blind spot"],[
+    [{t:"Zouk",b:1},"Women's vegan-leather bags","Women-coded; 45% ad ratio, losing ₹19.6 Cr<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>"],
+    [{t:"Rare Rabbit",b:1},"₹819 Cr men's apparel<a class='cite' href='https://startuppedia.in/trending/founded-in-2015-by-a-husband-wife-duo-fashion-brand-the-house-of-rare-clocks-rs-818-crore-revenue-in-fy25-profit-falls-to-rs-16-crore-11121290' target='_blank' rel='noopener'>[19]</a>","Bags as an extension, not the focus"],
+    [{t:"Snitch",b:1},"₹498 Cr filed FY25<a class='cite' href='https://entrackr.com/fintrackr/snitch-nears-rs-500-cr-revenue-in-fy25-stays-close-to-breakeven-11058503' target='_blank' rel='noopener'>[20]</a>","Volume and attach, not curation"],
+    [{t:"SALTY",b:1},"Mass accessories","Men's line 25 to 30%; ₹500 to 1,500<a class='cite' href='https://www.afaqs.com/news/mktg/salty-eyes-rs-150-cr-revenue-as-it-pivots-from-jewellery-to-accessories-11186922' target='_blank' rel='noopener'>[21]</a>"],
+    [{t:"TrendHim · OPUMO",b:1},"Global men's accessories<a class='cite' href='https://impactcommerce.com/insights/trendhim-achieves-global-growth-with-commercetools-2/' target='_blank' rel='noopener'>[22]</a>","Breadth without styling; curation that stalled"]
+  ],[22,34,44])+
+  take("They are pincering men's accessories from every adjacency, and capital is pricing it up now, SALTY's ₹30 Cr raise in January<a class='cite' href='https://inc42.com/buzz/d2c-lifestyle-brand-salty-raises-inr-30-cr-to-expand-product-portfolio/' target='_blank' rel='noopener'>[21]</a> the latest signal. The timing read: enter now and win on model, not novelty. The threat is a funded incumbent extending down, not a peer."),
   {});
 
-/* 07 · THE ANSWER (positioning + engine) */
+/* 08 THE ANSWER */
 S(
   kick("The answer")+
-  H("A look isn't bought. It's composed.")+
+  H("The stylist he belongs to, not a store.")+
   `<div class="posbox">For the man who knows the look he wants but not how to build it, <b style="color:var(--peri)">RUMOAR turns his vibe into his look, starting with what he already owns.</b> A stylist he belongs to, not a store that sells at him.</div>`+
   cols([
-    {k:"01 / YOUR CLOSET", title:"Buy nothing.", body:"A complete look from what he already owns. Proof before purchase; the trust engine that disarms the distrust reflex at the root."},
-    {k:"02 / THE ELEVATE", title:"One keystone.", body:"“You're ninety percent there. This sling is the ten.” One confident add, never a cart."},
+    {k:"01 / YOUR CLOSET", title:"Buy nothing.", body:"A complete look from what he already owns. Proof before purchase, and the structural sign we're advising, not selling."},
+    {k:"02 / THE ELEVATE", title:"One keystone.", body:"“You're ninety percent there, this sling is the ten.” One confident add, never a cart."},
     {k:"03 / THE CEILING", title:"The peak look.", body:"Including pieces we don't sell. Every gap we can't fill becomes a ranked, pre-validated product request.", dark:true}
   ]),
   {});
 
-/* 08 · SAYING IT WITHOUT SAYING IT (brand codes) */
+/* 09 BRAND CODES */
 S(
   kick("The codes")+
   H("Saying it without saying it.")+
   sub("Restraint over explanation. Recognition should come from palette and photography before the name does. The anti-codes matter as much as the codes: no SALE, no celebrity launch, no stock models.")+
   cols([
-    {k:"VISUAL", title:"Object as art", body:"A restrained wordmark, never a shouted logo. An edited palette. The sling shot as a portrait, in hard light, not an e-commerce cutout. Casting from the community, not agencies. Texture close-ups that prove the make."},
-    {k:"VERBAL", title:"Vibe-code your look", body:"The brand-native verb. Tiers that position on their own: Your Closet, The Elevate, The Ceiling. Drops named and numbered as Rumours, 001 first. The waitlist button reads “hear it first.” Captions literate, never “PREMIUM QUALITY.”"},
+    {k:"VISUAL", title:"Object as art", body:"A restrained wordmark, never a shouted logo. An edited palette. The sling shot as a portrait, in hard light. Casting from the community, not agencies. Texture close-ups that prove the make."},
+    {k:"VERBAL", title:"Vibe-code your look", body:"The brand-native verb. Tiers that position on their own: Your Closet, The Elevate, The Ceiling. Drops named and numbered as Rumours, 001 first. The waitlist button reads “hear it first.”"},
     {k:"RITUAL", title:"Induction, not a coupon", body:"The unboxing card names the maker's cluster, the drop number, a QR into the community. Monogramming turns a wallet into a gift object. Belonging, engineered.", dark:true}
   ]),
   {});
 
-/* 09 · WHAT SS27 IS TELLING US (trends) */
+/* 10 WHY WE'RE TRUSTABLE */
 S(
-  kick("The trend read")+
+  kick("The anti-trap")+
+  H("Why we can be trusted where they couldn't.")+
+  cols([
+    {k:"NEUTRAL ADVICE", title:"Not captive to a shelf", body:"The engine reads his closet and the whole market, and recommends across both, including pieces we don't sell. Only the keystone is ours."},
+    {k:"STARTS FROM HIS CLOSET", title:"Buy nothing, first", body:"Tier 1 is a look from what he already owns. It is the one move that proves we're advising, not selling, the thing the girlfriend has and no store did."},
+    {k:"NO BOX", title:"No returns cliff", body:"The reverse-logistics tax that killed Trunk Club never touches us. We sell decided keystones, made to demand, not a five-item box hoping he keeps one.", dark:true}
+  ])+
+  take("Trust is the product; the keystone sale is downstream. That is the line every dead styling business crossed, and the one we're built not to."),
+  {});
+
+/* 11 THE MOAT */
+S(
+  kick("The moat")+
+  H("Distribution and data, not design or marketing.")+
+  `<div class="moat">
+    <div class="mr"><div class="mk">LAYER 1 · Community-led distribution</div><div class="mb">Growth is a rumour, not a media buy. It drives the marginal cost of the next customer toward zero as the community compounds, while paid-first peers stay pinned at 20 to 45% of revenue on ads<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>. Design and marketing are copyable; this compounds.</div></div>
+    <div class="mr"><div class="mk">LAYER 2 · Styling-engine data</div><div class="mb">Every session logs what a specific man looks like, owns, wants and can't find, which becomes the ranked queue that cuts the next drop. A marketplace can clone an AI stylist, not the personal grain.</div></div>
+    <div class="mr"><div class="mk">REINFORCEMENT · Supply chain</div><div class="mb">India-made leather and canvas keeps the launch capital-light and the drops frequent, which keeps Layer 1 cheap to run.</div></div>
+    <div class="mr"><div class="mk">THE POSITION ITSELF · Trust</div><div class="mb">A trust-and-distribution problem, not a fashion problem, which is why an inventory-captive incumbent can bolt a styling feature on, Myntra or Google, but can't become the trusted source itself.</div></div>
+  </div>`,
+  {});
+
+/* 12 BUILT CAPITAL-LIGHT (ops) */
+S(
+  kick("How it's made")+
+  H("Made in India, on the categories where India wins.")+
+  `<div class="split6-6">
+    <div>${table(["Category","Made-in-India vs China"],[
+      [{t:"Wallets, SLG",b:1},"India wins landed cost by ~20 to 25%<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>"],
+      [{t:"Caps",b:1},"India competitive; GST 2.0 cut cap IGST 12 to 5%<a class='cite' href='https://www.pib.gov.in/PressNoteDetails.aspx?NoteId=155151&amp;ModuleId=3' target='_blank' rel='noopener'>[24]</a>"],
+      [{t:"Canvas totes",b:1},"India wins on low-MOQ runs"],
+      [{t:"Technical packs",b:1},"China flips ahead at ~2,000+ units"]
+    ],[34,66])}</div>
+    <div>${ul([
+      "The duty a China import must beat: ~16.5% on bags, ~11% on caps, IGST creditable but paid in cash at the port<a class='cite' href='https://www.business-standard.com/industry/news/china-india-luggage-bag-brands-made-in-india-manufacturing-shift-126012500235_1.html' target='_blank' rel='noopener'>[24]</a>.",
+      "Named hubs: Kolkata leather (~50% of India's leather-goods exports)<a class='cite' href='https://leatherindia.org/wp-content/uploads/2024/08/overview-Indian-leather-industry-2024.pdf' target='_blank' rel='noopener'>[25]</a>, Kanpur saddlery<a class='cite' href='https://www.knocksense.com/kanpur/kanpur-gi-tag-horse-saddle' target='_blank' rel='noopener'>[26]</a>, Karur canvas, Delhi and Ludhiana caps.",
+      "MOQ ~100 per style, 45 to 50-day sling lead<a class='cite' href='https://optimabags.com/pages/backpack-manufacturer' target='_blank' rel='noopener'>[27]</a>. Every purchase order after the first is cut against a waitlist, so we only make demand we've watched happen."
+    ])}</div>
+  </div>`,
+  {});
+
+/* 13 SS27 TRENDS */
+S(
+  kick("What the engine sells this season")+
   H("Milan reduced. Paris exulted. The overlap is our lane.")+
   `<div class="split7-5">
     <div>${table(["House, SS27","The accessories signal"],[
-      [{t:"Prada",b:1},"Belt bags clipped at the hip by carabiner; utility on belt loops<a class='cite' href='https://www.wallpaper.com/fashion-beauty/best-accessories-ss-2027-menswear-fashion-month' target='_blank' rel='noopener'>[12]</a>"],
+      [{t:"Prada",b:1},"Belt bags clipped at the hip by carabiner; utility on belt loops<a class='cite' href='https://www.wallpaper.com/fashion-beauty/best-accessories-ss-2027-menswear-fashion-month' target='_blank' rel='noopener'>[28]</a>"],
       [{t:"Hermès",b:1},"Toile-and-leather carryalls; sand, kraft, graphite"],
       [{t:"Louis Vuitton",b:1},"Sun-faded duffel, butter-yellow, colour as bleach not neon"],
       [{t:"Junya Watanabe",b:1},"The cap treated as jewellery, the season's breakout gesture"]
     ],[26,74])}</div>
     <div class="sidebox">
       <div class="bigcap" style="font-family:var(--display);font-size:18px;margin-bottom:12px">Read-through</div>
-      <div class="bigdesc">Crossbody and belt-worn beat hand-carry; no men's mini-bag moment; suede alive as accent; jewellery is the watch-list. And the tell: <b style="color:var(--ink)">Grace Wales Bonner debuts at Hermès menswear in January 2027<a class='cite' href='https://wwd.com/business-news/financial/hermes-grace-wales-bonner-menswear-creative-director-market-1238319083' target='_blank' rel='noopener'>[12]</a></b>, quiet craft-led menswear at the most-watched house. That is the direction of travel, and it is our register.</div>
+      <div class="bigdesc">Crossbody and belt-worn beat hand-carry; no men's mini-bag moment; suede alive as accent; jewellery is the watch-list. And the tell: <b style="color:var(--ink)">Grace Wales Bonner debuts at Hermès menswear in January 2027<a class='cite' href='https://wwd.com/business-news/financial/hermes-grace-wales-bonner-menswear-creative-director-market-1238319083' target='_blank' rel='noopener'>[28]</a></b>, quiet craft-led menswear at the most-watched house. That is the direction of travel, and we are built for it.</div>
     </div>
   </div>`,
   {});
 
-/* 10 · THE LOOK AND FEEL */
+/* 14 LOOK AND FEEL */
 S(
   kick("Look and feel")+
   H("Quiet street: reduction, with one loud accent.")+
-  `<div class="chart-t">The SS27 product palette, filtered for India (WGSN × Coloro)<a class='cite' href='https://www.wgsn.com/en/wgsn/press/press-releases/wgsn-and-coloro-reveal-colour-year-2027-luminous-blue-and-s-s-27-key' target='_blank' rel='noopener'>[13]</a></div>
+  `<div class="chart-t">The SS27 product palette, filtered for India (WGSN × Coloro)<a class='cite' href='https://www.wgsn.com/en/wgsn/press/press-releases/wgsn-and-coloro-reveal-colour-year-2027-luminous-blue-and-s-s-27-key' target='_blank' rel='noopener'>[29]</a></div>
    <div class="swrow" style="margin-bottom:18px">
      <div class="sw2" style="background:#E7E2D6;color:#17171B"><b>Bone</b><span>BASE</span></div>
      <div class="sw2" style="background:#33332F;color:#F6F5F2"><b>Charcoal</b><span>BASE</span></div>
@@ -250,17 +307,17 @@ S(
      <div class="sw2" style="background:#2F5BD1;color:#fff"><b>Luminous Blue</b><span>CoY 2027</span></div>
    </div>`+
   cols([
-    {k:"MOTIVES", title:"Construction as decoration", body:"Visible saddle stitch, burnished edges, hardware with weight. The Veilance discipline: let the make be the design, let the spec sheet do the advertising."},
-    {k:"THE MODULARITY", title:"One clip, many carries", body:"A carabiner pouch that rides sling strap, belt loop or tote, the exact gesture Prada validated this season<a class='cite' href='https://www.wallpaper.com/fashion-beauty/best-accessories-ss-2027-menswear-fashion-month' target='_blank' rel='noopener'>[12]</a>. One motif makes the wall modular."},
-    {k:"THE DISCIPLINE", title:"Colour as a flash", body:"Luminous Blue on a zip pull, a lining, one cap only. Pop Pink and Energy Orange stay off the body: runway-true, India-street-false. Stock-dye neutrals at launch.<a class='cite' href='https://fabriclore.com/blogs/fashion-business-lifestyle-trends/have-your-own-custom-color-and-want-us-to-dye-fabric-for-you' target='_blank' rel='noopener'>[14]</a>", dark:true}
+    {k:"MOTIVES", title:"Construction as decoration", body:"Visible saddle stitch, burnished edges, hardware with weight. The Veilance discipline: let the make be the design."},
+    {k:"THE MODULARITY", title:"One clip, many carries", body:"A carabiner pouch that rides sling strap, belt loop or tote, the exact gesture Prada validated this season<a class='cite' href='https://www.wallpaper.com/fashion-beauty/best-accessories-ss-2027-menswear-fashion-month' target='_blank' rel='noopener'>[28]</a>. One motif makes the wall modular."},
+    {k:"THE REFERENCES", title:"Whose discipline", body:"Aimé Leon Dore's casting and world, Veilance's construction, Hermès' toile-and-leather. The anti-references: Mokobara's colourway theatre, Urban Monkey's loudness.", dark:true}
   ]),
   {});
 
-/* 11 · THE WALL */
+/* 15 THE WALL */
 S(
   kick("The wall")+
   H("Nine styles, three drops, three shelf gaps.")+
-  table(["The style","MRP","The gap it fills, observed live 20 Jul 2026<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; the wallet-band vacancy was double-confirmed.'>[11]</sup>"],[
+  table(["The style","MRP","The gap it fills, observed live 20 Jul 2026<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; competitor product copy quoted verbatim.'>[30]</sup>"],[
     [{t:"Leather sling, full-grain veg-tan",b:1},{t:"₹3,000",b:1},"No real-leather men's sling exists between ₹2.5 and 4K"],
     [{t:"Canvas roll-top sling",b:1},{t:"₹2,499",b:1},"Same void, lighter entry, monsoon-practical"],
     [{t:"Clip pouch (the motif)",b:1},{t:"₹1,499",b:1},"Prada's exact SS27 gesture; the attach-rate engine"],
@@ -271,12 +328,12 @@ S(
     [{t:"Canvas + leather tote",b:1},{t:"₹2,499",b:1},"No masculine canvas-leather tote under Mokobara's ₹6,499"],
     [{t:"Backpack, second-line (Drop 3)",b:1},{t:"₹4,500",b:1},"The contested ladder; it follows demand, never leads"]
   ],[38,12,50])+
-  take("The wall is what the engine recommends, every style where a Tier-3 gap meets a shelf void. <b>Rumour 001</b> ships the sling, the wallet and the cap: the exact first purchase order; 002 and 003 are cut only against waitlists. Full-grain leather and canvas, made in India, released as drops, never held as a warehouse."),
+  take("The wall is what the engine recommends, every style where a Tier-3 gap meets a shelf void. <b>Rumour 001</b> ships the sling, the wallet and the cap: the exact first purchase order<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>; 002 and 003 are cut only against waitlists. Full-grain leather and canvas, made in India, released as drops."),
   {});
 
-/* 12 · WHAT IT'S MADE OF, AND WHAT IT COSTS */
+/* 16 BOM */
 S(
-  kick("The economics of a unit")+
+  kick("What it's made of, and what it costs")+
   H("Priced into the gap, not above it.")+
   `<div class="split7-5">
     <div>${table(["SKU","Landed COGS","MRP","GM"],[
@@ -287,63 +344,31 @@ S(
     ],[40,22,20,18])}</div>
     <div class="sidebox v">
       <div class="bignum" style="color:#fff;font-size:40px">~51%</div>
-      <div class="bigcap" style="color:var(--peri)">blended, ~53% at the Rumour 001 mix.<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup></div>
-      <div class="bigdesc" style="color:var(--mist)">Margins are on net revenue after discount. Landed-to-MRP runs 2.4 to 3.7×, against a 4 to 6× industry convention<a class='cite' href='https://www.aims360.com/fashion-business-resources/apparel-industry-pricing-margin-calculator-wholesale-retail-erp' target='_blank' rel='noopener'>[16]</a>, which is exactly why these prices sit inside the shelf gaps instead of above them. Seven named factory RFQs convert this desk BOM to quote-grade<sup class='cite cpop' data-pop='From our Track 03 product work. The wall&#39;s BOM is built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs to reach quote-grade. The after-SS27 read draws on competitor signals such as SALTY&#39;s founder-stated 25 to 30% men&#39;s share.'>[15]</sup>.</div>
+      <div class="bigcap" style="color:var(--peri)">blended, ~53% at the Rumour 001 mix.<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a lever.'>[18]</sup></div>
+      <div class="bigdesc" style="color:var(--mist)">Margins are on net revenue after discount. Landed-to-MRP runs 2.4 to 3.7× across the wall<sup class='cite cpop' data-pop='From our Track 03 product work. The wall, per-SKU BOM and landed costs are built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs out to reach quote-grade.'>[23]</sup>, against a 4 to 6× industry convention<a class='cite' href='https://www.aims360.com/fashion-business-resources/apparel-industry-pricing-margin-calculator-wholesale-retail-erp' target='_blank' rel='noopener'>[31]</a>, which is why these prices sit inside the shelf gaps instead of above them. Seven named factory RFQs are out for firm quotes.</div>
     </div>
   </div>`,
   {});
 
-/* 13 · WHY HIM, NOT MOKOBARA */
+/* 17 WHY HIM, NOT MOKOBARA */
 S(
   kick("On the same shelf")+
   H("Nobody else writes “full-grain.”")+
   table(["On the shelf","What their own copy says","The grade"],[
     [{t:"Mokobara",b:1},"“Reverse-coated polyester,” “vegan leather trims”","No leather"],
     [{t:"Uppercase",b:1},"“Polyester”; warranty excludes “vegan leather”","No leather"],
-    [{t:"Urban Monkey",b:1},"Bifold: “100% PVC”<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; the wallet-band vacancy was double-confirmed.'>[11]</sup>","No leather"],
+    [{t:"Urban Monkey",b:1},"Bifold: “100% PVC”<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; competitor product copy quoted verbatim.'>[30]</sup>","No leather"],
     [{t:"DailyObjects",b:1},"“Genuine leather,” ₹999","A grade below"],
     [{t:"RUMOAR",b:1},"Full-grain veg-tan, tannage and Kolkata cluster named, ₹2,200",{t:"Category of one",b:1}]
   ],[20,58,22])+
-  take("Men's-first where they're travel-gear and eco-luggage. Restraint where the shelf is loud. The engine that says “this completes the look you already own.” And drops that never train the discount reflex. The shelf ran 30 to 56% off the day we looked<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; the wallet-band vacancy was double-confirmed.'>[11]</sup>."),
+  take("The material is not the moat, the relationship is. It's the proof: when the engine says buy this one, the leather has to be real or the trust breaks. Men's-first where they're travel-gear and eco-luggage, restraint where the shelf is loud, and drops that never train the discount reflex, the shelf ran 30 to 56% off at last check<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; competitor product copy quoted verbatim.'>[30]</sup>."),
   {});
 
-/* 14 · THE MOAT */
-S(
-  kick("The moat")+
-  H("Two layers that compound, two that reinforce.")+
-  `<div class="moat">
-    <div class="mr"><div class="mk">LAYER 1 · Community-led distribution</div><div class="mb">Growth is a rumour, not a media buy. It holds acquisition cost structurally below peers who spend 17 to 45% of revenue on ads. This is the layer we prove in 90 days.</div></div>
-    <div class="mr"><div class="mk">LAYER 2 · Styling-engine data</div><div class="mb">Every session logs what a specific man looks like, owns, wants and can't find, which becomes the ranked queue that cuts the next drop. A marketplace can clone an AI stylist; it cannot clone the personal grain or the demand we have already watched happen.</div></div>
-    <div class="mr"><div class="mk">REINFORCEMENT · Supply chain</div><div class="mb">India-made leather and canvas keeps the launch capital-light and the drops frequent, which keeps Layer 1 cheap to run.</div></div>
-    <div class="mr"><div class="mk">REINFORCEMENT · Design restraint</div><div class="mb">The reason a taste-led man picks us on a loud shelf. The most copyable layer, which is exactly why it's fourth, not first.</div></div>
-  </div>
-  <div class="note-b">If Layer 1 fails its test, this is a good niche brand, not a venture outcome. That risk is priced and stated, not discovered later.</div>`,
-  {});
-
-/* 15 · BUILT CAPITAL-LIGHT (ops) */
-S(
-  kick("How it's made")+
-  H("Made in India, on the categories where India wins.")+
-  `<div class="split6-6">
-    <div>${table(["Category","Made-in-India vs China"],[
-      [{t:"Wallets, SLG",b:1},"India wins landed cost by ~20 to 25%<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup>"],
-      [{t:"Caps",b:1},"India competitive; GST 2.0 cut cap IGST 12 to 5%<a class='cite' href='https://www.pib.gov.in/PressNoteDetails.aspx?NoteId=155151&amp;ModuleId=3' target='_blank' rel='noopener'>[17]</a>"],
-      [{t:"Canvas totes",b:1},"India wins on low-MOQ runs"],
-      [{t:"Technical packs",b:1},"China at volume; kept off the launch wall"]
-    ],[34,66])}</div>
-    <div>${ul([
-      "The duty a China import must beat: ~16.5% on bags, ~11% on caps, IGST creditable but paid in cash at the port.<a class='cite' href='https://www.business-standard.com/industry/news/china-india-luggage-bag-brands-made-in-india-manufacturing-shift-126012500235_1.html' target='_blank' rel='noopener'>[17]</a>",
-      "Clusters named: Kolkata leather (~50% of India's leather-goods exports<a class='cite' href='https://leatherindia.org/wp-content/uploads/2024/08/overview-Indian-leather-industry-2024.pdf' target='_blank' rel='noopener'>[18]</a>), Kanpur saddlery<a class='cite' href='https://www.knocksense.com/kanpur/kanpur-gi-tag-horse-saddle' target='_blank' rel='noopener'>[19]</a>, Karur canvas, Delhi and Ludhiana caps.",
-      "MOQ ~100 per style, 45 to 50-day sling lead<a class='cite' href='https://optimabags.com/pages/backpack-manufacturer' target='_blank' rel='noopener'>[20]</a>, caps and wallets in weeks. Every purchase order after the first is cut against a waitlist, so we only ever make demand we've watched happen."
-    ])}</div>
-  </div>`,
-  {});
-
-/* 16 · PROVE IT FOR ₹2.3 LAKH */
+/* 18 PROVE IT FOR ₹2.3L */
 S(
   kick("Go to market")+
   H("Prove the moat for ₹2.3 lakh<br>before spending ₹25 crore.")+
-  sub("Ninety days, zero followers, no media budget. Not “we'll go viral,” a falsifiable experiment: measure the marginal cost of the next community-acquired customer, at product-cost stakes.<sup class='cite cpop' data-pop='From our Track 02 plan. The 2.3 lakh rupee budget, the phases, the roster terms and the CAC gates are our labelled plan and assumptions; the 90-day test exists to replace them with measurements.'>[21]</sup>")+
+  sub("Ninety days, zero followers, no media budget. Not “we'll go viral,” a falsifiable experiment: measure the marginal cost of the next community-acquired customer, at product-cost stakes<sup class='cite cpop' data-pop='From our Track 02 plan. The 2.3 lakh rupee budget, the phases, the roster terms, the AI-cost workings and the CAC gates are our labelled plan and assumptions; the 90-day test exists to replace them with measurements.'>[32]</sup>.")+
   `<div class="gates">
     <div class="gate"><div class="gv">&lt; ₹350</div><span class="gtag v">SCALE</span><div class="gd">Community becomes the growth engine. Spend follows only what measurably converts.</div></div>
     <div class="gate"><div class="gv">₹350 to 900</div><span class="gtag d">HYBRID</span><div class="gd">Community plus disciplined paid, at a comp-grade ad ratio.</div></div>
@@ -351,49 +376,37 @@ S(
   </div>`,
   {});
 
-/* 17 · THE 90 DAYS IN MOTION */
+/* 19 THE 90 DAYS IN MOTION */
 S(
   kick("The 90 days")+
   H("A system, then a voice, then a drop.")+
   cols([
-    {k:"PHASE 0 · WK 1 to 2", title:"The system", body:"Identity and codes locked. The WhatsApp styling concierge opens, founder-run, 20 sessions a day.<sup class='cite cpop' data-pop='From our Track 02 plan. The 2.3 lakh rupee budget, the phases, the roster terms and the CAC gates are our labelled plan and assumptions; the 90-day test exists to replace them with measurements.'>[21]</sup> First roster DMs go out, gifting, zero ask. One forecast purchase order clears the MOQ math."},
-    {k:"PHASE 1 · WK 3 to 8", title:"The founder engine", body:"Founder content from week 3, five posts a week in three formats<a class='cite' href='https://quid.com/knowledge-hub/resource-library/blog/2026-social-media-industry-benchmark-report' target='_blank' rel='noopener'>[22]</a>: vibe-code transformations, object-as-art construction, creator rotations. 100 squad kits land with codes."},
-    {k:"PHASE 2 · WK 8 to 13", title:"Rumour 001", body:"The drop, on the Comet mechanic<a class='cite' href='https://wearcomet.com/pages/sneaker-drop' target='_blank' rel='noopener'>[23]</a>: a waitlist, an honest batch, no restock, members hear it 48 hours first. Day 90, read the gate and publish the decision.", dark:true}
+    {k:"PHASE 0 · WK 1 to 2", title:"The system", body:"Identity and codes locked. The WhatsApp styling concierge opens, founder-run, 20 sessions a day.<sup class='cite cpop' data-pop='From our Track 02 plan. The 2.3 lakh rupee budget, the phases, the roster terms, the AI-cost workings and the CAC gates are our labelled plan and assumptions; the 90-day test exists to replace them with measurements.'>[32]</sup> First roster DMs go out, gifting, zero ask."},
+    {k:"PHASE 1 · WK 3 to 8", title:"The founder engine", body:"Founder content from week 3, five posts a week in three formats<a class='cite' href='https://quid.com/knowledge-hub/resource-library/blog/2026-social-media-industry-benchmark-report' target='_blank' rel='noopener'>[33]</a>: vibe-code transformations, object-as-art construction, creator rotations. 100 squad kits land with codes."},
+    {k:"PHASE 2 · WK 8 to 13", title:"Rumour 001", body:"The drop, on the Comet mechanic<a class='cite' href='https://wearcomet.com/pages/sneaker-drop' target='_blank' rel='noopener'>[34]</a>: a waitlist, an honest batch, no restock, members hear it 48 hours first. Day 90, read the gate.", dark:true}
   ])+
-  take("The budget is <b>~₹2.3 lakh</b>, product cost not media: 100 squad kits, 19 roster kits, founder content, AI tooling, the concierge, contest prizes. An optional ₹75K buys three paid creator Reels in the final weeks, reported separately."),
+  take("The budget is <b>~₹2.3 lakh</b>, product cost not media. And AI holds it down: on-model imagery at ~₹60 an image against ₹450 to 8,000<a class='cite' href='https://botika.com/pricing' target='_blank' rel='noopener'>[35]</a>, a WhatsApp concierge at ~₹0.10 to 2 a session, one founder editing five posts a week, while the taste stays human."),
   {});
 
-/* 18 · THE FACE AND THE FIRST 25 */
+/* 20 THE FACE AND THE FIRST 25 */
 S(
   kick("The roster")+
   H("A barbell, not a billboard.")+
   `<div class="split7-5">
-    <div>${table(["Tier","Who, live-verified 20 Jul 2026","Terms"],[
-      [{t:"The face",b:1},"Founder-as-author + one anchor: Marathe (300.7K)<sup class='cite cpop' data-pop='Live counts retrieved 19 to 20 July 2026: YouTube subscribers via SocialCounts (YouTube Data API); Instagram followers and engagement via HypeAuditor and Qoruz. Third-party tracker reads, dated, and expected to drift.'>[3]</sup>, or Gujral, or Dutta","Affiliate 15% + advisory equity, no cash retainer"],
-      [{t:"A · authority (3)",b:1},"Dhinggra (2.39M)<sup class='cite cpop' data-pop='Live counts retrieved 19 to 20 July 2026: YouTube subscribers via SocialCounts (YouTube Data API); Instagram followers and engagement via HypeAuditor and Qoruz. Third-party tracker reads, dated, and expected to drift.'>[3]</sup>, Khandelwal, Batra","Gift and relationship, no ask"],
+    <div>${table(["Tier","Who, live-verified 20 Jul 2026<sup class='cite cpop' data-pop='Live counts retrieved 19 to 20 July 2026: YouTube subscribers via SocialCounts (YouTube Data API); Instagram followers and engagement via HypeAuditor and Qoruz. Third-party tracker reads, dated, and expected to drift.'>[7]</sup>","Terms"],[
+      [{t:"The face",b:1},"Founder-as-author + one anchor: Marathe (300.7K), or Gujral, or Dutta","Affiliate 15% + advisory equity, no cash retainer"],
+      [{t:"A · authority (3)",b:1},"Dhinggra (2.39M), Khandelwal, Batra","Gift and relationship, no ask"],
       [{t:"B · core (11)",b:1},"Sachdev, Walid, scentwalebhaiyaaa, Kheni, and 7 more","Kits + 15% codes"],
       [{t:"C · nano (5 + 6)",b:1},"naazperfumes, lookbyn, thepiyushfits, and earned slots","Kits + codes; squad earns the six"]
     ],[22,54,24])}</div>
     <div class="sidebox">
-      <div class="bigcap" style="font-family:var(--display);font-size:18px;margin-bottom:10px">The rigor is the cut</div>
-      <div class="bigdesc">Names verified against live follower and engagement data; several with real reach were excluded for dead engagement (one at 0.67% ER, one at ~48 avg likes on 111K<sup class='cite cpop' data-pop='Live counts retrieved 19 to 20 July 2026: YouTube subscribers via SocialCounts (YouTube Data API); Instagram followers and engagement via HypeAuditor and Qoruz. Third-party tracker reads, dated, and expected to drift.'>[3]</sup>). The objective: ≥12 of 19 roster posting organically by week 10, ≥40% of the waitlist attributable to codes<sup class='cite cpop' data-pop='From our Track 02 plan. The 2.3 lakh rupee budget, the phases, the roster terms and the CAC gates are our labelled plan and assumptions; the 90-day test exists to replace them with measurements.'>[21]</sup>. Kit budget ~₹1.25 lakh, inside the ₹2.3L above.</div>
+      <div class="bigcap" style="font-family:var(--display);font-size:18px;margin-bottom:10px">Chosen on real engagement</div>
+      <div class="bigdesc">Every name is picked on live engagement, not headline reach; several with big followings were cut for dead numbers. The objective: ≥12 of 19 roster posting organically by week 10, ≥40% of the waitlist attributable to codes. Kit budget ~₹1.25 lakh, inside the ₹2.3L.<sup class='cite cpop' data-pop='From our Track 02 plan. The 2.3 lakh rupee budget, the phases, the roster terms, the AI-cost workings and the CAC gates are our labelled plan and assumptions; the 90-day test exists to replace them with measurements.'>[32]</sup></div>
     </div>
   </div>`,
   {});
 
-/* 19 · HOW AI MAKES IT CHEAP */
-S(
-  kick("The cost lever")+
-  H("AI compresses production, never judgment.")+
-  cols([
-    {k:"IMAGERY", title:"~₹60 an image", body:"AI on-model generation at ~₹60 versus ₹450 to 750 traditional, up to ₹1,750 to 8,000 campaign-grade<a class='cite' href='https://botika.com/pricing' target='_blank' rel='noopener'>[24]</a>. We plan 55 to 85% savings to absorb reshoots and rejects."},
-    {k:"THE CONCIERGE", title:"~₹0.10 a session", body:"The WhatsApp stylist runs at ~₹0.10 to 2 per session<sup class='cite cpop' data-pop='From our Track 02 plan. The 2.3 lakh rupee budget, the phases, the roster terms and the CAC gates are our labelled plan and assumptions; the 90-day test exists to replace them with measurements.'>[21]</sup> in model and carriage cost. A thousand styling sessions become a ~₹2,000 line, not a headcount."},
-    {k:"THE LINE WE HOLD", title:"Taste stays human", body:"The founder's voice, the taste calls, the three-tier looks stay human. AI compresses the cost of production; it never touches the judgment that is the product.", dark:true}
-  ])+
-  take("The result: one founder can run a five-post-a-week content engine, a live styling concierge and a full drop, solo, inside a ₹2.3 lakh test. The discipline scales because the cost base is engineered down, not because the team is large."),
-  {});
-
-/* 20 · UNIT ECONOMICS */
+/* 21 UNIT ECONOMICS */
 S(
   kick("The economics")+
   H("A first order barely clears. The second is the model.")+
@@ -407,94 +420,94 @@ S(
     <div class="sidebox v">
       <div class="bignum" style="color:#fff;font-size:44px">Repeat</div>
       <div class="bigcap" style="color:var(--peri)">is the model.</div>
-      <div class="bigdesc" style="color:var(--mist)">Per-SKU margins run 46% on the backpack to 57% on the wallet. The ₹900 is a conservative blended CAC from comp ad-ratios; the moat's job is to drive the marginal community cost far below it.<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup> Lifetime value comes from the cap-to-sling-to-fragrance ladder, not a single sale.</div>
+      <div class="bigdesc" style="color:var(--mist)">Per-SKU margins run 46% on the backpack to 57% on the wallet. The ₹900 is a conservative blended CAC from comp ad-ratios<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a lever.'>[18]</sup>; the moat's job is to drive the marginal community cost far below it. Lifetime value comes from the cap-to-sling-to-fragrance ladder, not a single sale.</div>
     </div>
   </div>`,
   {});
 
-/* 21 · THE PLAN TO BREAKEVEN */
+/* 22 THE PLAN */
 S(
   kick("The plan")+
   H("Breakeven in Year 5, three to seven times leaner than the funded peers.")+
   `<div class="split6-6">
     <div>
-      <div class="chart-t">EBITDA path, ₹ Cr &nbsp;·&nbsp; revenue 6 → 20 → 48 → 92 → 160<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup></div>
+      <div class="chart-t">EBITDA path, ₹ Cr &nbsp;·&nbsp; revenue 6 → 20 → 48 → 92 → 160<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a lever.'>[18]</sup></div>
       ${combo(["Y1","Y2","Y3","Y4","Y5"],[-3.2,-5.7,-6.2,-2.3,6.0],[-3.2,-8.9,-15.2,-17.5,-11.5])}
       <div class="chart-n">Bars are annual EBITDA; the line is cumulative. Marketing glides from 42 to 18% of revenue as community compounds.</div>
     </div>
     <div>${ul([
-      "₹25 to 35 crore to reach breakeven, against peers who raised ₹120 to 190 crore each.<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[5]</a>",
-      "The discipline is the edge: the same ~51% margins as the graveyard, spent on trust instead of ads. DailyObjects proves the shape, EBITDA −4.3% at ₹84 Cr on 17% ads<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[5]</a>.",
+      "₹25 to 35 crore to reach breakeven, against peers who raised ₹120 to 190 crore each.<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>",
+      "The discipline is the edge: the same ~51% margins as the graveyard, spent on trust instead of ads.",
       "The one aggressive assumption, the ramp, is exactly what the ninety-day test de-risks first."
     ])}</div>
   </div>`,
   {});
 
-/* 22 · WHAT MOVES IT (sensitivities) */
+/* 23 WHAT MOVES IT */
 S(
-  kick("The model is a model")+
+  kick("What moves it")+
   H("Every number is a lever. Here is the range they move.")+
   table(["Scenario","Capital to breakeven","Breakeven","What it hinges on"],[
     [{t:"Base · community converts",b:1},"₹25 to 35 Cr","Year 5","Marginal CAC < ₹350"],
     [{t:"Bear · community fails, paid fills in",b:1},"₹40 Cr and up","Slips past Year 5","Marginal CAC > ₹900"]
   ],[34,24,20,22])+
-  take("The swing between these two worlds is one number, community CAC, and the single 90-day test resolves it first, for ₹2.3 lakh, before scale capital ever moves.<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup> Every input is a toggle in the companion model, nothing hidden in a footnote."),
+  take("The swing between these two worlds is one number, community CAC, and the single 90-day test resolves it first, for ₹2.3 lakh, before scale capital ever moves.<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a lever.'>[18]</sup> Every input is a lever."),
   {});
 
-/* 23 · THE ASK AND THE RETURN */
+/* 24 THE ASK AND THE RETURN */
 S(
   kick("The ask")+
   H("₹25 to 35 crore to build the category's owner.")+
   cols([
-    {k:"WHAT IT BUYS", title:"Runway to breakeven", body:"Capital-light by design: a cumulative trough near ₹17.5 crore plus ₹10 to 15 crore of working capital<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup>, not a decade of losses. The three funded peers raised ₹475 to 480 crore between them, and lost ₹125 to 130 crore doing it.<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[5]</a>"},
-    {k:"THE RETURN", title:"Category ownership", body:"FMCG strategics buy category owners near profitability at about 2× revenue. The Man Company sold to Emami at ~2×<a class='cite' href='https://inc42.com/buzz/emami-to-acquire-remaining-46-stake-in-d2c-grooming-brand-the-man-company-for-inr-177-cr/' target='_blank' rel='noopener'>[27]</a>; Beardo returned an estimated 5 to 6.5×<a class='cite' href='https://entrackr.com/2020/07/category-creator-beardos-rs-350-cr-exit-story/' target='_blank' rel='noopener'>[28]</a> to Marico's early backers."},
-    {k:"THE PROOF", title:"De-risked in 90 days", body:"The moat is tested for a fraction of the raise before the rest is ever deployed. The downside is named, and it is cheap.", dark:true}
+    {k:"WHAT IT BUYS", title:"Runway to breakeven", body:"Capital-light by design: a cumulative trough near ₹17.5 crore plus ₹10 to 15 crore of working capital. The three funded peers raised ₹475 to 480 crore between them, and lost ₹125 to 130 crore doing it.<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>"},
+    {k:"THE RETURN", title:"Category ownership", body:"FMCG strategics buy category owners near profitability at about 2× revenue. The Man Company sold to Emami at ~2×<a class='cite' href='https://inc42.com/buzz/emami-to-acquire-remaining-46-stake-in-d2c-grooming-brand-the-man-company-for-inr-177-cr/' target='_blank' rel='noopener'>[36]</a>; Beardo returned an estimated 5 to 6.5×<a class='cite' href='https://entrackr.com/2020/07/category-creator-beardos-rs-350-cr-exit-story/' target='_blank' rel='noopener'>[37]</a> to Marico's early backers."},
+    {k:"THE PROOF", title:"De-risked in 90 days", body:"The moat is tested for a fraction of the raise before the rest is ever deployed. The downside is small, and cheap to test.", dark:true}
   ]),
   {});
 
-/* 24 · AFTER SS27 */
+/* 25 AFTER SS27 */
 S(
   kick("The horizon")+
-  H("Where the wall goes next.")+
+  H("Not a category ladder. An engine that enters any category.")+
   cols([
-    {k:"AW27", title:"Fragrance", body:"Rumour Noir, a 100ml plus a 10ml discovery, on the same drop mechanic. The consumable that turns a durables buyer into a repeat one, the LTV engine, launched as an attach, not a hero bet."},
-    {k:"AW27 to SS28", title:"Monogram gifting", body:"Belts enter as gifts; the card holder, already on the wall, gets its atelier monogram. Thin willingness-to-pay converted into sentiment."},
-    {k:"SS28 · WATCH-LIST", title:"Men's jewellery", body:"The runways' breakout category and SALTY already at 25 to 30% men's<sup class='cite cpop' data-pop='From our Track 03 product work. The wall&#39;s BOM is built from live India cluster-supplier listings minus an implied cut-make-trim rate (no public per-piece India rate exists), with seven named factory RFQs to reach quote-grade. The after-SS27 read draws on competitor signals such as SALTY&#39;s founder-stated 25 to 30% men&#39;s share.'>[15]</sup>. We enter only with a specialist partner, because metal QC is a different discipline.", dark:true}
+    {k:"THE SHIFT", title:"Demand-sensed, not sequenced", body:"The engine watches what each man wants and can't find, then drops the keystone that fills it, in whatever category ranks highest. The roadmap is dynamic, not a fixed list."},
+    {k:"THE EXPRESSIONS", title:"Fragrance, gifting, jewellery", body:"AW27 fragrance, the LTV consumable. Monogram gifting on the card holder. Men's jewellery as the SS28 pre-swarm frontier, entered as a keystone, not a bet."},
+    {k:"THE LINE", title:"Never luggage", body:"The wall stays on the body, off the carousel, out of the category the graveyard died in.", dark:true}
   ])+
-  take("And one line stated now, so the buyers see we mean it: <b>never luggage.</b> The wall stays on the body, off the carousel, out of the category the graveyard died in."),
+  take("Every mature category, bags, caps, jewellery, fragrance, becomes supply the engine routes, not a fight we have to win. The relationship is the durable asset; the product rotates through it."),
   {});
 
-/* 25 · WHY RUMOAR WON'T WORK (the bear case) */
+/* 26 WHY RUMOAR WON'T WORK */
 S(
   kick("The bear case")+
-  H("Here is the strongest argument that this fails.")+
-  sub("We would rather make it ourselves, sharply, than have you find it. Three ways RUMOAR does not become a venture outcome.")+
+  H("The strongest argument that this fails.")+
+  sub("Five ways RUMOAR does not become a venture outcome.")+
   cols([
-    {k:"01 · THE MOAT NEVER CONVERTS", title:"No Indian precedent", body:"No Indian brand has scaled on genuinely zero marketing. Comet spent ~32% of revenue on ads<a class='cite' href='https://www.indianretailer.com/news/comet-accelerates-growth-303-pc-revenue-jump-fy25' target='_blank' rel='noopener'>[25]</a>; the only true community-led comp, Urban Monkey, took five years to reach ~₹5 crore<a class='cite' href='https://yourstory.com/smbstory/urban-monkey-street-wear-hip-hop-brand-underground-artists-rappers-athletes' target='_blank' rel='noopener'>[26]</a>. If community doesn't convert, this is a nice niche brand.", dark:true},
-    {k:"02 · THE RAMP IS BORROWED", title:"Mokobara's curve, without the fuel", body:"₹6 to 160 crore is a Mokobara-shaped climb, and Mokobara bought that shape with ~₹190 crore raised and 20% ad ratios<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[5]</a>. Pairing that curve with a community budget is the plan's biggest single leap."},
-    {k:"03 · PREMIUM MEETS THE DISCOUNT REFLEX", title:"The shelf trained him to wait", body:"A ₹2,200 wallet collides with Redseer's finding that Gen Z pays about half the millennial unit price<a class='cite' href='https://redseer.com/articles/gen-z-defining-trends-influencing-spends/' target='_blank' rel='noopener'>[4]</a>, on a shelf that ran 30 to 56% off the day we looked<sup class='cite cpop' data-pop='Our own shelf audit, live-observed 20 July 2026 on mokobara.com, uppercase.co.in, urbanmonkey.com, dailyobjects.com, zouk.co.in and nappadori.com. A single-day snapshot; the wallet-band vacancy was double-confirmed.'>[11]</sup>."}
+    {k:"01 · THE MOAT NEVER CONVERTS", title:"No Indian precedent", body:"No Indian brand has scaled on genuinely zero marketing. Comet spent ~32% of revenue on ads<a class='cite' href='https://www.indianretailer.com/news/comet-accelerates-growth-303-pc-revenue-jump-fy25' target='_blank' rel='noopener'>[38]</a>; Urban Monkey took five years to reach ~₹5 crore<a class='cite' href='https://yourstory.com/smbstory/urban-monkey-street-wear-hip-hop-brand-underground-artists-rappers-athletes' target='_blank' rel='noopener'>[39]</a>. If community doesn't convert, this is a nice niche brand.", dark:true},
+    {k:"02 · THE RAMP IS BORROWED", title:"Mokobara's curve, without the fuel", body:"₹6 to 160 crore is a Mokobara-shaped climb bought with ~₹190 crore raised and 20% ad ratios<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>. Pairing that curve with a community budget is the plan's biggest leap."},
+    {k:"03 · THE TRUST TIGHTROPE", title:"We sell product too", body:"The moment the engine only ever points at our own shelf, we rebuild the exact inventory-captive distrust that killed every styling business before us. The buy-nothing tier has to stay real."}
   ])+
-  take("Each of these is a gate, not a guess, and the cheapest one to test, community CAC, is the one we test first, for ₹2.3 lakh. The argument against us is the reason to run the experiment, not to skip it."),
+  take("Two more, named: a ₹2,200 wallet meets Gen Z's half-price reflex on a discount-trained shelf; and Myntra or Google could bolt styling on as a feature. Each is a measurable gate, and the cheapest, community CAC, is tested first for ₹2.3 lakh."),
   {});
 
-/* 26 · WHAT HAS TO BE TRUE */
+/* 27 WHAT HAS TO BE TRUE */
 S(
   kick("The register")+
-  H("Five things have to be true. We named them.")+
+  H("Five things have to be true.")+
   table(["#","The load-bearing assumption","Base","Breaks if"],[
     ["1",{t:"Community CAC converts below the gate",b:1},"Hypothesis, not in the base P&L","Marginal CAC > ₹900 in the 90-day test"],
-    ["2",{t:"Blended gross margin holds ~51%",b:1},"Filed-comp cluster","Discounting, marketplace mix, leather spikes"],
+    ["2",{t:"Blended gross margin holds ~51%",b:1},"Filed-comp cluster<a class='cite' href='https://entrackr.com/fintrackr/mokobara-revenue-doubles-to-rs-230-cr-in-fy25-11066667' target='_blank' rel='noopener'>[13]</a>","Discounting, marketplace mix, leather spikes"],
     ["3",{t:"Revenue ramps to ₹160 Cr by Year 5",b:1},"Aggressive vs precedent","Growth caps at Urban Monkey pace"],
     ["4",{t:"The repeat / attach ladder lifts LTV",b:1},"Directionally supported","One-and-done persists at premium prices"],
-    ["5",{t:"Waitlist inventory holds WC at ₹10 to 15 Cr",b:1},"Design choice","Drop cadence forces safety stock"]
+    ["5",{t:"Trust holds as we sell",b:1},"The buy-nothing tier","Advice narrows to our own SKUs"]
   ],[6,42,26,26])+
-  take("The weak points are named by us, not found by you. Each is a measurable gate, every input a toggle in the model, and the cheapest one is tested first.<sup class='cite cpop' data-pop='RUMOAR financial model (audited). SAM is roughly 12M qualified times about 30% penetration times about 4,000 rupees annual spend, near 1,400 crore. Unit economics rest on the filed-comparable ~51% gross-margin cluster; the five-year plan, capital and breakeven follow. Every input is a toggle.'>[10]</sup>"),
+  take("Each is a measurable gate, every input a lever, and the cheapest one is tested first."),
   {});
 
-/* 27 · CLOSE */
+/* 28 CLOSE */
 S(`<div class="cov">
     <div class="cov-mark" style="font-size:100px;line-height:.92">The stylist<br>men belong to.</div>
-    <div class="cov-sub" style="margin-top:22px">A men's-fashion-first styling engine, built capital-light because the category's real killers are the balance sheet and acquisition cost, not demand. Every load-bearing number here survived an adversarial audit<sup class='cite cpop' data-pop='Our own red-team audit: 63 claims independently checked by adversarial fact-checkers instructed to refute, not confirm. Every figure that failed was killed or corrected before it entered this deck.'>[29]</sup> before you saw a single slide. Proven in ninety days, before the capital is at risk.</div>
+    <div class="cov-sub" style="margin-top:22px">Not another accessories brand, but the trusted source men have been outsourcing to their girlfriends for years, built capital-light because both the product category and the styling category kill everyone who plays them the normal way. Proven in ninety days, before the capital is at risk.</div>
     <div class="codestrip"><span>RUMOAR · <b class="v">VIBE-CODE YOUR LOOK</b></span><span>PRI · SS27</span></div>
    </div>`, {dark:true, nofoot:true});
 
