@@ -2,6 +2,6 @@ build_deck.js
 project/
 _local/
 README.md
-# The product app is a separate Vercel project (root directory app/).
-app/
-knowledge/
+# Do NOT ignore app/ here. This file is applied at the repository root for EVERY
+# Vercel project on this repo, including rumoar-app (Root Directory: app/) — ignoring
+# it deletes package.json before the build and Next.js is never detected.
