@@ -15,10 +15,21 @@ Don't hand-edit `index.html` (it's generated). Edit the content in **`build_deck
 
 Commit and push to redeploy.
 
+## The product app
+`app/` is the RUMOAR product — a Next.js PWA on Supabase that runs on Android, iOS and
+desktop from one codebase. It deploys as a **separate Vercel project** (root directory
+`app/`), so it never touches this deck's URL. See [`app/README.md`](app/README.md).
+
+`rumoar-app.html` is the original single-file prototype, kept as reference. It is no
+longer the product.
+
 ## Repo layout
     index.html        the deployed deck (generated)
     build_deck.js     the deck source — edit this
     vercel.json       static config
+    app/              the product app (Next.js + Supabase, its own Vercel project)
+    knowledge/        design system, architecture, data model, playbooks
+    rumoar-app.html   the original prototype (reference only)
     project/          internal strategy materials (git-ignored, local only)
 
 > Brand fonts load from Fontshare/Google, so the live view needs internet.

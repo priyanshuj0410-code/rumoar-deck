@@ -2,3 +2,6 @@ build_deck.js
 project/
 _local/
 README.md
+# The product app is a separate Vercel project (root directory app/).
+app/
+knowledge/

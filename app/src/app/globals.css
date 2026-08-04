@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/* Tokens are the canon in knowledge/design.md. Change them there first. */
+@theme {
+  --color-ink: #17171b;
+  --color-paper: #ffffff;
+  --color-wash: #f4f3ef;
+  --color-line: #e9e8e3;
+  --color-mute: #8c8b85;
+  --color-volt: #6152f0;
+  --color-peri: #b3acef;
+  --color-ok: #3e7d5a;
+
+  --font-display: "Clash Display", "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "General Sans", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  --ease-brand: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --spacing-btn: 52px;
+  --spacing-tab: 62px;
+  --spacing-rail: 88px;
+  --spacing-stylist: 380px;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    /* The installed PWA must clear the iOS home indicator and Android gesture bar. */
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-volt);
+    outline-offset: 2px;
+  }
+
+  /* Material Symbols Rounded is the only icon set. */
+  .mi {
+    font-family: "Material Symbols Rounded";
+    font-variation-settings: "wght" 300, "opsz" 24;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    user-select: none;
+    font-feature-settings: "liga";
+  }
+}
+
+@layer components {
+  /* Eyebrow */
+  .k {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-mute);
+  }
+
+  .btn {
+    height: var(--spacing-btn);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--color-ink);
+    color: #fff;
+    font-weight: 500;
+    font-size: 15px;
+    padding-inline: 20px;
+    transition:
+      transform 0.16s var(--ease-brand),
+      opacity 0.2s ease,
+      background 0.22s ease;
+  }
+  .btn:active {
+    transform: scale(0.975);
+    opacity: 0.92;
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  .btn-ghost {
+    background: var(--color-wash);
+    color: var(--color-ink);
+  }
+  .btn-sm {
+    height: 38px;
+    font-size: 13px;
+    padding-inline: 14px;
+  }
+
+  .field {
+    height: var(--spacing-btn);
+    width: 100%;
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    padding-inline: 14px;
+    font-size: 15px;
+    color: var(--color-ink);
+  }
+  .field::placeholder {
+    color: var(--color-mute);
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(22px) saturate(1.8);
+    backdrop-filter: blur(22px) saturate(1.8);
+  }
+
+  .skel {
+    background: linear-gradient(90deg, #f0efea 25%, #e5e4de 37%, #f0efea 63%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bubin {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.36s var(--ease-brand) both;
+}
+.animate-bubin {
+  animation: bubin 0.34s var(--ease-brand) both;
+}
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .skel {
+    animation: none;
+  }
+}

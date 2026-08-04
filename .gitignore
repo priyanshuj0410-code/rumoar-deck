@@ -10,3 +10,4 @@ kb/
 .vercel
 node_modules
 .DS_Store
+.plane_current_issue
