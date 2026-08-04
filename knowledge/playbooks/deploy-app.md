@@ -32,6 +32,15 @@ touches the deck.
 New project → same Git repository → **Root Directory: `app/`**. Framework preset is
 detected as Next.js.
 
+> **Trap, learned the hard way.** The repository-root `.vercelignore` is applied to
+> *every* Vercel project on this repo — including Git builds of `rumoar-app`, whose Root
+> Directory is `app/`. Listing `app/` in that file deletes `package.json` before the build
+> and the deploy fails with "No Next.js version detected". Never ignore `app/` there.
+
+Live production: **https://rumoar-app-alpha.vercel.app** (`rumoar-app.vercel.app` was
+already taken by an unrelated project). The Supabase Site URL and redirect URLs must use
+the real alias, not the one you expected the project to get.
+
 Environment variables:
 
 | Variable | Value |
