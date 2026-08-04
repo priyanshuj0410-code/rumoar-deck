@@ -24,8 +24,57 @@ One row per account, keyed to `auth.users`.
 | `vibe` | `text` | Free-text style self-description |
 | `occasions` | `text[]` | What he dresses for |
 | `budget_band` | `text` | `value` / `mid` / `premium` |
-| `onboarding_stage` | `text` | `call` → `vibe` → `photos` → `wardrobe` → `reveal` → `done` |
+| `onboarding_stage` | `text` | `photos` → `analysis` → `styles` → `done` |
 | `reference_photo_path` | `text` | The photo every generated image is rendered from (`wardrobe` bucket) |
+| `photo_paths` | `text[]` | The full intake set in upload order; `[1]` is the front shot |
+| `analysis` | `jsonb` | Colour/contrast/season analysis — see below |
+| `analysed_at` | `timestamptz` | When the analysis last ran |
+
+`vibe`, `occasions` and `budget_band` are retained but no longer collected during
+onboarding — the photos answer those questions better than the form did. The stylist still
+reads them if they are ever populated.
+
+### `profiles.analysis`
+
+```jsonc
+{
+  "undertone": "warm|cool|neutral|olive",
+  "depth": "light|medium|deep",
+  "contrast": "low|medium|high",
+  "chroma": "soft|muted|clear|bright",
+  "season": "Deep Autumn",          // one of the twelve seasons
+  "season_confidence": 0.72,        // 0–1, surfaced in the UI
+  "features": { "skin": "", "hair": "", "eyes": "" },
+  "build":    { "frame": "", "proportions": "", "fit_notes": "" },
+  "best_colours":  [{ "name": "Deep olive", "hex": "#3B4A2F", "why": "" }],
+  "avoid_colours": [{ "name": "Icy pink",   "hex": "#F6D4DF", "why": "" }],
+  "metals": "gold|silver|both",
+  "notes": "",
+  "caveat": ""                      // set when the lighting was poor
+}
+```
+
+Every field is re-validated server-side after the model returns: seasons must be one of
+the twelve, hex values must match `#RRGGBB` or the swatch is dropped, and confidence is
+clamped to 0–1. A malformed hex would otherwise render as a black chip and read as a
+deliberate recommendation.
+
+### `style_suggestions`
+Three directions generated from the analysis. Regenerating replaces the whole set.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` PK | |
+| `user_id` | `uuid` FK | |
+| `rank` | `int` | 0–2, display order |
+| `name` | `text` | "Quiet Utility" |
+| `one_liner` | `text` | |
+| `why_it_works` | `text` | Must reference the analysis, not generic flattery |
+| `palette` | `jsonb` | `[{name, hex}]` |
+| `key_pieces` | `text[]` | Garment descriptions, not brands |
+| `product_slugs` | `text[]` | Validated against `products`; invented slugs are dropped |
+| `occasions` | `text[]` | |
+| `image_path` | `text` | The style rendered on his own photo (`looks` bucket) |
 | `created_at` / `updated_at` | `timestamptz` | |
 
 ### `wardrobe_items`

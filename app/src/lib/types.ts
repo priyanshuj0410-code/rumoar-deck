@@ -19,7 +19,47 @@ export const ITEM_KINDS: ItemKind[] = [
   "other",
 ];
 
-export type OnboardingStage = "call" | "vibe" | "photos" | "wardrobe" | "reveal" | "done";
+export type OnboardingStage = "photos" | "analysis" | "styles" | "done";
+
+export type Swatch = { name: string; hex: string; why?: string };
+
+/**
+ * Seasonal colour analysis, read from the intake photos.
+ *
+ * `confidence` is load-bearing, not decoration: white balance, indoor lighting and phone
+ * processing all shift apparent skin tone, so the model is required to say how sure it is
+ * and the UI shows it.
+ */
+export type ColourAnalysis = {
+  undertone: "warm" | "cool" | "neutral" | "olive";
+  depth: "light" | "medium" | "deep";
+  contrast: "low" | "medium" | "high";
+  chroma: "soft" | "muted" | "clear" | "bright";
+  season: string;
+  season_confidence: number;
+  features: { skin: string; hair: string; eyes: string };
+  build: { frame: string; proportions: string; fit_notes: string };
+  best_colours: Swatch[];
+  avoid_colours: Swatch[];
+  metals: "gold" | "silver" | "both";
+  notes: string;
+  caveat?: string;
+};
+
+export type StyleSuggestion = {
+  id: string;
+  user_id: string;
+  rank: number;
+  name: string;
+  one_liner: string | null;
+  why_it_works: string | null;
+  palette: Swatch[];
+  key_pieces: string[];
+  product_slugs: string[];
+  occasions: string[];
+  image_path: string | null;
+  created_at: string;
+};
 
 export type Profile = {
   id: string;
@@ -30,6 +70,10 @@ export type Profile = {
   onboarding_stage: OnboardingStage;
   /** The photo every generated image is rendered from. Lives in the `wardrobe` bucket. */
   reference_photo_path: string | null;
+  /** The full intake set, in upload order. */
+  photo_paths: string[];
+  analysis: ColourAnalysis | null;
+  analysed_at: string | null;
 };
 
 export type WardrobeItem = {

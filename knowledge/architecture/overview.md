@@ -42,9 +42,12 @@ existing root `vercel.json` and the deck's deployment are unaffected.
         ├── Next.js App Router  ──  React Server Components for reads
         │        │
         │        ├── /api/stylist   → Gemini text    (conversation)
+        │        ├── /api/analyze   → Gemini vision  (photos → colour/season analysis)
+        │        ├── /api/styles    → Gemini text    (analysis → three directions)
+        │        │                  → Gemini image   (PATCH renders one style on him)
         │        ├── /api/vision    → Gemini vision  (photo → wardrobe items)
-        │        └── /api/render    → Gemini image   (reveal shots, PDP try-on)
-        │                             all three server-side; the key never ships
+        │        └── /api/render    → Gemini image   (PDP try-on)
+        │                             all server-side; the key never ships
         │
         └── Supabase JS  ── auth session, wardrobe/look reads+writes, Storage uploads
                  └── Postgres with row-level security on every user-owned table

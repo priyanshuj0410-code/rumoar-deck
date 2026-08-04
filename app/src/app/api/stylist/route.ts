@@ -24,6 +24,19 @@ function systemPrompt(profile: Profile | null, wardrobe: WardrobeItem[], catalog
     `The man you are styling${profile?.display_name ? ` is called ${profile.display_name}` : ""}.`,
     profile?.vibe ? `He describes his style as: ${profile.vibe}.` : "",
     profile?.occasions?.length ? `He dresses for: ${profile.occasions.join(", ")}.` : "",
+    ...(profile?.analysis
+      ? [
+          "",
+          "His colour analysis (read from his own photos):",
+          `- Season: ${profile.analysis.season}`,
+          `- Undertone ${profile.analysis.undertone}, depth ${profile.analysis.depth}, contrast ${profile.analysis.contrast}, chroma ${profile.analysis.chroma}`,
+          `- Metals: ${profile.analysis.metals}`,
+          `- Works on him: ${profile.analysis.best_colours.map((c) => c.name).join(", ")}`,
+          `- Fights him: ${profile.analysis.avoid_colours.map((c) => c.name).join(", ")}`,
+          profile.analysis.build.fit_notes ? `- Fit: ${profile.analysis.build.fit_notes}` : "",
+          "Use this. Never recommend a colour on his avoid list without saying why you are breaking the rule.",
+        ]
+      : []),
     "",
     "What he already owns:",
     owns,

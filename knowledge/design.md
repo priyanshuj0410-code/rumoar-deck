@@ -93,6 +93,15 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
 - **Toast** — ink block, bottom-anchored above the tab bar, `--peri` icon, auto-dismiss
   2.4s, spring transform in.
 - **Empty state** (`.emptymsg`) — 44/24px padding, centred, `--mute` 14px/1.6.
+- **Swatch grid** — 4-up square colour chips, no radius, name in 11px beneath. Each chip is
+  `role="img"` with the colour name as its label: colour alone must never be the only
+  carrier of meaning. A swatch whose hex fails `#RRGGBB` validation is dropped rather than
+  rendered, so a parse failure can't masquerade as a black recommendation.
+- **Confidence meter** — a 2px `--line` track with an `--ink` fill and the percentage in
+  mono beside it. Used wherever the product states a machine judgement about the user; it
+  is never decorative and never hidden when low.
+- **Intake instruction list** — numbered mono index, bold 13.5px label, `--mute` 13px hint.
+  For steps the user performs away from the screen (front / side / back photos).
 
 ## 3. Layout
 
@@ -149,5 +158,10 @@ that stays.
 
 - **2026-08-04** — Created. Audited from `rumoar-app.html` + `build_deck.js`; added the
   three-breakpoint responsive layout and accessibility rules for the productisation.
+- **2026-08-04** — Onboarding rebuilt around photo intake and colour analysis. Added the
+  swatch grid, confidence meter and intake instruction list. The call screen and the
+  name/vibe/occasions form are removed. Lazyweb coverage for colour-analysis result
+  screens was weak (top similarity 0.36), so these patterns are derived from this system
+  rather than from external evidence.
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)

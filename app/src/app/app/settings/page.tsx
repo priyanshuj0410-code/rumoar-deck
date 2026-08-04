@@ -21,16 +21,48 @@ export default async function SettingsPage() {
           <dd className="text-sm break-all">{user?.email ?? "—"}</dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
-          <dt className="text-mute text-sm">Style</dt>
-          <dd className="text-sm text-right">{profile?.vibe ?? "—"}</dd>
+          <dt className="text-mute text-sm">Season</dt>
+          <dd className="text-sm text-right">{profile?.analysis?.season ?? "—"}</dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
-          <dt className="text-mute text-sm">Dresses for</dt>
+          <dt className="text-mute text-sm">Colouring</dt>
           <dd className="text-sm text-right">
-            {profile?.occasions?.length ? profile.occasions.join(", ") : "—"}
+            {profile?.analysis
+              ? `${profile.analysis.undertone} · ${profile.analysis.depth} · ${profile.analysis.contrast} contrast`
+              : "—"}
           </dd>
         </div>
+        <div className="flex justify-between gap-6 py-4 border-b border-line">
+          <dt className="text-mute text-sm">Metals</dt>
+          <dd className="text-sm text-right">{profile?.analysis?.metals ?? "—"}</dd>
+        </div>
       </dl>
+
+      {profile?.analysis?.best_colours?.length ? (
+        <section className="mt-8">
+          <h2 className="k">Your colours</h2>
+          <ul className="grid grid-cols-4 gap-2 mt-3">
+            {profile.analysis.best_colours.map((colour) => (
+              <li key={colour.hex}>
+                <span
+                  className="block aspect-square"
+                  style={{ background: colour.hex }}
+                  role="img"
+                  aria-label={colour.name}
+                />
+                <span className="text-[11px] leading-tight block mt-1">{colour.name}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[11px] text-mute leading-snug mt-3">
+            Read from your intake photos
+            {profile.analysed_at
+              ? ` on ${new Date(profile.analysed_at).toLocaleDateString("en-IN")}`
+              : ""}
+            . Lighting affects this — treat it as a strong starting point, not a verdict.
+          </p>
+        </section>
+      ) : null}
 
       <NotificationToggle />
 
