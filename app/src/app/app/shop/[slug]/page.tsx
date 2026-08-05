@@ -58,8 +58,12 @@ export default async function ProductPage({ params }: Params) {
           <input type="hidden" name="product_id" value={product.id} />
           <input type="hidden" name="slug" value={product.slug} />
           <button className={`btn w-full ${isSaved ? "btn-ghost" : ""}`} aria-pressed={isSaved}>
-            <span className="mi text-[19px]" aria-hidden>
-              {isSaved ? "bookmark" : "bookmark_border"}
+            <span
+              className="mi text-[19px]"
+              style={{ fontVariationSettings: `'FILL' ${isSaved ? 1 : 0}, 'wght' 300, 'opsz' 24` }}
+              aria-hidden
+            >
+              bookmark
             </span>
             {isSaved ? "Saved" : "Save"}
           </button>

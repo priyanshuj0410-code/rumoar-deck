@@ -53,6 +53,18 @@ mono 10px, `letter-spacing:.24em`, uppercase, `--mute`.
 
 Icons: **Material Symbols Rounded**, `wght 300`, `opsz 24`. No other icon set.
 
+Three rules, because an icon font fails loudly and stupidly — an unknown ligature renders
+as its own literal text, so `favorite_border` appears on screen as the words
+"favorite\_border":
+
+1. **Never use a Material *Icons* name.** The `*_border`, `*_outline` and `*_filled`
+   suffixes belong to the old set and do not exist in Symbols.
+2. **State is the `FILL` axis, not a different glyph.** One ligature per icon;
+   `font-variation-settings: 'FILL' 0|1`. Fill is a shape change, so the state survives
+   greyscale and colour blindness — a colour swap alone does not.
+3. **Inline `font-variation-settings` replaces the whole property**, so any inline override
+   must restate `wght` and `opsz` or the glyph silently changes optical size.
+
 ### Geometry — square by default
 
 **Corner radius is `0` for every rectangular surface**: cards, tiles, buttons, inputs,

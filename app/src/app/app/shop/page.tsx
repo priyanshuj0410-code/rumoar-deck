@@ -63,8 +63,12 @@ export default async function ShopPage() {
                       isSaved ? "bg-ink text-paper" : "bg-paper/90 text-mute hover:text-ink"
                     }`}
                   >
-                    <span className="mi text-[17px]" aria-hidden>
-                      {isSaved ? "bookmark" : "bookmark_border"}
+                    <span
+                      className="mi text-[17px]"
+                      style={{ fontVariationSettings: `'FILL' ${isSaved ? 1 : 0}, 'wght' 300, 'opsz' 24` }}
+                      aria-hidden
+                    >
+                      bookmark
                     </span>
                   </button>
                 </form>

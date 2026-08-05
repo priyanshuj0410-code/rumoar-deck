@@ -42,11 +42,44 @@ export function Onboarding({ profile }: { profile: Profile }) {
   const [analysis, setAnalysis] = useState<ColourAnalysis | null>(profile.analysis ?? null);
   const [pending, startTransition] = useTransition();
 
+  const stepIndex = STEPS.indexOf(stage);
+
+  function goBack() {
+    const previous = STEPS[stepIndex - 1];
+    if (!previous) return;
+
+    // Returning to the photos means the existing read no longer describes the photos on
+    // file, so it is cleared — otherwise the analysis step would show the stale result
+    // and never re-run.
+    if (previous === "photos") setAnalysis(null);
+
+    startTransition(async () => {
+      await setStage(previous);
+      setLocalStage(previous);
+    });
+  }
+
   return (
     <div className="min-h-dvh flex flex-col max-w-[560px] mx-auto w-full px-5 py-6">
       <header className="flex-none flex items-center justify-between">
-        <span className="k">RUMOAR</span>
-        <span className="k">{STEPS.indexOf(stage) + 1} of 3</span>
+        <div className="flex items-center gap-1.5 -ml-2">
+          {stepIndex > 0 ? (
+            <button
+              onClick={goBack}
+              disabled={pending}
+              aria-label={`Back to ${STEPS[stepIndex - 1]}`}
+              className="w-8 h-8 flex items-center justify-center text-mute hover:text-ink transition-colors"
+            >
+              <span className="mi text-[20px]" aria-hidden>
+                arrow_back
+              </span>
+            </button>
+          ) : (
+            <span className="w-2" />
+          )}
+          <span className="k">RUMOAR</span>
+        </div>
+        <span className="k">{stepIndex + 1} of 3</span>
       </header>
 
       {stage === "photos" && (

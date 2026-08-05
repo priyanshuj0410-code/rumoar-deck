@@ -6,12 +6,22 @@ import { haptics, share } from "@/lib/platform";
 export type ReactionKind = "like" | "dislike" | "save" | "share";
 export type SubjectType = "style" | "look";
 
-const ICONS: Record<ReactionKind, { on: string; off: string; label: string }> = {
-  like: { on: "favorite", off: "favorite_border", label: "Like" },
-  dislike: { on: "heart_broken", off: "heart_broken", label: "Not for me" },
-  save: { on: "bookmark", off: "bookmark_border", label: "Save" },
-  share: { on: "ios_share", off: "ios_share", label: "Share" },
+/**
+ * Material Symbols has no `*_border` variants — those are Material Icons names, and an
+ * unknown ligature renders as its own literal text. One ligature per icon; the FILL axis
+ * carries the state.
+ */
+const ICONS: Record<ReactionKind, { glyph: string; label: string }> = {
+  like: { glyph: "favorite", label: "Like" },
+  dislike: { glyph: "thumb_down", label: "Not for me" },
+  save: { glyph: "bookmark", label: "Save" },
+  share: { glyph: "ios_share", label: "Share" },
 };
+
+/** Material Symbols is a variable font: fill the glyph rather than swapping it. */
+export function fillAxis(on: boolean) {
+  return { fontVariationSettings: `'FILL' ${on ? 1 : 0}, 'wght' ${on ? 400 : 300}, 'opsz' 24` };
+}
 
 /**
  * Feedback on a generated image. Every tap is training signal for what to generate next,
@@ -91,14 +101,12 @@ export function ReactionBar({
           >
             <span
               className="mi text-[22px]"
-              style={
-                // Material Symbols fills on the active state — a shape change, not just a
-                // colour change, so the state survives greyscale and colour blindness.
-                on ? { fontVariationSettings: "'FILL' 1, 'wght' 400" } : undefined
-              }
+              // Fill is a shape change, not just a colour change, so the state survives
+              // greyscale and colour blindness.
+              style={fillAxis(on)}
               aria-hidden
             >
-              {on ? ICONS[kind].on : ICONS[kind].off}
+              {ICONS[kind].glyph}
             </span>
           </button>
         );
@@ -112,7 +120,7 @@ export function ReactionBar({
                     ${shared ? "text-ink" : "text-mute hover:text-ink"}`}
       >
         <span className="mi text-[21px]" aria-hidden>
-          {ICONS.share.on}
+          {ICONS.share.glyph}
         </span>
       </button>
     </div>
