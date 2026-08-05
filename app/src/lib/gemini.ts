@@ -3,7 +3,28 @@ import "server-only";
 const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions";
 
 export const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || "gemini-3.6-flash";
-export const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
+
+const DEFAULT_IMAGE_MODEL = "gemini-3.1-flash-image";
+
+/**
+ * An image route must run on an image model. A text model given an image-editing prompt
+ * does not error — it politely describes the picture it would have made and returns
+ * `status: completed` with a text part, which is indistinguishable from success until you
+ * go looking for the bytes. So a misconfigured override is ignored rather than obeyed.
+ */
+function resolveImageModel(): string {
+  const configured = process.env.GEMINI_IMAGE_MODEL?.trim();
+  if (!configured) return DEFAULT_IMAGE_MODEL;
+  if (!/image/i.test(configured)) {
+    console.error(
+      `[gemini] GEMINI_IMAGE_MODEL="${configured}" is not an image model; using ${DEFAULT_IMAGE_MODEL}`,
+    );
+    return DEFAULT_IMAGE_MODEL;
+  }
+  return configured;
+}
+
+export const IMAGE_MODEL = resolveImageModel();
 
 export type InlineImage = { mimeType: string; data: string };
 
@@ -395,8 +416,14 @@ export async function generateImage(options: {
   // rather than a full dump whose informative tail gets truncated away. `usage` and `id`
   // told us nothing and ate the whole budget twice.
   const status = typeof json.status === "string" ? json.status : "?";
+  // The model that actually ran. A text model here is the whole bug, and its name is the
+  // one value in this response that would have identified it immediately.
+  const ran = typeof json.model === "string" ? json.model : "?";
+  const said = readText(json).slice(0, 200);
   const steps = json.steps ? describe(json.steps) : describe(json);
-  const shape = `status=${status} keys=[${Object.keys(json).join(",")}] steps=${steps}`;
+  const shape =
+    `requested=${IMAGE_MODEL} ran=${ran} status=${status} steps=${steps}` +
+    (said ? ` said="${said}"` : "");
 
   console.error("[gemini] no image in response;", shape);
   throw new GeminiError(`no image found. ${shape}`.slice(0, 4000), 502);
