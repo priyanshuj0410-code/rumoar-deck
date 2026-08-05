@@ -57,6 +57,8 @@ async function post(body: unknown, timeoutMs: number): Promise<Record<string, un
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
+    // Logged in full server-side; the caller only ever forwards a truncated reason.
+    console.error("[gemini] upstream error", response.status, detail.slice(0, 800));
     throw new GeminiError(`gemini returned ${response.status}: ${detail.slice(0, 200)}`, 502);
   }
 
@@ -204,7 +206,9 @@ export async function generateImage(options: {
   const json = await post(
     {
       model: IMAGE_MODEL,
-      input: [{ type: "user_input", content }],
+      // Image generation takes a flat array of parts, NOT the {type:"user_input",content}
+      // step wrapper that multi-turn text uses. Wrapping it here returns a 400.
+      input: content,
       response_format: {
         type: "image",
         mime_type: "image/jpeg",

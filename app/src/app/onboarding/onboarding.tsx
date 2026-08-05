@@ -192,14 +192,14 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
   const all = [...shots.filter((s): s is PickedImage => s !== null), ...extras];
 
   return (
-    <div className="flex-1 flex flex-col pt-6 min-h-0">
+    <div className="flex-1 flex flex-col pt-6">
       <p className="k">Review</p>
       <h1 className="text-[28px] mt-2">Do these look right?</h1>
       <p className="text-mute text-sm leading-relaxed mt-2">
         Head to feet in frame, taken in the same light. Tap any shot to redo it.
       </p>
 
-      <div className="flex-1 overflow-y-auto mt-5">
+      <div className="mt-5">
         <div className="grid grid-cols-3 gap-2">
           {SHOTS.map((shot, i) => (
             <button
@@ -318,14 +318,14 @@ function AnalysisStep({
   // about a second in rather than a progress bar over twenty seconds of silence.
   if (running && !error) {
     return (
-      <div className="flex-1 flex flex-col pt-8 min-h-0">
+      <div className="flex-1 flex flex-col pt-8">
         <p className="k flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />
           {status}
         </p>
         <h1 className="text-[28px] mt-2">Reading your colouring</h1>
 
-        <div className="flex-1 overflow-y-auto mt-5" aria-live="polite">
+        <div className="mt-5" aria-live="polite">
           {prose ? (
             <p className="text-[17px] leading-relaxed whitespace-pre-wrap">
               {prose}
@@ -360,7 +360,7 @@ function AnalysisStep({
   const confidence = Math.round(analysis.season_confidence * 100);
 
   return (
-    <div className="flex-1 flex flex-col pt-8 min-h-0">
+    <div className="flex-1 flex flex-col pt-8">
       <p className="k">Your analysis</p>
       <h1 className="text-[32px] mt-2">{analysis.season}</h1>
       <p className="text-mute text-sm leading-relaxed mt-2">
@@ -368,7 +368,7 @@ function AnalysisStep({
         {analysis.chroma}
       </p>
 
-      <div className="flex-1 overflow-y-auto mt-6 -mx-1 px-1">
+      <div className="mt-6">
         <Row label="Confidence">
           <div className="flex items-center gap-3">
             <div className="h-0.5 bg-line flex-1">
@@ -488,14 +488,16 @@ function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean 
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col pt-6 min-h-0">
+    <div className="flex-1 flex flex-col pt-6">
       <p className="k flex items-center gap-2">
         {running && <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />}
         {running ? status : "Built for your colouring"}
       </p>
       <h1 className="text-[28px] mt-2">Three directions.</h1>
 
-      <div className="flex-1 overflow-y-auto mt-5 flex flex-col gap-8 -mx-1 px-1" aria-live="polite">
+      {/* The page itself scrolls. An inner overflow container here produced a second
+          scrollbar inside the first — two things to drag, neither obviously the right one. */}
+      <div className="mt-5 flex flex-col gap-8" aria-live="polite">
         {styles.map((style) => (
           <StyleCard key={style.id} style={style} />
         ))}
@@ -517,9 +519,11 @@ function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean 
         )}
       </div>
 
-      <button className="btn w-full mt-4" onClick={onDone} disabled={pending || styles.length === 0}>
-        {pending ? "Finishing…" : "Open my app"}
-      </button>
+      <div className="sticky bottom-0 bg-paper pt-3 pb-[calc(8px+env(safe-area-inset-bottom))] mt-6">
+        <button className="btn w-full" onClick={onDone} disabled={pending || styles.length === 0}>
+          {pending ? "Finishing…" : "Open my app"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -530,7 +534,7 @@ function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean 
  */
 function StyleCard({ style }: { style: StyleSuggestion }) {
   const [url, setUrl] = useState<string | null>(null);
-  const [failed, setFailed] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ message: string; reason?: string } | null>(null);
   const [open, setOpen] = useState(false);
 
   const render = useCallback(async () => {
@@ -541,11 +545,11 @@ function StyleCard({ style }: { style: StyleSuggestion }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: style.id }),
       });
-      const json = (await response.json()) as { url?: string; message?: string };
+      const json = (await response.json()) as { url?: string; message?: string; reason?: string };
       if (json.url) setUrl(json.url);
-      else setFailed(json.message ?? "Couldn't render that one.");
+      else setFailed({ message: json.message ?? "Couldn't render that one.", reason: json.reason });
     } catch {
-      setFailed("Couldn't reach the renderer.");
+      setFailed({ message: "Couldn't reach the renderer." });
     }
   }, [style.id]);
 
@@ -565,9 +569,17 @@ function StyleCard({ style }: { style: StyleSuggestion }) {
             alt={`${style.name}, rendered on your own photo`}
             className="w-full h-full object-cover animate-rise"
           />
+        ) : failed ? (
+          // A shimmering skeleton on a permanent failure reads as "still loading forever".
+          <div className="absolute inset-0 bg-wash flex flex-col items-center justify-center gap-2 text-mute">
+            <span className="mi text-[28px]" aria-hidden>
+              image_not_supported
+            </span>
+            <span className="k">Render failed</span>
+          </div>
         ) : (
           <div className="absolute inset-0 skel flex items-end p-4">
-            <span className="k">{failed ? "" : "Dressing you…"}</span>
+            <span className="k">Dressing you…</span>
           </div>
         )}
 
@@ -606,11 +618,17 @@ function StyleCard({ style }: { style: StyleSuggestion }) {
       )}
 
       {failed ? (
-        <div className="mt-2 flex items-center gap-3">
-          <p className="text-[13px] text-mute flex-1">{failed}</p>
-          <button className="btn btn-ghost btn-sm" onClick={render}>
-            Retry
-          </button>
+        <div className="mt-2">
+          <div className="flex items-center gap-3">
+            <p className="text-[13px] text-mute flex-1">{failed.message}</p>
+            <button className="btn btn-ghost btn-sm flex-none" onClick={render}>
+              Retry
+            </button>
+          </div>
+          {failed.reason && (
+            // The upstream reason, verbatim. Without it a render failure is a guess.
+            <p className="text-[11px] text-mute/80 font-mono mt-1.5 break-all">{failed.reason}</p>
+          )}
         </div>
       ) : (
         <ReactionBar subjectType="style" subjectId={style.id} title={style.name} />
