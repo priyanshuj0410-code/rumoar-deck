@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { camera, haptics, type PickedImage } from "@/lib/platform";
 import { createClient } from "@/lib/supabase/client";
+import { readEvents } from "@/lib/ndjson";
 import { PhotoCapture } from "@/components/photo-capture";
+import { ReactionBar } from "@/components/reaction-bar";
 import type { ColourAnalysis, OnboardingStage, Profile, StyleSuggestion } from "@/lib/types";
 import { finishOnboarding, savePhotos, setStage } from "./actions";
 
@@ -280,6 +282,8 @@ function AnalysisStep({
 }) {
   const [analysis, setAnalysis] = useState<ColourAnalysis | null>(initial);
   const [running, setRunning] = useState(!initial);
+  const [prose, setProse] = useState("");
+  const [status, setStatus] = useState("Opening your photos");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -289,13 +293,15 @@ function AnalysisStep({
     (async () => {
       try {
         const response = await fetch("/api/analyze", { method: "POST" });
-        const json = (await response.json()) as {
-          analysis?: ColourAnalysis;
-          message?: string;
-        };
-        if (cancelled) return;
-        if (json.analysis) setAnalysis(json.analysis);
-        else setError(json.message ?? "Couldn't read those photos.");
+        if (!response.body) throw new Error("no stream");
+
+        await readEvents(response.body, (event) => {
+          if (cancelled) return;
+          if (event.t === "text") setProse((current) => current + event.v);
+          else if (event.t === "status") setStatus(event.v);
+          else if (event.t === "error") setError(event.message);
+          else if (event.t === "done") setAnalysis(event.payload as ColourAnalysis);
+        });
       } catch {
         if (!cancelled) setError("Couldn't reach the analyser. Check your connection.");
       } finally {
@@ -308,16 +314,31 @@ function AnalysisStep({
     };
   }, [analysis]);
 
-  if (running) {
+  // The model narrates what it sees while it works, so there is something to read from
+  // about a second in rather than a progress bar over twenty seconds of silence.
+  if (running && !error) {
     return (
-      <div className="flex-1 flex flex-col justify-center" aria-live="polite">
-        <div className="w-full h-1 bg-line overflow-hidden">
-          <div className="h-full w-1/3 bg-ink animate-pulse" />
-        </div>
-        <h1 className="text-[28px] mt-6">Reading your colouring…</h1>
-        <p className="text-mute text-sm leading-relaxed mt-3">
-          Undertone, depth, contrast, then the season. Fifteen seconds or so.
+      <div className="flex-1 flex flex-col pt-8 min-h-0">
+        <p className="k flex items-center gap-2">
+          <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />
+          {status}
         </p>
+        <h1 className="text-[28px] mt-2">Reading your colouring</h1>
+
+        <div className="flex-1 overflow-y-auto mt-5" aria-live="polite">
+          {prose ? (
+            <p className="text-[17px] leading-relaxed whitespace-pre-wrap">
+              {prose}
+              <span className="inline-block w-[2px] h-[1.1em] bg-ink align-[-2px] ml-0.5 animate-pulse" />
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              <span className="skel h-4 w-[92%] block" />
+              <span className="skel h-4 w-[78%] block" />
+              <span className="skel h-4 w-[85%] block" />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -436,6 +457,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 
 function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean }) {
   const [styles, setStyles] = useState<StyleSuggestion[]>([]);
+  const [status, setStatus] = useState("Reading your palette");
   const [running, setRunning] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -445,10 +467,14 @@ function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean 
     (async () => {
       try {
         const response = await fetch("/api/styles", { method: "POST" });
-        const json = (await response.json()) as { styles?: StyleSuggestion[]; message?: string };
-        if (cancelled) return;
-        if (json.styles?.length) setStyles(json.styles);
-        else setError(json.message ?? "Couldn't put those together.");
+        if (!response.body) throw new Error("no stream");
+
+        await readEvents(response.body, (event) => {
+          if (cancelled) return;
+          if (event.t === "style") setStyles((current) => [...current, event.style as StyleSuggestion]);
+          else if (event.t === "status") setStatus(event.v);
+          else if (event.t === "error") setError(event.message);
+        });
       } catch {
         if (!cancelled) setError("Couldn't reach the stylist. Check your connection.");
       } finally {
@@ -461,129 +487,166 @@ function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean 
     };
   }, []);
 
-  if (running) {
-    return (
-      <div className="flex-1 flex flex-col justify-center" aria-live="polite">
-        <div className="w-full h-1 bg-line overflow-hidden">
-          <div className="h-full w-1/2 bg-ink animate-pulse" />
-        </div>
-        <h1 className="text-[28px] mt-6">Building your three directions…</h1>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex-1 flex flex-col pt-8 min-h-0">
-      <p className="k">Built for your colouring</p>
+    <div className="flex-1 flex flex-col pt-6 min-h-0">
+      <p className="k flex items-center gap-2">
+        {running && <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />}
+        {running ? status : "Built for your colouring"}
+      </p>
       <h1 className="text-[28px] mt-2">Three directions.</h1>
 
-      {error && (
-        <p role="alert" className="text-sm text-mute leading-relaxed mt-3">
-          {error}
-        </p>
-      )}
-
-      <div className="flex-1 overflow-y-auto mt-5 flex flex-col gap-5 -mx-1 px-1">
+      <div className="flex-1 overflow-y-auto mt-5 flex flex-col gap-8 -mx-1 px-1" aria-live="polite">
         {styles.map((style) => (
           <StyleCard key={style.id} style={style} />
         ))}
+
+        {/* Placeholders for the directions still generating, so the page has shape. */}
+        {running &&
+          Array.from({ length: Math.max(0, 3 - styles.length) }).map((_, index) => (
+            <div key={`pending-${index}`} className="flex flex-col gap-2">
+              <span className="skel h-6 w-[52%] block" />
+              <span className="skel h-4 w-[72%] block" />
+              <span className="skel aspect-[3/4] w-full block mt-2" />
+            </div>
+          ))}
+
+        {error && (
+          <p role="alert" className="text-sm text-mute leading-relaxed">
+            {error}
+          </p>
+        )}
       </div>
 
-      <button className="btn w-full mt-4" onClick={onDone} disabled={pending}>
+      <button className="btn w-full mt-4" onClick={onDone} disabled={pending || styles.length === 0}>
         {pending ? "Finishing…" : "Open my app"}
       </button>
     </div>
   );
 }
 
+/**
+ * Image first. The rationale is real work and worth keeping, but it belongs behind a tap —
+ * what he wants to know at a glance is whether he'd wear it.
+ */
 function StyleCard({ style }: { style: StyleSuggestion }) {
   const [url, setUrl] = useState<string | null>(null);
-  const [rendering, setRendering] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
-  async function render() {
-    setRendering(true);
-    setFailed(false);
-    haptics.tap();
+  const render = useCallback(async () => {
+    setFailed(null);
     try {
       const response = await fetch("/api/styles", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: style.id }),
       });
-      const json = (await response.json()) as { url?: string };
+      const json = (await response.json()) as { url?: string; message?: string };
       if (json.url) setUrl(json.url);
-      else setFailed(true);
+      else setFailed(json.message ?? "Couldn't render that one.");
     } catch {
-      setFailed(true);
-    } finally {
-      setRendering(false);
+      setFailed("Couldn't reach the renderer.");
     }
-  }
+  }, [style.id]);
+
+  // Rendering starts on its own. Asking the user to press a button for something the
+  // product should obviously do is just friction.
+  useEffect(() => {
+    void render();
+  }, [render]);
 
   return (
-    <article className="border-t border-line pt-4">
-      <h2 className="text-[21px]">{style.name}</h2>
-      {style.one_liner && <p className="text-mute text-sm leading-relaxed mt-1">{style.one_liner}</p>}
-
-      {style.palette.length > 0 && (
-        <ul className="flex gap-1.5 mt-3">
-          {style.palette.map((colour) => (
-            <li
-              key={colour.hex}
-              className="w-8 h-8"
-              style={{ background: colour.hex }}
-              role="img"
-              aria-label={colour.name}
-              title={colour.name}
-            />
-          ))}
-        </ul>
-      )}
-
-      {style.why_it_works && (
-        <p className="text-sm leading-relaxed mt-3">{style.why_it_works}</p>
-      )}
-
-      {style.key_pieces.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5">
-          {style.key_pieces.map((piece) => (
-            <li key={piece} className="text-[12px] border border-line px-2 py-1">
-              {piece}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {url ? (
-        <figure className="mt-3">
-          <div className="aspect-[3/4] bg-wash overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={url}
-              alt={`${style.name} rendered on your own photo`}
-              className="w-full h-full object-cover animate-rise"
-            />
+    <article>
+      <div className="relative aspect-[3/4] bg-wash overflow-hidden">
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={url}
+            alt={`${style.name}, rendered on your own photo`}
+            className="w-full h-full object-cover animate-rise"
+          />
+        ) : (
+          <div className="absolute inset-0 skel flex items-end p-4">
+            <span className="k">{failed ? "" : "Dressing you…"}</span>
           </div>
-          <figcaption className="text-[11px] text-mute mt-2 leading-snug">
-            Generated from your photo — an impression of the direction, not real garments.
-          </figcaption>
-        </figure>
-      ) : rendering ? (
-        <div className="aspect-[3/4] skel mt-3 flex items-end p-4">
-          <span className="k">Dressing you…</span>
+        )}
+
+        {url && (
+          <div className="absolute inset-x-0 bottom-0 p-4 pt-10 bg-gradient-to-t from-ink/85 to-transparent text-paper">
+            <h2 className="font-display text-[22px] font-semibold leading-tight">{style.name}</h2>
+            {style.one_liner && <p className="text-[13px] opacity-90 mt-0.5">{style.one_liner}</p>}
+          </div>
+        )}
+
+        {style.palette.length > 0 && (
+          <ul className="absolute top-3 right-3 flex flex-col gap-1">
+            {style.palette.map((colour) => (
+              <li
+                key={colour.hex}
+                className="w-5 h-5 shadow-[0_1px_4px_rgba(0,0,0,.25)]"
+                style={{ background: colour.hex }}
+                role="img"
+                aria-label={colour.name}
+                title={colour.name}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {!url && (
+        <h2 className="text-[21px] mt-3">
+          {style.name}
+          {style.one_liner && (
+            <span className="block text-mute text-sm font-normal leading-relaxed mt-1">
+              {style.one_liner}
+            </span>
+          )}
+        </h2>
+      )}
+
+      {failed ? (
+        <div className="mt-2 flex items-center gap-3">
+          <p className="text-[13px] text-mute flex-1">{failed}</p>
+          <button className="btn btn-ghost btn-sm" onClick={render}>
+            Retry
+          </button>
         </div>
       ) : (
-        <button className="btn btn-ghost btn-sm mt-3" onClick={render}>
-          <span className="mi text-[18px]" aria-hidden>
-            styler
-          </span>
-          See it on me
-        </button>
+        <ReactionBar subjectType="style" subjectId={style.id} title={style.name} />
       )}
 
-      {failed && (
-        <p className="text-[13px] text-mute mt-2">Couldn&rsquo;t render that one. Try again.</p>
+      <button
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-1"
+      >
+        <span className="mi text-[18px]" aria-hidden>
+          {open ? "expand_less" : "expand_more"}
+        </span>
+        Why this works
+      </button>
+
+      {open && (
+        <div className="mt-2 animate-rise">
+          {style.why_it_works && (
+            <p className="text-sm leading-relaxed">{style.why_it_works}</p>
+          )}
+          {style.key_pieces.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-1.5">
+              {style.key_pieces.map((piece) => (
+                <li key={piece} className="text-[12px] border border-line px-2 py-1">
+                  {piece}
+                </li>
+              ))}
+            </ul>
+          )}
+          {url && (
+            <p className="text-[11px] text-mute mt-3 leading-snug">
+              Generated from your photo — an impression of the direction, not real garments.
+            </p>
+          )}
+        </div>
       )}
     </article>
   );

@@ -129,6 +129,23 @@ The catalog. **Publicly readable**, service-role writable.
 | `description` | `text` | |
 | `active` | `boolean` | Soft delete |
 
+### `reactions`
+Feedback on generated content. Stored per user per subject rather than as an aggregate
+counter, because the point is training signal for what to generate next.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` PK | |
+| `user_id` | `uuid` FK | |
+| `subject_type` | `text` | `style` / `look` |
+| `subject_id` | `uuid` | The generated thing being reacted to |
+| `kind` | `text` | `like` / `dislike` / `save` / `share` |
+| `created_at` | `timestamptz` | |
+
+Unique on `(user_id, subject_type, subject_id, kind)` — liking twice is not twice the
+signal. `like` and `dislike` are mutually exclusive and the API deletes the opposite on
+write; `save` and `share` are independent of both.
+
 ### `saved_products`
 | Column | Type |
 |---|---|

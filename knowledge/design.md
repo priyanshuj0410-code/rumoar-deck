@@ -93,6 +93,20 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
 - **Toast** — ink block, bottom-anchored above the tab bar, `--peri` icon, auto-dismiss
   2.4s, spring transform in.
 - **Empty state** (`.emptymsg`) — 44/24px padding, centred, `--mute` 14px/1.6.
+- **Streaming read-out** — for any generation over ~3s. A pulsing 6px dot beside a mono
+  status line naming the current phase, a display heading, and the model's own narration
+  streaming in at 17px with a 2px caret. Skeleton lines fill the gap before the first
+  token. **A progress bar over silence is not an acceptable loading state** — if the work
+  takes long enough to need an indicator, it takes long enough to owe the user something
+  to read.
+- **Reaction bar** — 40px targets: like · not-for-me · save on the left, share pushed
+  right. Active state fills the Material Symbol (`'FILL' 1`) rather than only changing
+  colour, so it survives greyscale and colour blindness. Optimistic: the tap paints
+  immediately and the request follows; a failed write is never surfaced as an error.
+- **Generated card** — image first, at 3:4. Name and one-liner sit in an ink gradient over
+  the foot of the image; the palette runs as 20px chips down the top-right corner.
+  Rationale collapses behind a "Why this works" disclosure. Anything generated from the
+  user's own photo carries a line saying it is an impression, not real garments.
 - **Swatch grid** — 4-up square colour chips, no radius, name in 11px beneath. Each chip is
   `role="img"` with the colour name as its label: colour alone must never be the only
   carrier of meaning. A swatch whose hex fails `#RRGGBB` validation is dropped rather than

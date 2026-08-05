@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { chat, generateImage, GeminiError, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
+import { generateImage, GeminiError, streamChat, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
+import { encodeEvent } from "@/lib/ndjson";
 import type { ColourAnalysis, Product, StyleSuggestion } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -26,25 +27,23 @@ function prompt(analysis: ColourAnalysis, catalog: Product[]) {
     stock,
     "",
     "Rules:",
-    "- Every palette colour must sit inside or next to his best colours. No pastels for a deep",
-    "  season, no muddy tones for a clear one.",
+    "- Every palette colour must sit inside or next to his best colours.",
     "- Ground each direction in Indian weather and occasions — heat, monsoon, weddings, office.",
     "- key_pieces are garment descriptions, not brands.",
-    "- why_it_works must reference his actual analysis, not generic flattery.",
+    "- why_it_works references his actual analysis, not generic flattery. Two sentences, max.",
+    "- one_liner is at most twelve words.",
     "",
-    "Reply with JSON only — no prose, no code fence:",
+    "OUTPUT: exactly three lines. One complete JSON object per line, nothing else — no",
+    "array, no code fence, no commentary. Each line must be valid JSON on its own so it can",
+    "be rendered the moment it finishes.",
     JSON.stringify({
-      styles: [
-        {
-          name: "Quiet Utility",
-          one_liner: "",
-          why_it_works: "",
-          palette: [{ name: "Deep olive", hex: "#3B4A2F" }],
-          key_pieces: [""],
-          product_slugs: [""],
-          occasions: [""],
-        },
-      ],
+      name: "Quiet Utility",
+      one_liner: "",
+      why_it_works: "",
+      palette: [{ name: "Deep olive", hex: "#3B4A2F" }],
+      key_pieces: [""],
+      product_slugs: [""],
+      occasions: [""],
     }),
   ].join("\n");
 }
@@ -68,46 +67,40 @@ type ParsedStyle = {
   occasions: string[];
 };
 
-function parse(raw: string, validSlugs: Set<string>): ParsedStyle[] {
-  const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) return [];
+function parseLine(line: string, validSlugs: Set<string>): ParsedStyle | null {
+  const trimmed = line.trim().replace(/^```(?:json)?|```$/g, "").trim();
+  if (!trimmed.startsWith("{")) return null;
   try {
-    const parsed = JSON.parse(match[0]) as { styles?: unknown };
-    if (!Array.isArray(parsed.styles)) return [];
+    const s = JSON.parse(trimmed) as Record<string, unknown>;
+    const name = str(s.name, 60);
+    if (!name) return null;
 
-    return parsed.styles
-      .map((entry) => {
-        const s = entry as Record<string, unknown>;
-        const palette = Array.isArray(s.palette)
-          ? s.palette
-              .map((p) => {
-                const item = p as Record<string, unknown>;
-                const hex = str(item.hex, 9);
-                return {
-                  name: str(item.name, 60),
-                  hex: /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toUpperCase() : "",
-                };
-              })
-              .filter((p) => p.name && p.hex)
-              .slice(0, 6)
-          : [];
+    const palette = Array.isArray(s.palette)
+      ? s.palette
+          .map((p) => {
+            const item = p as Record<string, unknown>;
+            const hex = str(item.hex, 9);
+            return {
+              name: str(item.name, 60),
+              hex: /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toUpperCase() : "",
+            };
+          })
+          .filter((p) => p.name && p.hex)
+          .slice(0, 6)
+      : [];
 
-        return {
-          name: str(s.name, 60),
-          one_liner: str(s.one_liner, 160),
-          why_it_works: str(s.why_it_works, 600),
-          palette,
-          key_pieces: strings(s.key_pieces, 6, 80),
-          // The model is told to use real slugs; anything invented is dropped rather
-          // than shown as a product that does not exist.
-          product_slugs: strings(s.product_slugs, 4, 60).filter((slug) => validSlugs.has(slug)),
-          occasions: strings(s.occasions, 4, 40),
-        };
-      })
-      .filter((s) => s.name)
-      .slice(0, 3);
+    return {
+      name,
+      one_liner: str(s.one_liner, 160),
+      why_it_works: str(s.why_it_works, 600),
+      palette,
+      key_pieces: strings(s.key_pieces, 6, 80),
+      // Anything invented is dropped rather than shown as a product that doesn't exist.
+      product_slugs: strings(s.product_slugs, 4, 60).filter((slug) => validSlugs.has(slug)),
+      occasions: strings(s.occasions, 4, 40),
+    };
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -116,85 +109,112 @@ export async function POST() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "not signed in" }, { status: 401 });
+  if (!user) return new Response("not signed in", { status: 401 });
 
   const [{ data: profile }, { data: catalog }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("analysis, reference_photo_path, photo_paths")
-      .eq("id", user.id)
-      .single(),
+    supabase.from("profiles").select("analysis").eq("id", user.id).single(),
     supabase.from("products").select("*").eq("active", true),
   ]);
 
   const analysis = profile?.analysis as ColourAnalysis | null;
   if (!analysis) {
-    return NextResponse.json(
-      { error: "no_analysis", message: "Run the analysis first." },
-      { status: 409 },
+    return new Response(
+      JSON.stringify({ t: "error", message: "Run the analysis first." }) + "\n",
+      { status: 409, headers: { "Content-Type": "application/x-ndjson" } },
     );
   }
 
   const products = (catalog ?? []) as Product[];
+  const validSlugs = new Set(products.map((p) => p.slug));
 
-  let parsed: ParsedStyle[];
-  try {
-    const raw = await chat({
-      turns: [{ role: "user", text: prompt(analysis, products) }],
-      model: TEXT_MODEL,
-      thinking: "high",
-      timeoutMs: 50_000,
-    });
-    parsed = parse(raw, new Set(products.map((p) => p.slug)));
-    if (parsed.length === 0) throw new GeminiError("no styles parsed", 502);
-  } catch (error) {
-    const status = error instanceof GeminiError ? error.status : 502;
-    return NextResponse.json(
-      { error: "styles_failed", message: "Couldn't put those together. Try again in a moment." },
-      { status },
-    );
-  }
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (event: Parameters<typeof encodeEvent>[0]) =>
+        controller.enqueue(encodeEvent(event));
 
-  // Regenerating replaces the previous set rather than stacking a second one.
-  const { data: previous } = await supabase
-    .from("style_suggestions")
-    .select("image_path")
-    .eq("user_id", user.id);
-  const stale = (previous ?? [])
-    .map((row: { image_path: string | null }) => row.image_path)
-    .filter((path): path is string => Boolean(path));
-  if (stale.length) await supabase.storage.from("looks").remove(stale);
-  await supabase.from("style_suggestions").delete().eq("user_id", user.id);
+      try {
+        send({ t: "status", v: `Working from your ${analysis.season} palette` });
 
-  const { data: inserted } = await supabase
-    .from("style_suggestions")
-    .insert(
-      parsed.map((style, index) => ({
-        user_id: user.id,
-        rank: index,
-        name: style.name,
-        one_liner: style.one_liner,
-        why_it_works: style.why_it_works,
-        palette: style.palette,
-        key_pieces: style.key_pieces,
-        product_slugs: style.product_slugs,
-        occasions: style.occasions,
-      })),
-    )
-    .select();
+        // Regenerating replaces the previous set rather than stacking a second one.
+        const { data: previous } = await supabase
+          .from("style_suggestions")
+          .select("image_path")
+          .eq("user_id", user.id);
+        const stale = (previous ?? [])
+          .map((row: { image_path: string | null }) => row.image_path)
+          .filter((path): path is string => Boolean(path));
+        if (stale.length) await supabase.storage.from("looks").remove(stale);
+        await supabase.from("style_suggestions").delete().eq("user_id", user.id);
 
-  await supabase
-    .from("profiles")
-    .update({ onboarding_stage: "styles", updated_at: new Date().toISOString() })
-    .eq("id", user.id);
+        let buffer = "";
+        let rank = 0;
 
-  return NextResponse.json({ styles: (inserted ?? []) as StyleSuggestion[] });
+        const flush = async (line: string) => {
+          const parsed = parseLine(line, validSlugs);
+          if (!parsed || rank >= 3) return;
+
+          const { data: inserted } = await supabase
+            .from("style_suggestions")
+            .insert({ user_id: user.id, rank, ...parsed })
+            .select()
+            .single();
+
+          if (inserted) {
+            rank++;
+            // Each direction ships the moment it is complete, so the first card lands
+            // long before the third one finishes generating.
+            send({ t: "style", style: inserted as StyleSuggestion });
+          }
+        };
+
+        for await (const delta of streamChat({
+          turns: [{ role: "user", text: prompt(analysis, products) }],
+          model: TEXT_MODEL,
+          thinking: "high",
+          timeoutMs: 55_000,
+        })) {
+          buffer += delta;
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+          for (const line of lines) await flush(line);
+        }
+        if (buffer.trim()) await flush(buffer);
+
+        if (rank === 0) {
+          send({ t: "error", message: "Couldn't put those together. Try again in a moment." });
+        } else {
+          await supabase
+            .from("profiles")
+            .update({ onboarding_stage: "styles", updated_at: new Date().toISOString() })
+            .eq("id", user.id);
+          send({ t: "done" });
+        }
+      } catch (error) {
+        send({
+          t: "error",
+          message:
+            (error as Error).message === "timed_out"
+              ? "That took too long. Try again — it's usually quicker."
+              : "Couldn't put those together. Try again in a moment.",
+        });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "application/x-ndjson; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }
 
 /**
- * Rendering one style onto his own photo. Split from the text generation above so the
- * three images render one at a time — three image calls in a single request would blow
- * past the function ceiling.
+ * Renders one style onto his own photo. One image per request — three image calls in a
+ * single function invocation would blow past the platform's ceiling.
  */
 export async function PATCH(request: Request) {
   const supabase = await createClient();
@@ -217,7 +237,10 @@ export async function PATCH(request: Request) {
   const suggestion = style as StyleSuggestion;
   const referencePath = profile?.reference_photo_path as string | undefined;
   if (!referencePath) {
-    return NextResponse.json({ error: "no_reference_photo" }, { status: 409 });
+    return NextResponse.json(
+      { error: "no_reference_photo", message: "Add a photo of yourself first." },
+      { status: 409 },
+    );
   }
 
   if (suggestion.image_path) {
@@ -228,7 +251,12 @@ export async function PATCH(request: Request) {
   }
 
   const { data: file } = await supabase.storage.from("wardrobe").download(referencePath);
-  if (!file) return NextResponse.json({ error: "reference unreadable" }, { status: 409 });
+  if (!file) {
+    return NextResponse.json(
+      { error: "reference_unreadable", message: "Your reference photo couldn't be opened." },
+      { status: 409 },
+    );
+  }
 
   const reference: InlineImage = {
     mimeType: file.type || "image/jpeg",
@@ -248,7 +276,7 @@ export async function PATCH(request: Request) {
       ].join(" "),
       images: [reference],
       aspectRatio: "3:4",
-      timeoutMs: 50_000,
+      timeoutMs: 48_000,
     });
 
     const path = `${user.id}/style-${suggestion.id}.jpg`;
@@ -269,7 +297,18 @@ export async function PATCH(request: Request) {
     const { data: signed } = await supabase.storage.from("looks").createSignedUrl(path, 3600);
     return NextResponse.json({ url: signed?.signedUrl ?? null });
   } catch (error) {
-    const status = error instanceof GeminiError ? error.status : 502;
-    return NextResponse.json({ error: "render_failed" }, { status });
+    const reason = (error as Error).message;
+    // Surfacing why it failed — a timeout, a refusal and a dead network all looked
+    // identical before, which made this impossible to diagnose from a screenshot.
+    const message =
+      reason === "timed_out"
+        ? "That render took too long. Tap to try again."
+        : reason.includes("429")
+          ? "Image quota reached for now. Try again shortly."
+          : "Couldn't render that one. Tap to try again.";
+    return NextResponse.json(
+      { error: "render_failed", reason: reason.slice(0, 200), message },
+      { status: error instanceof GeminiError ? error.status : 502 },
+    );
   }
 }

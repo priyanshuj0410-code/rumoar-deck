@@ -41,12 +41,19 @@ async function post(body: unknown, timeoutMs: number): Promise<Record<string, un
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new GeminiError("GEMINI_API_KEY is not configured", 500);
 
-  const response = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(timeoutMs),
-  });
+  let response: Response;
+  try {
+    response = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    // A timeout and a dead network are very different problems for whoever debugs this.
+    const timedOut = (error as { name?: string }).name === "TimeoutError";
+    throw new GeminiError(timedOut ? "timed_out" : `network: ${String(error)}`, timedOut ? 504 : 502);
+  }
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
@@ -98,6 +105,84 @@ export async function chat(options: {
   const text = readText(json);
   if (!text) throw new GeminiError("empty completion", 502);
   return text;
+}
+
+/** Pulls the incremental text out of one SSE payload, whatever shape it arrives in. */
+function readDelta(json: Record<string, unknown>): string {
+  const delta = json.delta as { type?: string; text?: string } | undefined;
+  if (delta?.text && (!delta.type || delta.type === "text")) return delta.text;
+
+  if (typeof json.text === "string") return json.text;
+
+  const content = (json.content ?? []) as Part[];
+  if (Array.isArray(content)) {
+    return content
+      .filter((part): part is { type: "text"; text: string } => part?.type === "text")
+      .map((part) => part.text)
+      .join("");
+  }
+  return "";
+}
+
+/**
+ * Streaming text. Yields deltas as they arrive so the UI has something to show within a
+ * second or two instead of a progress bar over a 20-second silence.
+ */
+export async function* streamChat(options: {
+  system?: string;
+  turns: Turn[];
+  model?: string;
+  thinking?: "low" | "medium" | "high";
+  timeoutMs?: number;
+}): AsyncGenerator<string> {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) throw new GeminiError("GEMINI_API_KEY is not configured", 500);
+
+  const response = await fetch(`${ENDPOINT}?alt=sse`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+    body: JSON.stringify({
+      model: options.model || TEXT_MODEL,
+      ...(options.system ? { system_instruction: options.system } : {}),
+      input: toSteps(options.turns),
+      generation_config: { thinking_level: options.thinking ?? "low" },
+      stream: true,
+    }),
+    signal: AbortSignal.timeout(options.timeoutMs ?? 55_000),
+  });
+
+  if (!response.ok || !response.body) {
+    const detail = await response.text().catch(() => "");
+    throw new GeminiError(`gemini returned ${response.status}: ${detail.slice(0, 200)}`, 502);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    // SSE events are separated by a blank line; keep the trailing partial event.
+    const events = buffer.split("\n\n");
+    buffer = events.pop() ?? "";
+
+    for (const event of events) {
+      for (const line of event.split("\n")) {
+        if (!line.startsWith("data:")) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === "[DONE]") continue;
+        try {
+          const text = readDelta(JSON.parse(payload) as Record<string, unknown>);
+          if (text) yield text;
+        } catch {
+          // A malformed frame is not worth killing a live generation over.
+        }
+      }
+    }
+  }
 }
 
 /**

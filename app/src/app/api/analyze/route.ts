@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { chat, GeminiError, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
+import { streamChat, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
+import { encodeEvent } from "@/lib/ndjson";
 import type { ColourAnalysis } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -13,28 +13,32 @@ const SEASONS = [
   "Deep Winter", "Cool Winter", "Clear Winter",
 ];
 
+const MARKER = "---JSON---";
+
 const PROMPT = [
   "You are a professional colour analyst and menswear fit consultant.",
   "You are looking at several photos of the same man, taken front, side and back.",
   "",
   "Work through the three colour dimensions before naming a season:",
   "1. HUE — is his skin undertone warm (golden/peach), cool (pink/blue), neutral, or olive?",
-  "2. VALUE — how light or deep are his colouring overall (skin, hair, eyes together)?",
+  "2. VALUE — how light or deep is his colouring overall (skin, hair, eyes together)?",
   "3. CHROMA — do his features look soft and blended, or clear and saturated?",
-  "Then judge CONTRAST: the gap between his hair, skin and eyes. Deep hair with light skin",
-  "is high contrast; hair, skin and eyes close in value is low contrast.",
+  "Then judge CONTRAST: the gap between his hair, skin and eyes.",
   "",
   `Name the closest of the twelve seasons: ${SEASONS.join(", ")}.`,
   "",
   "Also give practical fit notes from the full-body shots — frame, proportions, and what",
-  "cuts and lengths sit well. This is about clothing fit only. Never comment on weight,",
-  "attractiveness, fitness or perceived health, and never guess age, ethnicity or origin.",
+  "cuts and lengths sit well. Clothing fit only. Never comment on weight, attractiveness,",
+  "fitness or health, and never guess age, ethnicity or origin.",
   "",
-  "Be honest about uncertainty. Phone cameras, indoor lighting and auto white balance all",
-  "shift apparent skin tone. Set season_confidence between 0 and 1 accordingly, and if the",
-  "lighting is poor say so in `caveat`.",
+  "OUTPUT IN TWO PARTS.",
   "",
-  "Reply with JSON only — no prose, no code fence:",
+  "PART ONE: four to six short sentences, written to him, second person, no headings and",
+  "no lists. Narrate what you are seeing as you work it out — undertone first, then depth,",
+  "then contrast, then the season and what it means for what he wears. This part is read",
+  "aloud as it streams, so make every sentence land on its own.",
+  "",
+  `PART TWO: a line containing exactly ${MARKER}, then the JSON object below and nothing else.`,
   JSON.stringify({
     undertone: "warm|cool|neutral|olive",
     depth: "light|medium|deep",
@@ -51,7 +55,9 @@ const PROMPT = [
     caveat: "",
   }),
   "",
-  "Give 6 to 8 best_colours and 3 to 4 avoid_colours, each with a real hex value.",
+  "6 to 8 best_colours and 3 to 4 avoid_colours, each with a real hex value.",
+  "Phone cameras and indoor light shift apparent skin tone — set season_confidence",
+  "honestly, and put any lighting problem in `caveat`.",
 ].join("\n");
 
 const ONE_OF = <T extends string>(value: unknown, allowed: readonly T[], fallback: T): T =>
@@ -71,7 +77,7 @@ function swatches(value: unknown, limit: number) {
       const hex = str(item.hex, 9);
       return {
         name: str(item.name, 60),
-        // A bad hex would silently render as a black chip; drop it instead.
+        // A bad hex renders as a black chip and reads as advice; drop it instead.
         hex: /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toUpperCase() : "",
         why: str(item.why, 200),
       };
@@ -134,7 +140,7 @@ export async function POST() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "not signed in" }, { status: 401 });
+  if (!user) return new Response("not signed in", { status: 401 });
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -144,49 +150,98 @@ export async function POST() {
 
   const paths = ((profile?.photo_paths ?? []) as string[]).slice(0, 6);
   if (paths.length < 3) {
-    return NextResponse.json(
-      { error: "not_enough_photos", message: "Add at least three photos first." },
-      { status: 409 },
+    return new Response(
+      JSON.stringify({ t: "error", message: "Add at least three photos first." }) + "\n",
+      { status: 409, headers: { "Content-Type": "application/x-ndjson" } },
     );
   }
 
-  const images = (await Promise.all(paths.map((path) => download(supabase, path)))).filter(
-    (image): image is InlineImage => image !== null,
-  );
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (event: Parameters<typeof encodeEvent>[0]) =>
+        controller.enqueue(encodeEvent(event));
 
-  if (images.length < 3) {
-    return NextResponse.json({ error: "photos_unreadable" }, { status: 409 });
-  }
+      try {
+        send({ t: "status", v: "Opening your photos" });
 
-  try {
-    const raw = await chat({
-      turns: [{ role: "user", text: PROMPT, images }],
-      // Pinned to Flash. The analysis is worth thinking about, so we buy accuracy with
-      // reasoning budget rather than a more expensive model tier.
-      model: TEXT_MODEL,
-      thinking: "high",
-      timeoutMs: 55_000,
-    });
+        const images = (await Promise.all(paths.map((path) => download(supabase, path)))).filter(
+          (image): image is InlineImage => image !== null,
+        );
 
-    const analysis = parse(raw);
-    if (!analysis) throw new GeminiError("unparseable analysis", 502);
+        if (images.length < 3) {
+          send({ t: "error", message: "Those photos couldn't be read. Try different ones." });
+          controller.close();
+          return;
+        }
 
-    await supabase
-      .from("profiles")
-      .update({
-        analysis,
-        analysed_at: new Date().toISOString(),
-        onboarding_stage: "analysis",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id);
+        send({ t: "status", v: "Reading undertone, depth and contrast" });
 
-    return NextResponse.json({ analysis });
-  } catch (error) {
-    const status = error instanceof GeminiError ? error.status : 502;
-    return NextResponse.json(
-      { error: "analysis_failed", message: "Couldn't read those photos. Try again in a moment." },
-      { status },
-    );
-  }
+        let full = "";
+        let emitted = 0;
+        let proseDone = false;
+
+        for await (const delta of streamChat({
+          turns: [{ role: "user", text: PROMPT, images }],
+          model: TEXT_MODEL,
+          thinking: "high",
+          timeoutMs: 55_000,
+        })) {
+          full += delta;
+          if (proseDone) continue;
+
+          // Everything before the marker is for the reader; everything after is data.
+          const cut = full.indexOf(MARKER);
+          // The marker can arrive split across deltas, so hold back a tail long enough to
+          // contain it rather than flashing "---JS" on screen.
+          const limit = cut === -1 ? Math.max(emitted, full.length - MARKER.length) : cut;
+
+          if (limit > emitted) {
+            send({ t: "text", v: full.slice(emitted, limit) });
+            emitted = limit;
+          }
+
+          if (cut !== -1) {
+            proseDone = true;
+            send({ t: "status", v: "Picking your palette" });
+          }
+        }
+
+        const analysis = parse(full.slice(full.indexOf(MARKER) + MARKER.length) || full);
+        if (!analysis) {
+          send({ t: "error", message: "I couldn't finish that read. Try again in a moment." });
+          controller.close();
+          return;
+        }
+
+        await supabase
+          .from("profiles")
+          .update({
+            analysis,
+            analysed_at: new Date().toISOString(),
+            onboarding_stage: "analysis",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+
+        send({ t: "done", payload: analysis });
+      } catch (error) {
+        const message =
+          (error as Error).message === "timed_out"
+            ? "That took too long. Try again — it's usually quicker."
+            : "Couldn't read those photos. Try again in a moment.";
+        send({ t: "error", message });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "application/x-ndjson; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      // Without this some proxies buffer the whole body and streaming silently degrades.
+      "X-Accel-Buffering": "no",
+    },
+  });
 }
