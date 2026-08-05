@@ -117,7 +117,11 @@ export async function chat(options: {
  * Enumerating those shapes is how this broke twice, so it now searches for the thing
  * itself: a long base64 string carrying an image mime type.
  */
-function findImage(node: unknown, depth = 0): InlineImage | null {
+type ImageRef = { kind: "inline"; data: string; mimeType: string } | { kind: "uri"; uri: string; mimeType: string };
+
+const URI_KEYS = ["file_uri", "fileUri", "image_url", "imageUrl", "uri", "url"] as const;
+
+function findImage(node: unknown, depth = 0): ImageRef | null {
   if (node === null || node === undefined || depth > 8) return null;
 
   if (Array.isArray(node)) {
@@ -132,15 +136,21 @@ function findImage(node: unknown, depth = 0): InlineImage | null {
   const obj = node as Record<string, unknown>;
 
   const mime = (obj.mime_type ?? obj.mimeType) as string | undefined;
-  const data = (obj.data ?? obj.b64_json ?? obj.bytes_base64) as unknown;
+  const mimeIsImage = typeof mime !== "string" || mime.startsWith("image/");
 
-  if (
-    typeof data === "string" &&
-    // Long enough to be an image rather than an id or a short field.
-    data.length > 512 &&
-    (typeof mime !== "string" || mime.startsWith("image/"))
-  ) {
-    return { data, mimeType: typeof mime === "string" ? mime : "image/jpeg" };
+  const data = (obj.data ?? obj.b64_json ?? obj.bytes_base64) as unknown;
+  if (typeof data === "string" && data.length > 512 && mimeIsImage) {
+    return { kind: "inline", data, mimeType: typeof mime === "string" ? mime : "image/jpeg" };
+  }
+
+  // Some responses hand back a short-lived URI instead of inline bytes.
+  if (mimeIsImage) {
+    for (const key of URI_KEYS) {
+      const value = obj[key];
+      if (typeof value === "string" && /^https?:\/\//.test(value)) {
+        return { kind: "uri", uri: value, mimeType: typeof mime === "string" ? mime : "image/jpeg" };
+      }
+    }
   }
 
   for (const value of Object.values(obj)) {
@@ -148,6 +158,24 @@ function findImage(node: unknown, depth = 0): InlineImage | null {
     if (found) return found;
   }
   return null;
+}
+
+/** Downloads a URI-delivered image and returns it as inline bytes. */
+async function resolveImage(ref: ImageRef): Promise<InlineImage> {
+  if (ref.kind === "inline") return { data: ref.data, mimeType: ref.mimeType };
+
+  const key = process.env.GEMINI_API_KEY;
+  const response = await fetch(ref.uri, {
+    headers: key ? { "x-goog-api-key": key } : undefined,
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!response.ok) throw new GeminiError(`image fetch returned ${response.status}`, 502);
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  return {
+    data: buffer.toString("base64"),
+    mimeType: response.headers.get("content-type") ?? ref.mimeType,
+  };
 }
 
 /** Structure only — keys and types, never values. Safe to log. */
@@ -279,13 +307,14 @@ export async function generateImage(options: {
   );
 
   const found = findImage(json);
-  if (found) return found;
+  if (found) return resolveImage(found);
 
-  // No image came back. Log the response's structure (never its payload) and hand the
-  // caller any text the model returned — a refusal reads as prose, not as an error.
-  console.error("[gemini] no image in response; shape:", describe(json));
-  const text = readText(json).slice(0, 300);
-  throw new GeminiError(text ? `model replied with text: ${text}` : "no image in response", 502);
+  // No image anywhere. Log the structure (keys and types only, never payload) and put it
+  // in the error too — the model claiming it produced an image while we find nothing is
+  // only diagnosable if the actual response shape reaches whoever is reading the error.
+  const shape = describe(json);
+  console.error("[gemini] no image in response; shape:", shape);
+  throw new GeminiError(`no image found. response shape: ${shape}`.slice(0, 400), 502);
 }
 
 /** Strips a data: prefix if present — callers pass either raw base64 or a data URL. */

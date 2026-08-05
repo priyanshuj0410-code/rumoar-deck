@@ -315,7 +315,7 @@ export async function PATCH(request: Request) {
           ? "Image quota reached for now. Try again shortly."
           : "Couldn't render that one. Tap to try again.";
     return NextResponse.json(
-      { error: "render_failed", reason: reason.slice(0, 200), message },
+      { error: "render_failed", reason: reason.slice(0, 400), message },
       { status: error instanceof GeminiError ? error.status : 502 },
     );
   }
