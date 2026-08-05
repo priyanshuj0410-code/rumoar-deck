@@ -53,6 +53,32 @@ export async function savePhotos(paths: string[]): Promise<ActionResult> {
   return { ok: true };
 }
 
+/** Appends photos to the intake set without disturbing the front reference shot. */
+export async function addPhotos(paths: string[]): Promise<ActionResult> {
+  const { supabase, user } = await requireUser();
+  const clean = paths.filter(Boolean);
+  if (clean.length === 0) return { ok: false, error: "No photos uploaded." };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("photo_paths")
+    .eq("id", user.id)
+    .single();
+
+  const existing = (profile?.photo_paths ?? []) as string[];
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      photo_paths: [...existing, ...clean].slice(0, 10),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/onboarding");
+  return { ok: true };
+}
+
 export async function finishOnboarding() {
   const { supabase, user } = await requireUser();
   await supabase

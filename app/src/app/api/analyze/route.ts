@@ -135,18 +135,49 @@ async function download(
   };
 }
 
-export async function POST() {
+/**
+ * A correction from the user. He knows things the photos cannot show — how he tans, what
+ * light the room had — so the note is authoritative where it conflicts with the pixels,
+ * and the previous read is carried in so round three does not forget round one.
+ */
+function refinementPrompt(previous: ColourAnalysis, notes: string[]) {
+  return [
+    "",
+    "This is a REVISION, not a first read.",
+    "",
+    "Your previous conclusion:",
+    `- Season ${previous.season} (confidence ${previous.season_confidence})`,
+    `- Undertone ${previous.undertone}, depth ${previous.depth}, contrast ${previous.contrast}, chroma ${previous.chroma}`,
+    `- Best colours: ${previous.best_colours.map((c) => c.name).join(", ")}`,
+    "",
+    "Corrections he has given you, oldest first:",
+    ...notes.map((note) => `- "${note}"`),
+    "",
+    "He can see things the photographs cannot show you — how his skin behaves in person,",
+    "what light the photos were taken in, how he tans. Where his note conflicts with what",
+    "you think you see, believe him and say what changed in PART ONE. If a correction does",
+    "not change the season, say that plainly rather than inventing a shift to seem responsive.",
+  ].join("\n");
+}
+
+export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return new Response("not signed in", { status: 401 });
 
+  const body = (await request.json().catch(() => null)) as { note?: string } | null;
+  const note = body?.note?.trim().slice(0, 500) || null;
+
   const { data: profile } = await supabase
     .from("profiles")
-    .select("photo_paths")
+    .select("photo_paths, analysis")
     .eq("id", user.id)
     .single();
+
+  const previous = (profile?.analysis ?? null) as ColourAnalysis | null;
+  const notes = [...(previous?.refinements ?? []), ...(note ? [note] : [])];
 
   const paths = ((profile?.photo_paths ?? []) as string[]).slice(0, 6);
   if (paths.length < 3) {
@@ -177,7 +208,13 @@ export async function POST() {
         send({ t: "status", v: "Reading undertone, depth and contrast" });
 
         const request = {
-          turns: [{ role: "user" as const, text: PROMPT, images }],
+          turns: [
+            {
+              role: "user" as const,
+              text: previous && notes.length ? PROMPT + refinementPrompt(previous, notes) : PROMPT,
+              images,
+            },
+          ],
           model: TEXT_MODEL,
           thinking: "high" as const,
           timeoutMs: 55_000,
@@ -227,17 +264,19 @@ export async function POST() {
           return;
         }
 
+        const stored = { ...analysis, refinements: notes };
+
         await supabase
           .from("profiles")
           .update({
-            analysis,
+            analysis: stored,
             analysed_at: new Date().toISOString(),
             onboarding_stage: "analysis",
             updated_at: new Date().toISOString(),
           })
           .eq("id", user.id);
 
-        send({ t: "done", payload: analysis });
+        send({ t: "done", payload: stored });
       } catch (error) {
         const message =
           (error as Error).message === "timed_out"

@@ -6,11 +6,8 @@ import { camera, haptics, type Facing, type PickedImage } from "@/lib/platform";
 type Props = {
   title: string;
   hint: string;
-  index: number;
-  total: number;
   existing?: PickedImage | null;
   onCaptured: (image: PickedImage) => void;
-  onBack?: () => void;
 };
 
 const DENIED_COPY =
@@ -24,15 +21,7 @@ const UNSUPPORTED_COPY =
  * available beside it and is never treated as the lesser path — on a laptop it usually is
  * the better one.
  */
-export function PhotoCapture({
-  title,
-  hint,
-  index,
-  total,
-  existing,
-  onCaptured,
-  onBack,
-}: Props) {
+export function PhotoCapture({ title, hint, existing, onCaptured }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -106,19 +95,8 @@ export function PhotoCapture({
   }
 
   return (
-    <div className="flex-1 flex flex-col pt-6 min-h-0">
-      <div className="flex items-center justify-between">
-        <p className="k">
-          {title} · {index + 1} of {total}
-        </p>
-        {onBack && (
-          <button className="text-mute text-[13px] hover:text-ink transition-colors" onClick={onBack}>
-            Back
-          </button>
-        )}
-      </div>
-
-      <h1 className="text-[28px] mt-2">{title}</h1>
+    <div className="flex-1 flex flex-col pt-6">
+      <h1 className="text-[28px]">{title}</h1>
       <p className="text-mute text-sm leading-relaxed mt-2">{hint}</p>
 
       <div className="relative flex-1 min-h-[220px] bg-wash overflow-hidden mt-5 flex items-center justify-center">

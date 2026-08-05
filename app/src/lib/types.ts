@@ -44,6 +44,11 @@ export type ColourAnalysis = {
   metals: "gold" | "silver" | "both";
   notes: string;
   caveat?: string;
+  /**
+   * Every correction the user has made, oldest first. Kept inside the analysis rather
+   * than in its own column so the reasoning behind a read stays with the read.
+   */
+  refinements?: string[];
 };
 
 export type StyleSuggestion = {
