@@ -160,6 +160,47 @@ function findImage(node: unknown, depth = 0): ImageRef | null {
   return null;
 }
 
+// A 1K JPEG is ~40KB of base64 at the absolute minimum. Thought signatures and ids are
+// orders of magnitude shorter, so this threshold separates image bytes from every other
+// long-ish string in the response without needing to know the key name.
+const MIN_IMAGE_B64 = 20_000;
+const NOT_IMAGE_KEYS = /signature|token|^id$|trace|cache/i;
+
+/**
+ * Last resort: find image bytes by their shape rather than their key.
+ *
+ * Three separate fixes here failed because I kept predicting where the API puts the
+ * image. This looks for what an image actually is — a very long base64 string — and is
+ * deliberately conservative about what it will accept.
+ */
+function findLooseBase64(node: unknown, depth = 0): string | null {
+  if (node === null || node === undefined || depth > 8) return null;
+
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = findLooseBase64(child, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  if (typeof node !== "object") return null;
+
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (
+      typeof value === "string" &&
+      value.length > MIN_IMAGE_B64 &&
+      !NOT_IMAGE_KEYS.test(key) &&
+      /^[A-Za-z0-9+/\r\n=_-]+$/.test(value.slice(0, 512))
+    ) {
+      return value;
+    }
+    const found = findLooseBase64(value, depth + 1);
+    if (found) return found;
+  }
+  return null;
+}
+
 /** Downloads a URI-delivered image and returns it as inline bytes. */
 async function resolveImage(ref: ImageRef): Promise<InlineImage> {
   if (ref.kind === "inline") return { data: ref.data, mimeType: ref.mimeType };
@@ -178,14 +219,21 @@ async function resolveImage(ref: ImageRef): Promise<InlineImage> {
   };
 }
 
-/** Structure only — keys and types, never values. Safe to log. */
+/**
+ * Structure only — keys and types, never values. Safe to log.
+ *
+ * Describes every array element, not just the first: the previous version hid the image
+ * step behind an ellipsis because it only ever showed `steps[0]`.
+ */
 function describe(node: unknown, depth = 0): string {
   if (node === null) return "null";
   if (Array.isArray(node)) {
-    return depth > 3 ? "[…]" : `[${node.length ? describe(node[0], depth + 1) : ""}${node.length > 1 ? ", …" : ""}]`;
+    if (depth > 5) return "[…]";
+    const shown = node.slice(0, 4).map((child) => describe(child, depth + 1));
+    return `[${shown.join(", ")}${node.length > 4 ? `, …+${node.length - 4}` : ""}]`;
   }
   if (typeof node === "object") {
-    if (depth > 3) return "{…}";
+    if (depth > 5) return "{…}";
     return `{${Object.entries(node as Record<string, unknown>)
       .map(([key, value]) => `${key}: ${describe(value, depth + 1)}`)
       .join(", ")}}`;
@@ -309,12 +357,15 @@ export async function generateImage(options: {
   const found = findImage(json);
   if (found) return resolveImage(found);
 
+  const loose = findLooseBase64(json);
+  if (loose) return { data: loose, mimeType: "image/jpeg" };
+
   // No image anywhere. Log the structure (keys and types only, never payload) and put it
   // in the error too — the model claiming it produced an image while we find nothing is
   // only diagnosable if the actual response shape reaches whoever is reading the error.
   const shape = describe(json);
   console.error("[gemini] no image in response; shape:", shape);
-  throw new GeminiError(`no image found. response shape: ${shape}`.slice(0, 400), 502);
+  throw new GeminiError(`no image found. response shape: ${shape}`.slice(0, 1500), 502);
 }
 
 /** Strips a data: prefix if present — callers pass either raw base64 or a data URL. */
