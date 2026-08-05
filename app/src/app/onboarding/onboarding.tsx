@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { camera, haptics, type PickedImage } from "@/lib/platform";
 import { createClient } from "@/lib/supabase/client";
@@ -13,15 +13,18 @@ import { addPhotos, finishOnboarding, savePhotos, setStage } from "./actions";
 const SHOTS = [
   {
     label: "Front",
-    hint: "Full body, facing the camera, arms relaxed at your sides. Plain wall and daylight if you can, and no sunglasses — this is the shot your colouring is read from.",
+    hint: "Facing the camera, arms at your sides.",
+    guide: "Stand against a plain wall in daylight, full body in frame, no sunglasses. Your colouring is read from this one.",
   },
   {
     label: "Side",
-    hint: "Turn 90°, look straight ahead. Same spot, same distance, same light.",
+    hint: "Turned 90°, looking straight ahead.",
+    guide: "Same spot, same distance, same light as the front shot.",
   },
   {
     label: "Back",
-    hint: "Face away from the camera. Same distance again.",
+    hint: "Facing away from the camera.",
+    guide: "Same spot and distance again.",
   },
 ];
 
@@ -119,39 +122,44 @@ function ShotTiles({
   onPick: (index: number) => void;
 }) {
   return (
-    <ol className="flex-none grid grid-cols-3 gap-2 mt-5">
+    <ol className="flex-none flex gap-2 mt-5">
       {SHOTS.map((shot, index) => {
         const image = shots[index];
         const active = index === current;
+        const locked = !image && index > current;
         return (
           <li key={shot.label}>
             <button
               onClick={() => onPick(index)}
-              disabled={!image && index > current}
+              disabled={locked}
               aria-current={active ? "step" : undefined}
               aria-label={
                 image ? `${shot.label} — taken. Redo it.` : `${shot.label} — not taken yet`
               }
-              className={`w-full text-left transition-shadow ${
-                active ? "shadow-[inset_0_0_0_2px_var(--color-ink)]" : ""
-              } ${!image && index > current ? "opacity-40" : ""}`}
+              className={`block text-left ${locked ? "opacity-35" : ""}`}
             >
-              <span className="block aspect-[3/4] bg-wash overflow-hidden relative">
+              {/* The ring goes on the image only. Wrapping the label in it made the
+                  pair read as a text input with the shot name typed into it. */}
+              <span
+                className={`block w-[58px] aspect-[3/4] bg-wash overflow-hidden relative ${
+                  active ? "shadow-[inset_0_0_0_2px_var(--color-ink)]" : ""
+                }`}
+              >
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={image.dataUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <span className="absolute inset-0 flex items-center justify-center">
-                    <span className="mi text-[20px] text-mute" aria-hidden>
+                    <span className="mi text-[16px] text-mute" aria-hidden>
                       person
                     </span>
                   </span>
                 )}
                 {image && (
-                  <span className="absolute top-1 right-1 w-5 h-5 bg-ink text-paper flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-ink text-paper flex items-center justify-center">
                     <span
-                      className="mi text-[13px]"
-                      style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'opsz' 24" }}
+                      className="mi text-[11px]"
+                      style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'opsz' 20" }}
                       aria-hidden
                     >
                       check
@@ -159,7 +167,9 @@ function ShotTiles({
                   </span>
                 )}
               </span>
-              <span className={`text-[11px] mt-1 block ${active ? "text-ink" : "text-mute"}`}>
+              <span
+                className={`text-[10px] mt-1 block tracking-wide ${active ? "text-ink" : "text-mute"}`}
+              >
                 {shot.label}
               </span>
             </button>
@@ -178,7 +188,6 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
 
   const current = shots[index];
   const isLast = index === SHOTS.length - 1;
-  const complete = shots.every(Boolean);
 
   async function finish() {
     setError(null);
@@ -242,10 +251,19 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         key={index}
         title={SHOTS[index].label}
         hint={SHOTS[index].hint}
+        guide={SHOTS[index].guide}
         existing={current}
+        busy={busy}
+        nextLabel={isLast ? "Read my colouring" : "Next"}
         onCaptured={(image) =>
           setShots((all) => all.map((shot, i) => (i === index ? image : shot)))
         }
+        onBack={index > 0 ? () => setIndex(index - 1) : undefined}
+        onNext={() => {
+          haptics.tap();
+          if (isLast) void finish();
+          else setIndex(index + 1);
+        }}
       />
 
       {error && (
@@ -253,31 +271,6 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
           {error}
         </p>
       )}
-
-      <p className="text-[11px] text-mute leading-snug mt-4">
-        Your photos are private to your account and are never shown to anyone else.
-      </p>
-
-      <div className="flex gap-2.5 mt-3">
-        <button
-          className="btn btn-ghost flex-none px-5"
-          onClick={() => setIndex(index - 1)}
-          disabled={index === 0 || busy}
-        >
-          Back
-        </button>
-        <button
-          className="btn flex-1"
-          disabled={!current || busy}
-          onClick={() => {
-            haptics.tap();
-            if (isLast) void finish();
-            else setIndex(index + 1);
-          }}
-        >
-          {busy ? "Uploading…" : isLast ? (complete ? "Read my colouring" : "Finish the set") : "Next"}
-        </button>
-      </div>
     </div>
   );
 }
@@ -298,6 +291,23 @@ function AnalysisStep({
   const [analysis, setAnalysis] = useState<ColourAnalysis | null>(initial);
   const [prose, setProse] = useState("");
   const [status, setStatus] = useState("Opening your photos");
+  // Gemini streams in very coarse chunks — often the whole reply in two frames — so the
+  // raw stream still lands as a wall of text. This buffers what has arrived and reveals
+  // it at a readable pace, which is what makes it feel like it is being written.
+  const buffered = useRef("");
+  const [revealed, setRevealed] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRevealed((shown) => {
+        if (shown >= buffered.current.length) return shown;
+        // Faster when the backlog is long, so a late burst still catches up.
+        const backlog = buffered.current.length - shown;
+        return shown + Math.max(2, Math.ceil(backlog / 18));
+      });
+    }, 30);
+    return () => clearInterval(timer);
+  }, []);
   const [running, setRunning] = useState(!initial);
   const [error, setError] = useState<string | null>(null);
 
@@ -309,6 +319,8 @@ function AnalysisStep({
     setRunning(true);
     setError(null);
     setProse("");
+    buffered.current = "";
+    setRevealed(0);
     setStatus(refinement ? "Taking your note into account" : "Opening your photos");
 
     try {
@@ -320,7 +332,10 @@ function AnalysisStep({
       if (!response.body) throw new Error("no stream");
 
       await readEvents(response.body, (event) => {
-        if (event.t === "text") setProse((current) => current + event.v);
+        if (event.t === "text") {
+          buffered.current += event.v;
+          setProse(buffered.current);
+        }
         else if (event.t === "status") setStatus(event.v);
         else if (event.t === "error") setError(event.message);
         else if (event.t === "done") setAnalysis(event.payload as ColourAnalysis);
@@ -375,7 +390,7 @@ function AnalysisStep({
     }
   }
 
-  if (running) {
+  if (running || revealed < buffered.current.length) {
     return (
       <div className="flex-1 flex flex-col pt-6">
         <BackLink label="Photos" onBack={onBack} />
@@ -386,9 +401,9 @@ function AnalysisStep({
         <h1 className="text-[28px] mt-2">Reading your colouring</h1>
 
         <div className="mt-5" aria-live="polite">
-          {prose ? (
+          {revealed > 0 ? (
             <p className="text-[17px] leading-relaxed whitespace-pre-wrap">
-              {prose}
+              {prose.slice(0, revealed)}
               <span className="inline-block w-[2px] h-[1.1em] bg-ink align-[-2px] ml-0.5 animate-pulse" />
             </p>
           ) : (

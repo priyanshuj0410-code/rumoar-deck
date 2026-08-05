@@ -105,12 +105,21 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
 - **Toast** — ink block, bottom-anchored above the tab bar, `--peri` icon, auto-dismiss
   2.4s, spring transform in.
 - **Empty state** (`.emptymsg`) — 44/24px padding, centred, `--mute` 14px/1.6.
+- **One primary action per screen.** The primary is whatever moves you forward *from the
+  current state* — "Take photo" on an empty step becomes "Next" once a photo exists.
+  Secondary actions are text links, not a second ink block: two black full-width buttons
+  on one screen means neither is primary. Cap: one `.btn`, one `.btn-ghost`, then text.
+- **Media is capped, not full-bleed.** A hero image runs to `max-w-[280px]` centred at 3:4.
+  Letting it fill the column pushes every control below the fold and makes a step look
+  like it has nothing to do.
 - **Streaming read-out** — for any generation over ~3s. A pulsing 6px dot beside a mono
   status line naming the current phase, a display heading, and the model's own narration
   streaming in at 17px with a 2px caret. Skeleton lines fill the gap before the first
   token. **A progress bar over silence is not an acceptable loading state** — if the work
   takes long enough to need an indicator, it takes long enough to owe the user something
-  to read.
+  to read. **Pace the reveal client-side**: Gemini streams in very coarse chunks — often a
+  whole reply in two frames — so piping the raw stream to the DOM still lands as a wall of
+  text. Buffer what arrives and reveal it on a ~30ms tick, accelerating with the backlog.
 - **Reaction bar** — 40px targets: like · not-for-me · save on the left, share pushed
   right. Active state fills the Material Symbol (`'FILL' 1`) rather than only changing
   colour, so it survives greyscale and colour blindness. Optimistic: the tap paints
