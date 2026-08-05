@@ -13,26 +13,4 @@ export { haptics } from "./haptics";
 export { notifications } from "./notifications";
 export { speech } from "./speech";
 export { kv } from "./kv";
-
-export function isNative(): boolean {
-  // Capacitor injects this global. Absent on the web today.
-  return typeof window !== "undefined" && "Capacitor" in window;
-}
-
-export function isStandalone(): boolean {
-  if (typeof window === "undefined") return false;
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    // iOS Safari predates display-mode and uses a non-standard flag.
-    (window.navigator as unknown as { standalone?: boolean }).standalone === true
-  );
-}
-
-export function isIOS(): boolean {
-  if (typeof navigator === "undefined") return false;
-  return (
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    // iPadOS 13+ reports as a Mac; the touch-point count gives it away.
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
-  );
-}
+export { isNative, isStandalone, isIOS } from "./env";

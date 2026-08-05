@@ -1,4 +1,4 @@
-import { isIOS, isStandalone } from "./index";
+import { isIOS, isStandalone } from "./env";
 
 export const notifications = {
   /**

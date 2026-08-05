@@ -13,19 +13,28 @@ const SHOTS = [
   { label: "Back", hint: "Face away, same distance." },
 ];
 
+const STEPS: OnboardingStage[] = ["photos", "analysis", "styles"];
+
+/**
+ * Anything we don't recognise restarts at the photo step. Rows written by an earlier
+ * schema (call/vibe/wardrobe/reveal) would otherwise match no branch and render a blank
+ * screen — a dead end with no way out.
+ */
+function normalise(stage: OnboardingStage): OnboardingStage {
+  return STEPS.includes(stage) ? stage : "photos";
+}
+
 export function Onboarding({ profile }: { profile: Profile }) {
   const router = useRouter();
-  const [stage, setLocalStage] = useState<OnboardingStage>(profile.onboarding_stage);
-  const [analysis, setAnalysis] = useState<ColourAnalysis | null>(profile.analysis);
+  const [stage, setLocalStage] = useState<OnboardingStage>(normalise(profile.onboarding_stage));
+  const [analysis, setAnalysis] = useState<ColourAnalysis | null>(profile.analysis ?? null);
   const [pending, startTransition] = useTransition();
 
   return (
     <div className="min-h-dvh flex flex-col max-w-[560px] mx-auto w-full px-5 py-6">
       <header className="flex-none flex items-center justify-between">
         <span className="k">RUMOAR</span>
-        <span className="k">
-          {stage === "photos" ? "1 of 3" : stage === "analysis" ? "2 of 3" : "3 of 3"}
-        </span>
+        <span className="k">{STEPS.indexOf(stage) + 1} of 3</span>
       </header>
 
       {stage === "photos" && (
@@ -37,6 +46,18 @@ export function Onboarding({ profile }: { profile: Profile }) {
             })
           }
         />
+      )}
+
+      {!STEPS.includes(stage) && (
+        <div className="flex-1 flex flex-col justify-center">
+          <h1 className="text-[28px]">Let&rsquo;s start again.</h1>
+          <p className="text-mute text-sm leading-relaxed mt-3">
+            Your setup was left in a state this version doesn&rsquo;t recognise.
+          </p>
+          <button className="btn w-full mt-6" onClick={() => setLocalStage("photos")}>
+            Start over
+          </button>
+        </div>
       )}
 
       {stage === "analysis" && (
@@ -115,9 +136,14 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
       return;
     }
 
-    await savePhotos(paths);
-    haptics.success();
+    const saved = await savePhotos(paths);
     setBusy(false);
+    if (!saved.ok) {
+      setError(`Couldn't save those: ${saved.error}`);
+      return;
+    }
+
+    haptics.success();
     onDone();
   }
 
