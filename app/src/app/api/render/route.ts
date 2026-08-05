@@ -90,7 +90,12 @@ export async function POST(request: Request) {
     }
   }
 
-  const reference = await toInlineFromBucket(supabase, "wardrobe", referencePath);
+  // Prefer the small derivative written at intake — same identity, a quarter of the
+  // payload, a much faster render.
+  const reference =
+    (await toInlineFromBucket(supabase, "wardrobe", referencePath.replace(/\.jpg$/, "-sm.jpg"))) ??
+    (await toInlineFromBucket(supabase, "wardrobe", referencePath));
+
   if (!reference) {
     return NextResponse.json({ error: "reference photo unreadable" }, { status: 409 });
   }

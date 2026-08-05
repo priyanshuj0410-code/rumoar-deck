@@ -71,6 +71,38 @@ function openPicker(multiple: boolean): Promise<PickedImage[]> {
 export type CameraError = "unsupported" | "denied" | "unavailable";
 
 export const camera = {
+  /**
+   * A smaller derivative for sending to the image model. Identity survives 768px fine,
+   * and the base64 payload is roughly a quarter the size — which is a large share of the
+   * round-trip on a generation that is already near the function time limit.
+   */
+  async resize(file: File, maxEdge = 768): Promise<File> {
+    const dataUrl = await readDataUrl(file);
+    if (typeof document === "undefined") return file;
+
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = reject;
+      el.src = dataUrl;
+    });
+
+    const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+    if (scale === 1) return file;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.8),
+    );
+    return blob ? new File([blob], file.name, { type: "image/jpeg" }) : file;
+  },
+
   /** Pick images from the library. */
   pick: () => openPicker(true),
   pickOne: async (): Promise<PickedImage | null> => (await openPicker(false))[0] ?? null,

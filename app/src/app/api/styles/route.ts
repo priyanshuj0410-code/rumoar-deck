@@ -250,7 +250,13 @@ export async function PATCH(request: Request) {
     if (signed?.signedUrl) return NextResponse.json({ url: signed.signedUrl, cached: true });
   }
 
-  const { data: file } = await supabase.storage.from("wardrobe").download(referencePath);
+  // Prefer the small derivative written at intake; fall back to the full-size original
+  // for accounts that predate it.
+  const smallPath = referencePath.replace(/\.jpg$/, "-sm.jpg");
+  const { data: small } = await supabase.storage.from("wardrobe").download(smallPath);
+  const file =
+    small ?? (await supabase.storage.from("wardrobe").download(referencePath)).data ?? null;
+
   if (!file) {
     return NextResponse.json(
       { error: "reference_unreadable", message: "Your reference photo couldn't be opened." },
@@ -276,7 +282,9 @@ export async function PATCH(request: Request) {
       ].join(" "),
       images: [reference],
       aspectRatio: "3:4",
-      timeoutMs: 48_000,
+      // Must stay under the platform's 60s function ceiling, or Vercel kills the request
+      // and the client gets an unparseable 504 instead of a legible reason.
+      timeoutMs: 52_000,
     });
 
     const path = `${user.id}/style-${suggestion.id}.jpg`;

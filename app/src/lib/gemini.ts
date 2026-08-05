@@ -109,6 +109,63 @@ export async function chat(options: {
   return text;
 }
 
+/**
+ * Walks the response for image bytes instead of assuming a path.
+ *
+ * The Interactions API, the legacy generateContent API and their SDKs each nest image
+ * data differently (`output_image`, `steps[].content[]`, `inline_data`, `inlineData`).
+ * Enumerating those shapes is how this broke twice, so it now searches for the thing
+ * itself: a long base64 string carrying an image mime type.
+ */
+function findImage(node: unknown, depth = 0): InlineImage | null {
+  if (node === null || node === undefined || depth > 8) return null;
+
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = findImage(child, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  if (typeof node !== "object") return null;
+  const obj = node as Record<string, unknown>;
+
+  const mime = (obj.mime_type ?? obj.mimeType) as string | undefined;
+  const data = (obj.data ?? obj.b64_json ?? obj.bytes_base64) as unknown;
+
+  if (
+    typeof data === "string" &&
+    // Long enough to be an image rather than an id or a short field.
+    data.length > 512 &&
+    (typeof mime !== "string" || mime.startsWith("image/"))
+  ) {
+    return { data, mimeType: typeof mime === "string" ? mime : "image/jpeg" };
+  }
+
+  for (const value of Object.values(obj)) {
+    const found = findImage(value, depth + 1);
+    if (found) return found;
+  }
+  return null;
+}
+
+/** Structure only — keys and types, never values. Safe to log. */
+function describe(node: unknown, depth = 0): string {
+  if (node === null) return "null";
+  if (Array.isArray(node)) {
+    return depth > 3 ? "[…]" : `[${node.length ? describe(node[0], depth + 1) : ""}${node.length > 1 ? ", …" : ""}]`;
+  }
+  if (typeof node === "object") {
+    if (depth > 3) return "{…}";
+    return `{${Object.entries(node as Record<string, unknown>)
+      .map(([key, value]) => `${key}: ${describe(value, depth + 1)}`)
+      .join(", ")}}`;
+  }
+  if (typeof node === "string") return `string(${node.length})`;
+  return typeof node;
+}
+
 /** Pulls the incremental text out of one SSE payload, whatever shape it arrives in. */
 function readDelta(json: Record<string, unknown>): string {
   const delta = json.delta as { type?: string; text?: string } | undefined;
@@ -221,20 +278,14 @@ export async function generateImage(options: {
     options.timeoutMs ?? 55_000,
   );
 
-  const direct = json.output_image as InlineImage | { data?: string; mime_type?: string } | undefined;
-  if (direct && typeof direct === "object" && "data" in direct && direct.data) {
-    return {
-      data: direct.data as string,
-      mimeType: (direct as { mime_type?: string }).mime_type ?? "image/jpeg",
-    };
-  }
+  const found = findImage(json);
+  if (found) return found;
 
-  for (const step of (json.steps ?? []) as Step[]) {
-    const image = step.content?.find((part): part is Extract<Part, { type: "image" }> => part.type === "image");
-    if (image?.data) return { data: image.data, mimeType: image.mime_type ?? "image/jpeg" };
-  }
-
-  throw new GeminiError("no image in response", 502);
+  // No image came back. Log the response's structure (never its payload) and hand the
+  // caller any text the model returned — a refusal reads as prose, not as an error.
+  console.error("[gemini] no image in response; shape:", describe(json));
+  const text = readText(json).slice(0, 300);
+  throw new GeminiError(text ? `model replied with text: ${text}` : "no image in response", 502);
 }
 
 /** Strips a data: prefix if present — callers pass either raw base64 or a data URL. */

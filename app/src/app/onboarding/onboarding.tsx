@@ -142,12 +142,22 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
     }
 
     const paths: string[] = [];
-    for (const image of images) {
+    for (const [i, image] of images.entries()) {
       const path = `${user.id}/intake-${crypto.randomUUID()}.jpg`;
       const { error: uploadError } = await supabase.storage
         .from("wardrobe")
         .upload(path, image.file, { contentType: "image/jpeg" });
-      if (!uploadError) paths.push(path);
+      if (uploadError) continue;
+      paths.push(path);
+
+      // The front shot also gets a small derivative, which is what the image model is
+      // sent. Same identity, a quarter of the payload, a much faster render.
+      if (i === 0) {
+        const small = await camera.resize(image.file, 768);
+        await supabase.storage
+          .from("wardrobe")
+          .upload(path.replace(/\.jpg$/, "-sm.jpg"), small, { contentType: "image/jpeg" });
+      }
     }
 
     if (paths.length < 3) {
@@ -555,9 +565,13 @@ function StyleCard({ style }: { style: StyleSuggestion }) {
 
   // Rendering starts on its own. Asking the user to press a button for something the
   // product should obviously do is just friction.
+  //
+  // Staggered by rank: three simultaneous image generations compete for the same upstream
+  // capacity and were pushing each other past the timeout.
   useEffect(() => {
-    void render();
-  }, [render]);
+    const timer = setTimeout(() => void render(), style.rank * 2500);
+    return () => clearTimeout(timer);
+  }, [render, style.rank]);
 
   return (
     <article>
