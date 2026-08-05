@@ -8,6 +8,7 @@
  * See knowledge/architecture/overview.md § Cross-platform strategy.
  */
 export { camera } from "./camera";
+export type { Facing, PickedImage, CameraError } from "./camera";
 export { share } from "./share";
 export { haptics } from "./haptics";
 export { notifications } from "./notifications";

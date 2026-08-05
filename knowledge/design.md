@@ -101,7 +101,15 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
   mono beside it. Used wherever the product states a machine judgement about the user; it
   is never decorative and never hidden when low.
 - **Intake instruction list** — numbered mono index, bold 13.5px label, `--mute` 13px hint.
-  For steps the user performs away from the screen (front / side / back photos).
+  For steps the user performs away from the screen.
+- **Guided capture** (`PhotoCapture`) — one shot per screen: `LABEL · n of N` eyebrow,
+  display heading, hint, then a 1:1-ish live viewport with a full-body framing rectangle
+  inset 18%/6% in `--paper` at 70% opacity. Camera opens only on an explicit tap, never on
+  mount, so the permission prompt is always attached to a visible intent. Preview is
+  mirrored for the front-facing camera; the captured frame never is. **Upload sits beside
+  capture as an equal, not a fallback** — on desktop it is usually the better path, and
+  where `getUserMedia` is unavailable or blocked it is the only one. Denial is explained
+  in words with the alternative in the same breath, never a dead end.
 
 ## 3. Layout
 

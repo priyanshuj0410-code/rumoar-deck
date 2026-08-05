@@ -2,15 +2,25 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { camera, haptics } from "@/lib/platform";
+import { camera, haptics, type PickedImage } from "@/lib/platform";
 import { createClient } from "@/lib/supabase/client";
+import { PhotoCapture } from "@/components/photo-capture";
 import type { ColourAnalysis, OnboardingStage, Profile, StyleSuggestion } from "@/lib/types";
 import { finishOnboarding, savePhotos, setStage } from "./actions";
 
 const SHOTS = [
-  { label: "Front", hint: "Face the camera, arms relaxed at your sides." },
-  { label: "Side", hint: "Turn 90°, look straight ahead." },
-  { label: "Back", hint: "Face away, same distance." },
+  {
+    label: "Front",
+    hint: "Full body, facing the camera, arms relaxed at your sides. Plain wall and daylight if you can, and no sunglasses — this is the shot your colouring is read from.",
+  },
+  {
+    label: "Side",
+    hint: "Turn 90°, look straight ahead. Same spot, same distance, same light.",
+  },
+  {
+    label: "Back",
+    hint: "Face away from the camera. Same distance again.",
+  },
 ];
 
 const STEPS: OnboardingStage[] = ["photos", "analysis", "styles"];
@@ -98,18 +108,26 @@ export function Onboarding({ profile }: { profile: Profile }) {
 /* ───────────────────────────────────────────── 1 · photos */
 
 function PhotosStep({ onDone }: { onDone: () => void }) {
-  const [previews, setPreviews] = useState<string[]>([]);
+  // One slot per required shot, plus optional extra angles appended after.
+  const [shots, setShots] = useState<(PickedImage | null)[]>([null, null, null]);
+  const [extras, setExtras] = useState<PickedImage[]>([]);
+  const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function pick() {
-    setError(null);
-    const picked = await camera.pick();
-    if (picked.length === 0) return;
+  const reviewing = index >= SHOTS.length;
 
+  function capture(image: PickedImage) {
+    setShots((current) => current.map((shot, i) => (i === index ? image : shot)));
+    haptics.tap();
+    setIndex(index + 1);
+  }
+
+  async function submit() {
+    setError(null);
     setBusy(true);
-    const images = picked.slice(0, 6);
-    setPreviews(images.map((image) => image.dataUrl));
+
+    const images = [...shots.filter((s): s is PickedImage => s !== null), ...extras];
 
     const supabase = createClient();
     const {
@@ -131,11 +149,13 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
     }
 
     if (paths.length < 3) {
-      setError("Those didn't all upload. Try again with three or more photos.");
+      setError("Those didn't all upload. Check your connection and try again.");
       setBusy(false);
       return;
     }
 
+    // Order matters: paths[0] is the front shot and becomes the reference photo every
+    // generated image is rendered from.
     const saved = await savePhotos(paths);
     setBusy(false);
     if (!saved.ok) {
@@ -147,52 +167,99 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
     onDone();
   }
 
+  if (!reviewing) {
+    const shot = SHOTS[index];
+    return (
+      <>
+        <PhotoCapture
+          title={shot.label}
+          hint={shot.hint}
+          index={index}
+          total={SHOTS.length}
+          existing={shots[index]}
+          onCaptured={capture}
+          onBack={index > 0 ? () => setIndex(index - 1) : undefined}
+        />
+        <p className="flex-none text-[11px] text-mute leading-snug pt-3">
+          Your photos are private to your account and are never shown to anyone else.
+        </p>
+      </>
+    );
+  }
+
+  const all = [...shots.filter((s): s is PickedImage => s !== null), ...extras];
+
   return (
-    <div className="flex-1 flex flex-col pt-8">
-      <h1 className="text-[28px]">Three to six photos of you.</h1>
-      <p className="text-mute text-sm leading-relaxed mt-3">
-        Full body — front, side and back, like mugshots. Plain wall, daylight if you can, no
-        sunglasses. I read your colouring and proportions from these; nothing else works as well.
+    <div className="flex-1 flex flex-col pt-6 min-h-0">
+      <p className="k">Review</p>
+      <h1 className="text-[28px] mt-2">Do these look right?</h1>
+      <p className="text-mute text-sm leading-relaxed mt-2">
+        Head to feet in frame, taken in the same light. Tap any shot to redo it.
       </p>
 
-      <ul className="mt-6 flex flex-col gap-3">
-        {SHOTS.map((shot, index) => (
-          <li key={shot.label} className="flex gap-3 items-start">
-            <span className="font-mono text-[11px] text-mute mt-0.5 w-4">{index + 1}</span>
-            <div>
-              <b className="text-[13.5px] font-semibold">{shot.label}</b>
-              <p className="text-mute text-[13px] leading-relaxed">{shot.hint}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {previews.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 mt-6">
-          {previews.map((src, index) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={index}
-              src={src}
-              alt=""
-              className="aspect-[3/4] w-full object-cover bg-wash"
-            />
+      <div className="flex-1 overflow-y-auto mt-5">
+        <div className="grid grid-cols-3 gap-2">
+          {SHOTS.map((shot, i) => (
+            <button
+              key={shot.label}
+              onClick={() => setIndex(i)}
+              className="text-left"
+              aria-label={`Redo the ${shot.label.toLowerCase()} photo`}
+            >
+              <span className="block aspect-[3/4] bg-wash overflow-hidden">
+                {shots[i] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={shots[i]!.dataUrl} alt="" className="w-full h-full object-cover" />
+                ) : null}
+              </span>
+              <span className="text-[11px] mt-1 block">{shot.label}</span>
+            </button>
           ))}
         </div>
-      )}
 
-      {error && (
-        <p role="alert" className="text-sm mt-4 leading-relaxed">
-          {error}
-        </p>
-      )}
+        {extras.length > 0 && (
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {extras.map((extra, i) => (
+              <button
+                key={i}
+                onClick={() => setExtras((current) => current.filter((_, j) => j !== i))}
+                aria-label={`Remove extra photo ${i + 1}`}
+                className="text-left"
+              >
+                <span className="block aspect-[3/4] bg-wash overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={extra.dataUrl} alt="" className="w-full h-full object-cover" />
+                </span>
+                <span className="text-[11px] mt-1 block text-mute">Remove</span>
+              </button>
+            ))}
+          </div>
+        )}
 
-      <p className="text-[11px] text-mute leading-snug mt-auto pt-6">
-        Your photos are private to your account and are never shown to anyone else.
-      </p>
+        {all.length < 6 && (
+          <button
+            className="btn btn-ghost btn-sm mt-4"
+            onClick={async () => {
+              const picked = await camera.pick();
+              if (picked.length) setExtras((c) => [...c, ...picked].slice(0, 6 - SHOTS.length));
+            }}
+          >
+            <span className="mi text-[18px]" aria-hidden>
+              add
+            </span>
+            Add another angle
+          </button>
+        )}
 
-      <button className="btn w-full mt-3" onClick={pick} disabled={busy}>
-        {busy ? "Uploading…" : "Choose photos"}
+        {error && (
+          <p role="alert" className="text-sm mt-4 leading-relaxed">
+            {error}
+          </p>
+        )}
+      </div>
+
+      <button className="btn w-full mt-4" onClick={submit} disabled={busy || all.length < 3}>
+        {busy ? "Uploading…" : "Read my colouring"}
       </button>
     </div>
   );
