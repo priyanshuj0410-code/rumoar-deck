@@ -61,25 +61,26 @@ export function Onboarding({ profile }: { profile: Profile }) {
 
   return (
     <div className="min-h-dvh flex flex-col max-w-[560px] mx-auto w-full px-5 py-6">
+      {/* One counter per screen. This bar is the stage-level position; the numeric
+          counter belongs to whichever step owns a sub-sequence (the three photos).
+          The wordmark sits flush with the body text — nothing may indent it. */}
       <header className="flex-none flex items-center justify-between">
-        <div className="flex items-center gap-1.5 -ml-2">
-          {stepIndex > 0 ? (
-            <button
-              onClick={goBack}
-              disabled={pending}
-              aria-label={`Back to ${STEPS[stepIndex - 1]}`}
-              className="w-8 h-8 flex items-center justify-center text-mute hover:text-ink transition-colors"
-            >
-              <span className="mi text-[20px]" aria-hidden>
-                arrow_back
-              </span>
-            </button>
-          ) : (
-            <span className="w-2" />
-          )}
-          <span className="k">RUMOAR</span>
+        <span className="k">RUMOAR</span>
+        <div
+          className="flex gap-1"
+          role="progressbar"
+          aria-valuenow={stepIndex + 1}
+          aria-valuemin={1}
+          aria-valuemax={STEPS.length}
+          aria-label={`Step ${stepIndex + 1} of ${STEPS.length}`}
+        >
+          {STEPS.map((step, index) => (
+            <span
+              key={step}
+              className={`h-0.5 w-6 transition-colors ${index <= stepIndex ? "bg-ink" : "bg-line"}`}
+            />
+          ))}
         </div>
-        <span className="k">{stepIndex + 1} of 3</span>
       </header>
 
       {stage === "photos" && (
@@ -115,12 +116,7 @@ export function Onboarding({ profile }: { profile: Profile }) {
               setLocalStage("styles");
             });
           }}
-          onRetake={() =>
-            startTransition(async () => {
-              await setStage("photos");
-              setLocalStage("photos");
-            })
-          }
+          onBack={goBack}
           pending={pending}
         />
       )}
@@ -133,6 +129,7 @@ export function Onboarding({ profile }: { profile: Profile }) {
               router.replace("/app");
             })
           }
+          onBack={goBack}
           pending={pending}
         />
       )}
@@ -312,15 +309,30 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
 
 /* ───────────────────────────────────────────── 2 · analysis */
 
+/** One back affordance per screen, left-aligned with the body text. */
+function BackLink({ label, onBack }: { label: string; onBack: () => void }) {
+  return (
+    <button
+      onClick={onBack}
+      className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors self-start"
+    >
+      <span className="mi text-[18px] -ml-0.5" aria-hidden>
+        arrow_back
+      </span>
+      {label}
+    </button>
+  );
+}
+
 function AnalysisStep({
   initial,
   onDone,
-  onRetake,
+  onBack,
   pending,
 }: {
   initial: ColourAnalysis | null;
   onDone: (analysis: ColourAnalysis) => void;
-  onRetake: () => void;
+  onBack: () => void;
   pending: boolean;
 }) {
   const [analysis, setAnalysis] = useState<ColourAnalysis | null>(initial);
@@ -392,7 +404,7 @@ function AnalysisStep({
         <h1 className="text-[28px]">That didn&rsquo;t work.</h1>
         <p className="text-mute text-sm leading-relaxed mt-3">{error}</p>
         <div className="mt-6 flex flex-col gap-2.5">
-          <button className="btn w-full" onClick={onRetake}>
+          <button className="btn w-full" onClick={onBack}>
             Use different photos
           </button>
         </div>
@@ -404,7 +416,8 @@ function AnalysisStep({
 
   return (
     <div className="flex-1 flex flex-col pt-8">
-      <p className="k">Your analysis</p>
+      <BackLink label="Photos" onBack={onBack} />
+      <p className="k mt-4">Your analysis</p>
       <h1 className="text-[32px] mt-2">{analysis.season}</h1>
       <p className="text-mute text-sm leading-relaxed mt-2">
         {analysis.undertone} undertone · {analysis.depth} depth · {analysis.contrast} contrast ·{" "}
@@ -498,7 +511,15 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 
 /* ───────────────────────────────────────────── 3 · styles */
 
-function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean }) {
+function StylesStep({
+  onDone,
+  onBack,
+  pending,
+}: {
+  onDone: () => void;
+  onBack: () => void;
+  pending: boolean;
+}) {
   const [styles, setStyles] = useState<StyleSuggestion[]>([]);
   const [status, setStatus] = useState("Reading your palette");
   const [running, setRunning] = useState(true);
@@ -532,7 +553,8 @@ function StylesStep({ onDone, pending }: { onDone: () => void; pending: boolean 
 
   return (
     <div className="flex-1 flex flex-col pt-6">
-      <p className="k flex items-center gap-2">
+      <BackLink label="Analysis" onBack={onBack} />
+      <p className="k flex items-center gap-2 mt-4">
         {running && <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />}
         {running ? status : "Built for your colouring"}
       </p>

@@ -128,6 +128,13 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
   is never decorative and never hidden when low.
 - **Intake instruction list** — numbered mono index, bold 13.5px label, `--mute` 13px hint.
   For steps the user performs away from the screen.
+- **Progress** — **one counter per screen.** Stage-level position is a segmented bar
+  (2px × 24px per stage, `--ink` filled / `--line` empty) with no numerals; a numeric
+  "n of N" belongs only to a step that owns a sub-sequence, such as the three photos.
+  Two numeric counters on one screen read as one broken counter.
+- **Back** — a single left-aligned text link at the top of the step content, never in the
+  header. Header controls that appear conditionally shift the wordmark and break its
+  alignment with the body text.
 - **Guided capture** (`PhotoCapture`) — one shot per screen: `LABEL · n of N` eyebrow,
   display heading, hint, then a 1:1-ish live viewport with a full-body framing rectangle
   inset 18%/6% in `--paper` at 70% opacity. Camera opens only on an explicit tap, never on
