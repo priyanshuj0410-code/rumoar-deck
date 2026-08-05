@@ -6,7 +6,6 @@ import { camera, haptics, type Facing, type PickedImage } from "@/lib/platform";
 type Props = {
   title: string;
   hint: string;
-  guide: string;
   existing?: PickedImage | null;
   onCaptured: (image: PickedImage) => void;
   onNext: () => void;
@@ -30,7 +29,6 @@ const UNSUPPORTED_COPY = "This browser won't open the camera here. Upload a phot
 export function PhotoCapture({
   title,
   hint,
-  guide,
   existing,
   onCaptured,
   onNext,
@@ -103,15 +101,15 @@ export function PhotoCapture({
   }
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="mt-6">
+    <div className="flex flex-col">
+      <div>
         <h1 className="text-[26px]">{title}</h1>
-        {!preview && !live && <p className="text-mute text-[13px] leading-relaxed mt-1">{hint}</p>}
+        <p className="text-mute text-[13px] leading-relaxed mt-1">{hint}</p>
       </div>
 
       {/* Capped, and centred. A full-bleed hero pushed every control below the fold and
           made the step look like it had nothing to do. */}
-      <div className="relative w-full max-w-[280px] mx-auto aspect-[3/4] bg-wash overflow-hidden mt-5">
+      <div className="relative w-full h-[clamp(300px,46vh,440px)] bg-wash overflow-hidden mt-4">
         {live ? (
           <>
             <video
@@ -119,7 +117,7 @@ export function PhotoCapture({
               playsInline
               muted
               // Mirroring the preview only. The captured frame is never mirrored.
-              className={`w-full h-full object-cover ${facing === "user" ? "-scale-x-100" : ""}`}
+              className={`w-full h-full object-contain ${facing === "user" ? "-scale-x-100" : ""}`}
             />
             <div
               aria-hidden
@@ -134,25 +132,24 @@ export function PhotoCapture({
           <img
             src={preview}
             alt={`Your ${title.toLowerCase()} photo`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
-            <span className="mi text-[26px] text-mute" aria-hidden>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="mi text-[28px] text-mute" aria-hidden>
               person
             </span>
-            <p className="text-mute text-[12px] leading-relaxed">{guide}</p>
           </div>
         )}
       </div>
 
       {notice && (
-        <p role="alert" className="text-[13px] text-mute leading-relaxed mt-3 text-center">
+        <p role="alert" className="text-[13px] text-mute leading-relaxed mt-3">
           {notice}
         </p>
       )}
 
-      <div className="mt-auto pt-6">
+      <div className="mt-4">
         {live ? (
           <div className="flex flex-col gap-2.5">
             <button className="btn w-full" onClick={shoot}>
@@ -161,7 +158,7 @@ export function PhotoCapture({
               </span>
               Capture
             </button>
-            <div className="flex justify-center gap-6 text-[13px] text-mute">
+            <div className="flex gap-6 text-[13px] text-mute pt-0.5">
               <button
                 className="hover:text-ink transition-colors"
                 onClick={() => start(facing === "user" ? "environment" : "user")}
@@ -180,7 +177,7 @@ export function PhotoCapture({
             </button>
             {/* Secondary actions are text, not buttons. Two black blocks on one screen
                 means neither of them is the primary one. */}
-            <div className="flex justify-center gap-6 text-[13px] text-mute">
+            <div className="flex gap-6 text-[13px] text-mute pt-0.5">
               {camera.supportsLive() && (
                 <button
                   className="hover:text-ink transition-colors"
@@ -220,8 +217,8 @@ export function PhotoCapture({
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-4">
-          {onBack ? (
+        <div className="flex items-center gap-4 mt-5">
+          {onBack && (
             <button
               onClick={onBack}
               className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors"
@@ -231,8 +228,6 @@ export function PhotoCapture({
               </span>
               Back
             </button>
-          ) : (
-            <span />
           )}
           <span className="text-[11px] text-mute">Private to your account</span>
         </div>

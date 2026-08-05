@@ -13,19 +13,10 @@ import { addPhotos, finishOnboarding, savePhotos, setStage } from "./actions";
 const SHOTS = [
   {
     label: "Front",
-    hint: "Facing the camera, arms at your sides.",
-    guide: "Stand against a plain wall in daylight, full body in frame, no sunglasses. Your colouring is read from this one.",
+    hint: "Full body, facing the camera. Plain wall, daylight if you can, no sunglasses.",
   },
-  {
-    label: "Side",
-    hint: "Turned 90°, looking straight ahead.",
-    guide: "Same spot, same distance, same light as the front shot.",
-  },
-  {
-    label: "Back",
-    hint: "Facing away from the camera.",
-    guide: "Same spot and distance again.",
-  },
+  { label: "Side", hint: "Turn 90°. Same spot, same distance, same light." },
+  { label: "Back", hint: "Facing away. Same spot and distance again." },
 ];
 
 const STAGES: OnboardingStage[] = ["photos", "analysis", "styles"];
@@ -56,12 +47,16 @@ export function Onboarding({ profile }: { profile: Profile }) {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col max-w-[560px] mx-auto w-full px-5 py-6">
+    <div className="min-h-dvh flex flex-col max-w-[440px] mx-auto w-full px-5 py-6">
       <header className="flex-none">
         <span className="k">RUMOAR</span>
       </header>
 
-      {stage === "photos" && <PhotosStep onDone={() => go("analysis")} />}
+      {stage === "photos" && (
+        <div className="flex-1 flex flex-col justify-center py-6">
+          <PhotosStep onDone={() => go("analysis")} />
+        </div>
+      )}
 
       {stage === "analysis" && (
         <AnalysisStep
@@ -122,7 +117,7 @@ function ShotTiles({
   onPick: (index: number) => void;
 }) {
   return (
-    <ol className="flex-none flex gap-2 mt-5">
+    <ol className="flex-none flex gap-2 mb-6">
       {SHOTS.map((shot, index) => {
         const image = shots[index];
         const active = index === current;
@@ -244,14 +239,13 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex flex-col">
       <ShotTiles shots={shots} current={index} onPick={setIndex} />
 
       <PhotoCapture
         key={index}
         title={SHOTS[index].label}
         hint={SHOTS[index].hint}
-        guide={SHOTS[index].guide}
         existing={current}
         busy={busy}
         nextLabel={isLast ? "Read my colouring" : "Next"}
