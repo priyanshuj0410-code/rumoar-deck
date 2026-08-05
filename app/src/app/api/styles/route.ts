@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { generateImage, GeminiError, streamChat, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
+import { chat, generateImage, GeminiError, streamChat, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
 import { encodeEvent } from "@/lib/ndjson";
 import type { ColourAnalysis, Product, StyleSuggestion } from "@/lib/types";
 
@@ -167,18 +167,36 @@ export async function POST() {
           }
         };
 
-        for await (const delta of streamChat({
-          turns: [{ role: "user", text: prompt(analysis, products) }],
+        const request = {
+          turns: [{ role: "user" as const, text: prompt(analysis, products) }],
           model: TEXT_MODEL,
-          thinking: "high",
+          thinking: "high" as const,
           timeoutMs: 55_000,
-        })) {
-          buffer += delta;
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-          for (const line of lines) await flush(line);
+        };
+
+        let streamed = "";
+        try {
+          for await (const delta of streamChat(request)) {
+            streamed += delta;
+            buffer += delta;
+            const lines = buffer.split("\n");
+            buffer = lines.pop() ?? "";
+            for (const line of lines) await flush(line);
+          }
+          if (buffer.trim()) await flush(buffer);
+        } catch (streamError) {
+          // Only swallow it if nothing came through — a mid-stream failure with content
+          // already delivered should surface rather than silently double-generate.
+          if (streamed) throw streamError;
         }
-        if (buffer.trim()) await flush(buffer);
+
+        // Streaming is an enhancement, not a dependency. If it produced nothing, fall
+        // back to the plain call so the user still gets their three directions.
+        if (rank === 0) {
+          send({ t: "status", v: "Still working" });
+          const text = await chat(request);
+          for (const line of text.split("\n")) await flush(line);
+        }
 
         if (rank === 0) {
           send({ t: "error", message: "Couldn't put those together. Try again in a moment." });

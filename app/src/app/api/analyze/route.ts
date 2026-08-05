@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { streamChat, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
+import { chat, streamChat, TEXT_MODEL, type InlineImage } from "@/lib/gemini";
 import { encodeEvent } from "@/lib/ndjson";
 import type { ColourAnalysis } from "@/lib/types";
 
@@ -176,18 +176,20 @@ export async function POST() {
 
         send({ t: "status", v: "Reading undertone, depth and contrast" });
 
+        const request = {
+          turns: [{ role: "user" as const, text: PROMPT, images }],
+          model: TEXT_MODEL,
+          thinking: "high" as const,
+          timeoutMs: 55_000,
+        };
+
         let full = "";
         let emitted = 0;
         let proseDone = false;
 
-        for await (const delta of streamChat({
-          turns: [{ role: "user", text: PROMPT, images }],
-          model: TEXT_MODEL,
-          thinking: "high",
-          timeoutMs: 55_000,
-        })) {
+        const consume = (delta: string) => {
           full += delta;
-          if (proseDone) continue;
+          if (proseDone) return;
 
           // Everything before the marker is for the reader; everything after is data.
           const cut = full.indexOf(MARKER);
@@ -204,6 +206,18 @@ export async function POST() {
             proseDone = true;
             send({ t: "status", v: "Picking your palette" });
           }
+        };
+
+        try {
+          for await (const delta of streamChat(request)) consume(delta);
+        } catch (streamError) {
+          if (full) throw streamError;
+        }
+
+        // Streaming is an enhancement, not a dependency.
+        if (!full.trim()) {
+          send({ t: "status", v: "Still working" });
+          consume(await chat(request));
         }
 
         const analysis = parse(full.slice(full.indexOf(MARKER) + MARKER.length) || full);

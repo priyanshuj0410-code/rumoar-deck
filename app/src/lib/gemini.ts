@@ -331,6 +331,8 @@ export async function* streamChat(options: {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let yielded = false;
+  let firstShape = "";
 
   while (true) {
     const { done, value } = await reader.read();
@@ -347,13 +349,25 @@ export async function* streamChat(options: {
         const payload = line.slice(5).trim();
         if (!payload || payload === "[DONE]") continue;
         try {
-          const text = readDelta(JSON.parse(payload) as Record<string, unknown>);
-          if (text) yield text;
+          const parsed = JSON.parse(payload) as Record<string, unknown>;
+          if (!firstShape) firstShape = describe(parsed);
+          const text = readDelta(parsed);
+          if (text) {
+            yielded = true;
+            yield text;
+          }
         } catch {
           // A malformed frame is not worth killing a live generation over.
         }
       }
     }
+  }
+
+  // Frames arrived but none of them parsed as text — the delta shape is not what this
+  // reader expects. Callers fall back to the non-streaming call; this records the shape
+  // so the streaming path can be fixed rather than guessed at.
+  if (!yielded && firstShape) {
+    console.error("[gemini] stream yielded no text; first frame:", firstShape.slice(0, 800));
   }
 }
 
