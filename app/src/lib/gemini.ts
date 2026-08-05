@@ -201,6 +201,22 @@ function findLooseBase64(node: unknown, depth = 0): string | null {
   return null;
 }
 
+/** Re-fetches an interaction by id, in case the image arrives after the create call. */
+async function retrieve(id: string): Promise<Record<string, unknown> | null> {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) return null;
+
+  // A little breathing room in case generation is still finishing server-side.
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  const response = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+    headers: { "x-goog-api-key": key },
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok) return null;
+  return (await response.json()) as Record<string, unknown>;
+}
+
 /** Downloads a URI-delivered image and returns it as inline bytes. */
 async function resolveImage(ref: ImageRef): Promise<InlineImage> {
   if (ref.kind === "inline") return { data: ref.data, mimeType: ref.mimeType };
@@ -360,12 +376,30 @@ export async function generateImage(options: {
   const loose = findLooseBase64(json);
   if (loose) return { data: loose, mimeType: "image/jpeg" };
 
-  // No image anywhere. Log the structure (keys and types only, never payload) and put it
-  // in the error too — the model claiming it produced an image while we find nothing is
-  // only diagnosable if the actual response shape reaches whoever is reading the error.
-  const shape = describe(json);
-  console.error("[gemini] no image in response; shape:", shape);
-  throw new GeminiError(`no image found. response shape: ${shape}`.slice(0, 1500), 502);
+  // The response is an interaction resource with an id and a status, so the remaining
+  // possibility is that the bytes land on a follow-up retrieval rather than in the
+  // create response. One bounded retry, then give up honestly.
+  const id = typeof json.id === "string" ? json.id : null;
+  if (id) {
+    const retrieved = await retrieve(id).catch(() => null);
+    if (retrieved) {
+      const late = findImage(retrieved);
+      if (late) return resolveImage(late);
+      const lateLoose = findLooseBase64(retrieved);
+      if (lateLoose) return { data: lateLoose, mimeType: "image/jpeg" };
+      console.error("[gemini] retrieval had no image either;", describe(retrieved).slice(0, 1500));
+    }
+  }
+
+  // No image anywhere. Report the part that matters — the status and the step tree —
+  // rather than a full dump whose informative tail gets truncated away. `usage` and `id`
+  // told us nothing and ate the whole budget twice.
+  const status = typeof json.status === "string" ? json.status : "?";
+  const steps = json.steps ? describe(json.steps) : describe(json);
+  const shape = `status=${status} keys=[${Object.keys(json).join(",")}] steps=${steps}`;
+
+  console.error("[gemini] no image in response;", shape);
+  throw new GeminiError(`no image found. ${shape}`.slice(0, 4000), 502);
 }
 
 /** Strips a data: prefix if present — callers pass either raw base64 or a data URL. */
