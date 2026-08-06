@@ -979,6 +979,23 @@ function Row({
     </section>
   );
 }
+/** What we know about a direction's picture, which arrives long after the direction does. */
+type Render = {
+  url: string | null;
+  failed: { message: string; reason?: string } | null;
+  reworking: boolean;
+};
+
+const BLANK: Render = { url: null, failed: null, reworking: false };
+
+/**
+ * One direction at a time, in the grammar the intake step established: the look holds the
+ * left pane, the flow runs down the right, and the tiles are the only way between them.
+ *
+ * The render state lives up here rather than inside the card, because the tiles have to
+ * show which directions have drawn, which are still drawing and which failed — and a card
+ * that owned its own picture could not tell them.
+ */
 function StylesStep({
   onDone,
   onBack,
@@ -989,9 +1006,97 @@ function StylesStep({
   pending: boolean;
 }) {
   const [styles, setStyles] = useState<StyleSuggestion[]>([]);
+  const [renders, setRenders] = useState<Record<string, Render>>({});
+  const [index, setIndex] = useState(0);
   const [status, setStatus] = useState("Reading your palette");
   const [running, setRunning] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const started = useRef<Set<string>>(new Set());
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach(clearTimeout);
+  }, []);
+
+  const patch = useCallback(async (id: string) => {
+    try {
+      const response = await fetch("/api/styles", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const json = (await response.json()) as {
+        url?: string;
+        message?: string;
+        reason?: string;
+      };
+      setRenders((all) => {
+        // A rework started while this was in flight owns the slot now.
+        if (all[id]?.reworking) return all;
+        return {
+          ...all,
+          [id]: json.url
+            ? { url: json.url, failed: null, reworking: false }
+            : {
+                url: null,
+                reworking: false,
+                failed: {
+                  message: json.message ?? "Couldn't render that one.",
+                  reason: json.reason,
+                },
+              },
+        };
+      });
+    } catch {
+      setRenders((all) => ({
+        ...all,
+        [id]: {
+          url: null,
+          reworking: false,
+          failed: { message: "Couldn't reach the renderer." },
+        },
+      }));
+    }
+  }, []);
+
+  /**
+   * Staggered by rank: three simultaneous image generations compete for the same upstream
+   * capacity and were pushing each other past the timeout. The second timer is the one
+   * that matters on a bad connection — without it a hung request shimmers for ever.
+   */
+  useEffect(() => {
+    for (const style of styles) {
+      if (started.current.has(style.id)) continue;
+      started.current.add(style.id);
+
+      const rank =
+        typeof style.rank === "number" ? style.rank : styles.indexOf(style);
+      timers.current.push(setTimeout(() => void patch(style.id), rank * 2500));
+      timers.current.push(
+        setTimeout(
+          () =>
+            setRenders((all) =>
+              all[style.id]?.url || all[style.id]?.failed
+                ? all
+                : {
+                    ...all,
+                    [style.id]: {
+                      url: null,
+                      reworking: false,
+                      failed: {
+                        message: "That one took too long.",
+                        reason: "render timeout",
+                      },
+                    },
+                  },
+            ),
+          rank * 2500 + 90_000,
+        ),
+      );
+    }
+  }, [styles, patch]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1024,50 +1129,206 @@ function StylesStep({
     };
   }, []);
 
+  async function rework(id: string, note: string) {
+    setRenders((all) => ({
+      ...all,
+      [id]: { url: null, failed: null, reworking: true },
+    }));
+    try {
+      const response = await fetch("/api/styles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, note }),
+      });
+      const json = (await response.json()) as {
+        style?: StyleSuggestion;
+        message?: string;
+      };
+      if (json.style) {
+        const next = json.style;
+        setStyles((all) => all.map((s) => (s.id === id ? next : s)));
+        setRenders((all) => ({
+          ...all,
+          [id]: { url: null, failed: null, reworking: false },
+        }));
+        await patch(id);
+      } else {
+        setRenders((all) => ({
+          ...all,
+          [id]: {
+            url: null,
+            reworking: false,
+            failed: { message: json.message ?? "Couldn't rework that one." },
+          },
+        }));
+      }
+    } catch {
+      setRenders((all) => ({
+        ...all,
+        [id]: {
+          url: null,
+          reworking: false,
+          failed: { message: "Couldn't reach the stylist." },
+        },
+      }));
+    }
+  }
+
+  // While the stream is open the strip always shows three slots, so it never grows a tile
+  // under the finger. Once it closes, it shows exactly what arrived.
+  const slots = running ? Math.max(3, styles.length) : styles.length;
+  const current = styles[index] ?? null;
+  const render = current ? (renders[current.id] ?? BLANK) : BLANK;
+  const drawing = styles.filter((s) => {
+    const r = renders[s.id] ?? BLANK;
+    return !r.url && !r.failed;
+  }).length;
+
+  if (error && styles.length === 0) {
+    return (
+      <div className="flex-1 flex flex-col justify-center lg:max-w-[440px]">
+        <h1 className="text-[28px] lg:text-[38px]">That didn&rsquo;t work.</h1>
+        <p className="text-mute text-sm leading-relaxed mt-3">{error}</p>
+        <button className="btn w-full mt-6" onClick={onBack}>
+          Back to the analysis
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col pt-6">
+      {/* The tiles move between directions; this moves between steps. They do not collide,
+          so unlike the intake screen this one keeps its way back. */}
       <BackLink label="Analysis" onBack={onBack} />
-      <p className="k flex items-center gap-2 mt-4">
-        {running && (
-          <span
-            className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse"
-            aria-hidden
-          />
-        )}
-        {running ? status : "Built for your colouring"}
-      </p>
-      <h1 className="text-[28px] lg:text-[56px] lg:leading-[0.98] mt-2 lg:mt-3">
-        Three directions.
-      </h1>
 
-      {/* The page itself scrolls. An inner overflow container here produced a second
-          scrollbar inside the first — two things to drag, neither obviously the right one. */}
       <div
-        className="mt-5 lg:mt-10 flex flex-col gap-8
-                   lg:grid lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14 lg:items-start"
-        aria-live="polite"
+        className="mt-4 lg:mt-6 flex flex-col
+                   lg:grid lg:grid-cols-[auto_minmax(0,1fr)] lg:grid-rows-[auto_1fr]
+                   lg:gap-x-14 lg:items-start"
       >
-        {styles.map((style) => (
-          <StyleCard key={style.id} style={style} />
-        ))}
+        <div className="lg:col-start-2 lg:row-start-1 lg:max-w-[540px]">
+          <DirectionTiles
+            styles={styles}
+            renders={renders}
+            slots={slots}
+            current={index}
+            onPick={(next) => {
+              setIndex(next);
+              scrollToTop();
+            }}
+          />
 
-        {/* Placeholders for the directions still generating, so the page has shape. */}
-        {running &&
-          Array.from({ length: Math.max(0, 3 - styles.length) }).map(
-            (_, index) => (
-              <div key={`pending-${index}`} className="flex flex-col gap-2">
-                <span className="skel h-6 w-[52%] block" />
-                <span className="skel h-4 w-[72%] block" />
-                <span className="skel aspect-[3/4] w-full block mt-2" />
-              </div>
-            ),
-          )}
-
-        {error && (
-          <p role="alert" className="text-sm text-mute leading-relaxed">
-            {error}
+          <p className="k flex items-center gap-2 mt-5">
+            {drawing > 0 && (
+              <span
+                className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse"
+                aria-hidden
+              />
+            )}
+            {current
+              ? `Direction ${index + 1} of ${slots}${drawing > 0 ? ` · ${drawing} still drawing` : ""}`
+              : status}
           </p>
-        )}
+          {/* Narrow enough that a screen reader hears arrivals, not every mutation. */}
+          <span className="sr-only" aria-live="polite">
+            {running ? status : `${styles.length} directions ready`}
+          </span>
+
+          {current ? (
+            <>
+              <h1 className="text-[26px] lg:text-[34px] mt-2 leading-[1.1]">
+                {current.name || `Direction ${index + 1}`}
+              </h1>
+              {current.one_liner && (
+                <p className="text-mute text-[13px] lg:text-[15px] leading-relaxed mt-1 lg:mt-3 lg:max-w-[46ch]">
+                  {current.one_liner}
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="mt-3 flex flex-col gap-2.5">
+              <span className="skel h-7 w-[52%] block" />
+              <span className="skel h-4 w-[72%] block" />
+            </div>
+          )}
+        </div>
+
+        {/* The look. Its aspect drives the column width, so the palette below it lands at
+            exactly the picture's measure and nothing has to be cropped to fit a well. */}
+        <div className="lg:col-start-1 lg:row-start-1 lg:row-span-2 mt-4 lg:mt-0 w-full lg:w-auto">
+          <div className="relative w-full lg:w-auto aspect-[3/4] lg:h-[min(68vh,660px)] bg-wash overflow-hidden">
+            {render.url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={render.url}
+                alt={`${current?.name ?? "This direction"}, rendered on your own photo`}
+                className="w-full h-full object-cover animate-rise"
+              />
+            ) : render.failed ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-mute">
+                <span className="mi text-[28px]" aria-hidden>
+                  image_not_supported
+                </span>
+                <span className="k">Render failed</span>
+              </div>
+            ) : (
+              <div className="absolute inset-0 skel flex items-end p-4">
+                <span className="k">
+                  {render.reworking ? "Reworking…" : "Dressing you…"}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* The palette is a claim about what is in the photograph, so it is captioned
+              like one — the same plate the intake frame uses. */}
+          {current && current.palette.length > 0 && (
+            <ul
+              className="grid"
+              role="list"
+              style={{
+                gridTemplateColumns: `repeat(${current.palette.filter(validHex).length}, minmax(0, 1fr))`,
+              }}
+            >
+              {current.palette.filter(validHex).map((colour) => (
+                <li
+                  key={colour.hex}
+                  // No ring: these butt together at full width, so a hairline on each draws
+                  // a grid of lines through the band.
+                  className="min-h-[76px] p-2.5 flex flex-col justify-end"
+                  style={{
+                    background: colour.hex,
+                    color: readableOn(colour.hex),
+                  }}
+                >
+                  <span className="text-[12px] font-medium leading-tight">
+                    {colour.name}
+                  </span>
+                  <span className="font-mono text-[10px] opacity-70 mt-0.5">
+                    {colour.hex}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* A measure, not a column width: the reaction bar pushes share to its right edge,
+            and across 700px that stranded the icons a hand's width from the likes. */}
+        <div className="mt-4 lg:mt-8 lg:col-start-2 lg:row-start-2 lg:self-start lg:max-w-[540px]">
+          {current && (
+            <StyleDetail
+              style={current}
+              render={render}
+              onRetry={() => {
+                setRenders((all) => ({ ...all, [current.id]: BLANK }));
+                void patch(current.id);
+              }}
+              onRework={(note) => void rework(current.id, note)}
+            />
+          )}
+        </div>
       </div>
 
       <div className="sticky bottom-0 mt-6 lg:mt-12">
@@ -1092,194 +1353,227 @@ function StylesStep({
   );
 }
 
-/**
- * Image first. The rationale is real work and worth keeping, but it belongs behind a tap —
- * what he wants to know at a glance is whether he'd wear it.
- */
-function StyleCard({ style: initial }: { style: StyleSuggestion }) {
-  const [style, setStyle] = useState(initial);
-  const [url, setUrl] = useState<string | null>(null);
-  const [failed, setFailed] = useState<{
-    message: string;
-    reason?: string;
-  } | null>(null);
-  const [open, setOpen] = useState(false);
-  const [note, setNote] = useState("");
-  const [reworking, setReworking] = useState(false);
-  const [reworkOpen, setReworkOpen] = useState(false);
+/** A hex the browser will actually paint. Without this a bad one leaves a hole in the band. */
+function validHex(colour: { hex: string }) {
+  return /^#[0-9a-f]{6}$/i.test(colour.hex?.trim() ?? "");
+}
 
-  const render = useCallback(async () => {
-    setFailed(null);
-    try {
-      const response = await fetch("/api/styles", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: style.id }),
-      });
-      const json = (await response.json()) as {
-        url?: string;
-        message?: string;
-        reason?: string;
-      };
-      if (json.url) setUrl(json.url);
-      else
-        setFailed({
-          message: json.message ?? "Couldn't render that one.",
-          reason: json.reason,
-        });
-    } catch {
-      setFailed({ message: "Couldn't reach the renderer." });
-    }
+/**
+ * The only navigation between directions. Three photographs of the same man are hard to
+ * tell apart at thumbnail size, so each tile carries its direction's name — that, not the
+ * picture, is what distinguishes them at a glance.
+ */
+function DirectionTiles({
+  styles,
+  renders,
+  slots,
+  current,
+  onPick,
+}: {
+  styles: StyleSuggestion[];
+  renders: Record<string, Render>;
+  slots: number;
+  current: number;
+  onPick: (index: number) => void;
+}) {
+  return (
+    <ol className="flex-none flex gap-2">
+      {Array.from({ length: slots }).map((_, index) => {
+        const style = styles[index];
+        const render = style ? (renders[style.id] ?? BLANK) : BLANK;
+        const active = index === current;
+        const label = style?.name || `Direction ${index + 1}`;
+
+        return (
+          <li
+            key={style?.id ?? `slot-${index}`}
+            className="w-[76px] lg:w-[88px]"
+          >
+            <button
+              onClick={() => style && onPick(index)}
+              disabled={!style}
+              aria-current={active ? "step" : undefined}
+              aria-label={
+                !style
+                  ? "Still to arrive"
+                  : render.failed
+                    ? `${label} — didn't render. Go to it.`
+                    : render.url
+                      ? `${label}. Go to it.`
+                      : `${label} — still drawing. Go to it.`
+              }
+              className="block text-left w-full group"
+            >
+              <span
+                className={`block w-full aspect-[3/4] bg-wash overflow-hidden relative transition-shadow ${
+                  active
+                    ? "shadow-[inset_0_0_0_2px_var(--color-ink)]"
+                    : style
+                      ? "group-hover:shadow-[inset_0_0_0_1px_var(--color-mute)]"
+                      : ""
+                } ${!style || (!render.url && !render.failed) ? "skel" : ""}`}
+              >
+                {render.url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={render.url}
+                    alt=""
+                    // Biased to the top: the garment is what tells these apart, and a
+                    // centred crop of a full-length render is mostly trousers.
+                    className="w-full h-full object-cover object-top"
+                  />
+                )}
+                {render.failed && (
+                  <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-ink text-paper flex items-center justify-center">
+                    <span
+                      className="mi text-[11px]"
+                      style={{
+                        fontVariationSettings:
+                          "'FILL' 1, 'wght' 500, 'opsz' 20",
+                      }}
+                      aria-hidden
+                    >
+                      priority_high
+                    </span>
+                  </span>
+                )}
+              </span>
+              <span
+                className={`text-[10px] lg:text-[11px] mt-1 block leading-tight line-clamp-2 transition-colors ${
+                  active ? "text-ink" : "text-mute group-hover:text-ink"
+                }`}
+              >
+                {style ? label : " "}
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+/**
+ * Everything about the direction that is not the photograph. It stays live while the
+ * picture is still drawing and while it has failed — the name, the one-liner and the
+ * palette all arrived on the stream, and a direction you can read is a direction you can
+ * have an opinion about.
+ */
+function StyleDetail({
+  style,
+  render,
+  onRetry,
+  onRework,
+}: {
+  style: StyleSuggestion;
+  render: Render;
+  onRetry: () => void;
+  onRework: (note: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reworkOpen, setReworkOpen] = useState(false);
+  const [note, setNote] = useState("");
+
+  // Each direction gets its own disclosure; switching tiles must not carry one open.
+  // Desktop opens it: the flow pane has the room, and the argument is the product. On a
+  // phone it stays behind the tap, where the picture is what the screen is for.
+  useEffect(() => {
+    setOpen(window.matchMedia("(min-width: 1024px)").matches);
+    setNote("");
   }, [style.id]);
 
-  async function rework() {
-    const trimmed = note.trim();
-    if (!trimmed) return;
-
-    setReworking(true);
-    setFailed(null);
-    try {
-      const response = await fetch("/api/styles", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: style.id, note: trimmed }),
-      });
-      const json = (await response.json()) as {
-        style?: StyleSuggestion;
-        message?: string;
-      };
-      if (json.style) {
-        setStyle(json.style);
-        setNote("");
-        // The old render belongs to the old direction; drop it and draw the new one.
-        setUrl(null);
-        void render();
-      } else {
-        setFailed({ message: json.message ?? "Couldn't rework that one." });
-      }
-    } catch {
-      setFailed({ message: "Couldn't reach the stylist." });
-    } finally {
-      setReworking(false);
-    }
-  }
-
-  // Rendering starts on its own. Asking the user to press a button for something the
-  // product should obviously do is just friction.
-  //
-  // Staggered by rank: three simultaneous image generations compete for the same upstream
-  // capacity and were pushing each other past the timeout.
-  useEffect(() => {
-    const timer = setTimeout(() => void render(), style.rank * 2500);
-    return () => clearTimeout(timer);
-  }, [render, style.rank]);
-
   return (
-    <article>
-      <div className="relative aspect-[3/4] bg-wash overflow-hidden">
-        {url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={url}
-            alt={`${style.name}, rendered on your own photo`}
-            className="w-full h-full object-cover animate-rise"
-          />
-        ) : failed ? (
-          // A shimmering skeleton on a permanent failure reads as "still loading forever".
-          <div className="absolute inset-0 bg-wash flex flex-col items-center justify-center gap-2 text-mute">
-            <span className="mi text-[28px]" aria-hidden>
-              image_not_supported
-            </span>
-            <span className="k">Render failed</span>
-          </div>
-        ) : (
-          <div className="absolute inset-0 skel flex items-end p-4">
-            <span className="k">Dressing you…</span>
-          </div>
-        )}
-      </div>
-
-      {/* The palette is the direction, not a garnish on it: full width, named, and
-          carrying its own hex. Twenty-pixel chips in the photo's corner read as
-          decoration. */}
-      {style.palette.length > 0 && (
-        <ul
-          className="grid"
-          role="list"
-          style={{
-            gridTemplateColumns: `repeat(${style.palette.length}, minmax(0, 1fr))`,
-          }}
-        >
-          {style.palette.map((colour) => (
-            <li
-              key={colour.hex}
-              // No ring here. These blocks butt against each other at full width, so a
-              // hairline on each draws a grid of lines through the band — the swatches
-              // already separate themselves by being different colours. The ring stays
-              // on the analysis swatches, which sit apart on white and need an edge.
-              className="min-h-[76px] p-2.5 flex flex-col justify-end"
-              style={{ background: colour.hex, color: readableOn(colour.hex) }}
+    <div>
+      {render.failed && (
+        // Above the reactions, never instead of them.
+        <div className="mb-3">
+          <div className="flex items-center gap-3">
+            <p className="text-[13px] text-mute flex-1">
+              {render.failed.message}
+            </p>
+            <button
+              className="btn btn-ghost btn-sm flex-none"
+              onClick={onRetry}
             >
-              <span className="text-[12px] font-medium leading-tight">
-                {colour.name}
-              </span>
-              <span className="font-mono text-[10px] opacity-70 mt-0.5">
-                {colour.hex}
-              </span>
+              Retry
+            </button>
+          </div>
+          {render.failed.reason && (
+            // The upstream reason, verbatim. Without it a render failure is a guess.
+            <p className="text-[11px] text-mute/80 font-mono mt-1.5 break-all">
+              {render.failed.reason}
+            </p>
+          )}
+        </div>
+      )}
+
+      <ReactionBar
+        key={style.id}
+        subjectType="style"
+        subjectId={style.id}
+        title={style.name}
+        extra={{
+          glyph: "auto_awesome",
+          label: `Rework ${style.name}`,
+          onClick: () => setReworkOpen(true),
+          busy: render.reworking,
+        }}
+      />
+
+      {(style.why_it_works || style.key_pieces.length > 0) && (
+        <>
+          <button
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-4"
+          >
+            <span className="mi text-[18px]" aria-hidden>
+              {open ? "expand_less" : "expand_more"}
+            </span>
+            Why this works
+          </button>
+
+          {open && (
+            <div className="mt-2 animate-rise">
+              {style.why_it_works && (
+                <p className="text-sm lg:text-[15px] leading-relaxed lg:max-w-[62ch]">
+                  {style.why_it_works}
+                </p>
+              )}
+              {style.key_pieces.length > 0 && (
+                <ul className="mt-3 flex flex-wrap gap-1.5">
+                  {style.key_pieces.map((piece) => (
+                    <li
+                      key={piece}
+                      className="text-[12px] border border-line px-2 py-1"
+                    >
+                      {piece}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {style.refinements?.length > 0 && (
+        <ul className="mt-4 flex flex-col gap-1">
+          {style.refinements.map((entry, index) => (
+            <li key={index} className="text-[12px] text-mute leading-relaxed">
+              &ldquo;{entry}&rdquo;
             </li>
           ))}
         </ul>
       )}
 
-      {failed ? (
-        <div className="mt-2">
-          <div className="flex items-center gap-3">
-            <p className="text-[13px] text-mute flex-1">{failed.message}</p>
-            <button className="btn btn-ghost btn-sm flex-none" onClick={render}>
-              Retry
-            </button>
-          </div>
-          {failed.reason && (
-            // The upstream reason, verbatim. Without it a render failure is a guess.
-            <p className="text-[11px] text-mute/80 font-mono mt-1.5 break-all">
-              {failed.reason}
-            </p>
-          )}
-        </div>
-      ) : (
-        <ReactionBar
-          subjectType="style"
-          subjectId={style.id}
-          title={style.name}
-          extra={{
-            glyph: "auto_awesome",
-            label: `Rework ${style.name}`,
-            onClick: () => setReworkOpen(true),
-            busy: reworking,
-          }}
-        />
-      )}
+      <p className="text-[11px] text-mute mt-6 leading-snug lg:max-w-[52ch]">
+        Generated from your photo — an impression of the direction, not real
+        garments.
+      </p>
 
-      <h2 className="text-[21px] mt-2">{style.name}</h2>
-      {style.one_liner && (
-        <p className="text-mute text-sm leading-relaxed mt-1">
-          {style.one_liner}
-        </p>
-      )}
-
-      <button
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
-        className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-2"
-      >
-        <span className="mi text-[18px]" aria-hidden>
-          {open ? "expand_less" : "expand_more"}
-        </span>
-        Why this works
-      </button>
-
-      {/* One direction at a time. A note here reworks this card only — the other two
-          are someone else's argument and should not move because of it. */}
+      {/* A note here reworks this direction only; the others are a different argument and
+          should not move because of it. */}
       <Modal
         open={reworkOpen}
         title={`Rework ${style.name}`}
@@ -1288,13 +1582,16 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            const trimmed = note.trim();
+            if (!trimmed) return;
             setReworkOpen(false);
-            void rework();
+            setNote("");
+            onRework(trimmed);
           }}
         >
           <p className="text-mute text-sm leading-relaxed">
-            Say what to change. Only this direction moves — the other two stay
-            as they are.
+            Say what to change. Only this direction moves — the others stay as
+            they are.
           </p>
           <label htmlFor={`note-${style.id}`} className="sr-only">
             Suggest a change to {style.name}
@@ -1305,52 +1602,16 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
             placeholder="Too formal for me — same colours, softer shapes."
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            disabled={reworking}
+            disabled={render.reworking}
           />
           <button
             className="btn w-full mt-3"
-            disabled={!note.trim() || reworking}
+            disabled={!note.trim() || render.reworking}
           >
-            {reworking ? "Reworking…" : "Rework this direction"}
+            {render.reworking ? "Reworking…" : "Rework this direction"}
           </button>
         </form>
       </Modal>
-
-      {style.refinements?.length > 0 && (
-        <ul className="mt-2 flex flex-col gap-1">
-          {style.refinements.map((entry, index) => (
-            <li key={index} className="text-[12px] text-mute leading-relaxed">
-              &ldquo;{entry}&rdquo;
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {open && (
-        <div className="mt-2 animate-rise">
-          {style.why_it_works && (
-            <p className="text-sm leading-relaxed">{style.why_it_works}</p>
-          )}
-          {style.key_pieces.length > 0 && (
-            <ul className="mt-3 flex flex-wrap gap-1.5">
-              {style.key_pieces.map((piece) => (
-                <li
-                  key={piece}
-                  className="text-[12px] border border-line px-2 py-1"
-                >
-                  {piece}
-                </li>
-              ))}
-            </ul>
-          )}
-          {url && (
-            <p className="text-[11px] text-mute mt-3 leading-snug">
-              Generated from your photo — an impression of the direction, not
-              real garments.
-            </p>
-          )}
-        </div>
-      )}
-    </article>
+    </div>
   );
 }

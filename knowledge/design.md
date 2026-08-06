@@ -207,7 +207,12 @@ at least as wide as the phone shows them.
 - **Analysis** — a masthead (season at 68px left, confidence as its byline right), then a
   full-width colour band with named swatches and hex, then the readings in two columns
   (`columns-2`, `break-inside-avoid` per section).
-- **Styles** — three directions across three columns.
+- **Styles** — one direction at a time, in the same two-pane machine: the look holds the
+  left column with its palette plate at exactly the picture's measure, and the flow runs
+  down the right. Tiles are the only way between directions; the back link stays, because
+  here the tiles move sideways and the link moves between steps, so they do not collide.
+  The tiles carry each direction's **name** — three photographs of the same man are hard
+  to tell apart at thumbnail size, and the name is what distinguishes them.
 - **Product detail** — image left, price and actions right, image sticky while the right
   column scrolls.
 
@@ -314,6 +319,25 @@ Rules this encodes:
 Failures (upload, session) keep `role="alert"` and ink body text. Findings like the above
 are `role="status"` and mute. The screen must never blur the two.
 
+### 7.1.1 Text arrives before pixels
+
+A generated look streams its name, one-liner, palette and rationale seconds before its
+image, which is a separate staggered request that can take a minute. The screen must be
+honest and useful in that gap, not a spinner:
+
+- Everything that has arrived is **live** while the picture is still drawing — including
+  the reactions, because a reaction is about the direction, not the pixels.
+- A render failure puts its message and the verbatim upstream reason **above** the reaction
+  bar, never instead of it. A direction whose picture failed is still judgeable from its
+  name, palette and argument, and that judgement is training signal we would otherwise
+  throw away.
+- Every render carries a **timeout** as well as a stagger. Without one a hung request
+  shimmers for ever, which is the worst outcome on a slow connection.
+- A progress strip shows a **fixed number of slots while the stream is open**, then exactly
+  what arrived once it closes, so it never grows a tile under the finger.
+- `aria-live` goes on a narrow status node, never on the container — a live region wrapped
+  around a grid announces every mutation in it.
+
 ## 7.2 The printed surface
 
 The reading is downloadable as **one side of A4** at `/report`. There is no PDF library and
@@ -393,5 +417,7 @@ list.
 - **2026-08-07** — Photo capture recomposed ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). Subject moved to the left column and the flow to the right; the back link removed in favour of the tiles; § 7.1 added for the angle-check finding, which replaced a full-bleed alert box under both panes. Fixed a live defect where the camera-permission notice and the action stack were declared in the same desktop grid cell and overlapped.
 
 - **2026-08-07** — Downloadable report added at `/report` ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)); § 7.2 records the print rules. The analysis footer now carries both actions behind a scrim, and the "Skip these" eyebrow aligns to the chip row rather than to a flex baseline resolved from a swatch's bottom edge.
+
+- **2026-08-07** — Styles step rebuilt one-at-a-time in the intake two-pane ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)); § 7.1.1 added for streamed content that outruns its images. Render state lifted out of the card so the tiles can report it, and the reaction bar no longer disappears when a picture fails.
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)
