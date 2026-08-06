@@ -168,6 +168,17 @@
   }
 }
 
+@keyframes toastin {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes breathe {
   0%,
   100% {
@@ -186,6 +197,38 @@
 }
 .animate-breathe {
   animation: breathe 3s ease-in-out infinite;
+}
+.animate-toast {
+  animation: toastin 0.32s var(--ease-brand) both;
+}
+
+/* Every tappable surface answers the finger. Without this, a tile that navigates and a
+   tile that does nothing feel identical at the moment of contact. */
+@media (hover: none) {
+  button:active,
+  a:active,
+  [role="button"]:active {
+    transform: scale(0.985);
+  }
+}
+
+button,
+a {
+  transition: transform 0.16s var(--ease-brand);
+}
+
+/* Images fade in rather than snapping, so a grid fills gracefully as it loads. */
+img {
+  animation: fadein 0.4s var(--ease-brand) both;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

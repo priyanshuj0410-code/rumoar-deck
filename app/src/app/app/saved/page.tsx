@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { catalogUrl, getLooks, signPaths } from "@/lib/data";
 import { formatINR, type Product } from "@/lib/types";
+import { EmptyState, IconSubmit } from "@/components/states";
 import { toggleSavedLook } from "../actions";
 
 export const metadata = { title: "Saved — RUMOAR" };
@@ -32,9 +33,12 @@ export default async function SavedPage() {
       <h1 className="text-[26px] mt-1">Kept for later</h1>
 
       {empty && (
-        <p className="text-mute text-sm leading-relaxed text-center py-16 px-6 max-w-[34ch] mx-auto">
-          Nothing saved yet. Bookmark a piece in the shop, or keep a look the stylist builds you.
-        </p>
+        <EmptyState
+          icon="bookmark"
+          title="Nothing saved yet"
+          body="Bookmark a piece in the shop, or keep a look the stylist builds you, and it waits here."
+          action={{ label: "Browse the shop", href: "/app/shop" }}
+        />
       )}
 
       {looks.length > 0 && (
@@ -67,14 +71,12 @@ export default async function SavedPage() {
                   <form action={toggleSavedLook} className="absolute top-2 right-2">
                     <input type="hidden" name="id" value={look.id} />
                     <input type="hidden" name="saved" value="true" />
-                    <button
-                      aria-label={`Remove ${look.title} from saved`}
+                    <IconSubmit
+                      glyph="bookmark"
+                      label={`Remove ${look.title} from saved`}
+                      active
                       className="w-8 h-8 bg-paper/90 flex items-center justify-center"
-                    >
-                      <span className="mi text-[17px]" aria-hidden>
-                        bookmark
-                      </span>
-                    </button>
+                    />
                   </form>
                 </article>
               );

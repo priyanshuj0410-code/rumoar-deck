@@ -205,7 +205,37 @@ Patterns validated against real products via Lazyweb (Jul 2026):
 RUMOAR's departure from all of them is the square geometry and the monochrome restraint —
 that stays.
 
-## 7. The editorial surface (landing page)
+## 7. The nine states
+
+Every surface that shows data must answer all nine before it is finished. Most bugs a user
+notices are a missing state, not a broken feature.
+
+| State | What it must do | Where it lives |
+|---|---|---|
+| **Empty** | Say what goes here and give one way to fill it. An empty screen with no action is a wall. | `<EmptyState>` — icon, title, body, optional CTA |
+| **Loading** | Hold the shape of what is coming, not a spinner in the void. | `loading.tsx` per route, `<Skeleton>` |
+| **Partial** | Show what has arrived and keep a place for the rest. Never block on the slowest item. | style cards stream in; placeholders for the pending ones |
+| **One** | Read correctly in the singular. "1 pieces" is a bug. | count copy pluralises |
+| **Ideal** | The designed case. | — |
+| **Overflow** | Degrade by scroll or truncation, never by breaking the grid. Say what was dropped. | rails scroll; lists cap and label the cap |
+| **Error** | Plain language, what is safe, and two exits: retry and somewhere that works. Never a stack trace; carry the digest for support. | `error.tsx` |
+| **Invalid** | Say which field and why, next to the field, before submit where possible. | inline `role="alert"` |
+| **Success** | Confirm anything whose result is off-screen or too small to notice. | `useToast()` |
+
+Rules that apply across all nine:
+
+- **A pending action must look pending.** Server-action forms are inert between the tap and
+  the re-render — long enough to tap twice on a slow connection. `SubmitButton` and
+  `IconSubmit` take the pending state from `useFormStatus`.
+- **Confirm, don't interrupt.** Toasts are `role="status"`, not `alert`; they never block and
+  never carry an action.
+- **A failure that is a safeguard must not become a gate.** The shot-angle check and the
+  reaction write both fail open.
+- **Every tappable surface answers the finger** — a 0.985 press scale on touch. Without it a
+  tile that navigates and a tile that does nothing feel identical at the moment of contact.
+- All of it is off under `prefers-reduced-motion`.
+
+## 8. The editorial surface (landing page)
 
 The marketing page at `/` is **deliberately not** the product system above. It is a
 separate, hand-built surface — `app/public/landing.{html,css,js}`, no framework — with its
@@ -233,7 +263,7 @@ Section rhythm is one idea per screen, on a single `--section-y` scale, with alt
 composition — hero split, card row, bleeding rail, split, centred close. Never a feature
 list.
 
-## 8. Change log
+## 9. Change log
 
 - **2026-08-04** — Created. Audited from `rumoar-app.html` + `build_deck.js`; added the
   three-breakpoint responsive layout and accessibility rules for the productisation.

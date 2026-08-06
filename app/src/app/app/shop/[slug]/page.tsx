@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { catalogUrl, getProduct, getSavedProductIds } from "@/lib/data";
 import { formatINR } from "@/lib/types";
+import { SubmitButton } from "@/components/states";
 import { TryOn } from "@/components/try-on";
 import { toggleSavedProduct } from "../../actions";
 

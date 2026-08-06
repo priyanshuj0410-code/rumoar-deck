@@ -1,5 +1,6 @@
 import { getWardrobe, signPaths } from "@/lib/data";
 import { AddWardrobeItem } from "@/components/add-wardrobe-item";
+import { EmptyState, IconSubmit } from "@/components/states";
 import { deleteWardrobeItem } from "../actions";
 
 export const metadata = { title: "Wardrobe — RUMOAR" };
@@ -24,9 +25,11 @@ export default async function WardrobePage() {
       </div>
 
       {items.length === 0 ? (
-        <p className="text-mute text-sm leading-relaxed text-center py-16 px-6 max-w-[36ch] mx-auto">
-          Nothing here yet. Photograph a few pieces and RUMOAR will name them for you.
-        </p>
+        <EmptyState
+          icon="checkroom"
+          title="Your wardrobe is empty"
+          body="Photograph a few pieces and RUMOAR names them for you. Three or four is enough to start styling."
+        />
       ) : (
         <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5 mt-6">
           {items.map((item) => {
@@ -55,15 +58,11 @@ export default async function WardrobePage() {
 
                 <form action={deleteWardrobeItem} className="absolute top-1.5 right-1.5">
                   <input type="hidden" name="id" value={item.id} />
-                  <button
-                    aria-label={`Remove ${item.label}`}
-                    className="w-7 h-7 bg-paper/90 flex items-center justify-center text-mute
-                               hover:text-ink transition-colors"
-                  >
-                    <span className="mi text-[15px]" aria-hidden>
-                      close
-                    </span>
-                  </button>
+                  <IconSubmit
+                    glyph="close"
+                    label={`Remove ${item.label}`}
+                    className="w-7 h-7 bg-paper/90 flex items-center justify-center text-mute hover:text-ink"
+                  />
                 </form>
               </li>
             );

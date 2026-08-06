@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Stylist } from "@/components/stylist";
 import { InstallPrompt } from "@/components/install-prompt";
+import { ToastProvider } from "@/components/toast";
 import { createClient } from "@/lib/supabase/server";
 import { catalogUrl, getProfile } from "@/lib/data";
 import type { Message, Product } from "@/lib/types";
@@ -25,7 +26,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   );
 
   return (
-    <>
+    <ToastProvider>
       <AppShell
         stylist={
           <Stylist
@@ -38,6 +39,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {children}
       </AppShell>
       <InstallPrompt />
-    </>
+    </ToastProvider>
   );
 }

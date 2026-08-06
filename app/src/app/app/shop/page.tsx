@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { catalogUrl, getProducts, getSavedProductIds } from "@/lib/data";
 import { formatINR } from "@/lib/types";
+import { EmptyState, IconSubmit } from "@/components/states";
 import { toggleSavedProduct } from "../actions";
 
 export const metadata = { title: "Shop — RUMOAR" };
@@ -17,9 +18,11 @@ export default async function ShopPage() {
       </p>
 
       {products.length === 0 ? (
-        <p className="text-mute text-sm leading-relaxed text-center py-16">
-          The catalogue is empty. Run <code className="font-mono">npm run seed</code> to load it.
-        </p>
+        <EmptyState
+          icon="shopping_bag"
+          title="The catalogue is empty"
+          body="Nothing has been loaded yet. Run the seed script and the nine keystones appear here."
+        />
       ) : (
         <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-6">
           {products.map((product) => {
@@ -56,21 +59,14 @@ export default async function ShopPage() {
                 <form action={toggleSavedProduct} className="absolute top-1.5 right-1.5">
                   <input type="hidden" name="product_id" value={product.id} />
                   <input type="hidden" name="slug" value={product.slug} />
-                  <button
-                    aria-label={isSaved ? `Remove ${product.name} from saved` : `Save ${product.name}`}
-                    aria-pressed={isSaved}
-                    className={`w-8 h-8 flex items-center justify-center transition-colors ${
+                  <IconSubmit
+                    glyph="bookmark"
+                    label={isSaved ? `Remove ${product.name} from saved` : `Save ${product.name}`}
+                    active={isSaved}
+                    className={`w-8 h-8 flex items-center justify-center ${
                       isSaved ? "bg-ink text-paper" : "bg-paper/90 text-mute hover:text-ink"
                     }`}
-                  >
-                    <span
-                      className="mi text-[17px]"
-                      style={{ fontVariationSettings: `'FILL' ${isSaved ? 1 : 0}, 'wght' 300, 'opsz' 24` }}
-                      aria-hidden
-                    >
-                      bookmark
-                    </span>
-                  </button>
+                  />
                 </form>
               </li>
             );

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { camera, haptics } from "@/lib/platform";
 import { createClient } from "@/lib/supabase/client";
 import { ITEM_KINDS, type ItemKind } from "@/lib/types";
+import { useToast } from "./toast";
 
 type Draft = { label: string; kind: ItemKind; colour: string; path: string; preview: string };
 
@@ -14,6 +15,7 @@ export function AddWardrobeItem() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, startSaving] = useTransition();
+  const toast = useToast();
 
   async function pick() {
     setError(null);
@@ -90,8 +92,10 @@ export function AddWardrobeItem() {
         form.set("image_path", draft.path);
         await addWardrobeItem(form);
       }
+      const added = drafts.filter((d) => d.label.trim()).length;
       setDrafts([]);
       haptics.success();
+      toast(`${added} ${added === 1 ? "piece" : "pieces"} added to your wardrobe`);
       router.refresh();
     });
   }

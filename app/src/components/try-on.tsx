@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { haptics } from "@/lib/platform";
+import { useToast } from "./toast";
 
 type State = "idle" | "rendering" | "done" | "error";
 
@@ -13,6 +14,7 @@ export function TryOn({ slug, name }: { slug: string; name: string }) {
   const [state, setState] = useState<State>("idle");
   const [url, setUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const toast = useToast();
 
   async function render() {
     setState("rendering");
@@ -31,6 +33,7 @@ export function TryOn({ slug, name }: { slug: string; name: string }) {
         setUrl(json.url);
         setState("done");
         haptics.success();
+        toast("Rendered on your photo");
       } else {
         setMessage(
           json.error === "no_reference_photo"

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { haptics, share } from "@/lib/platform";
+import { useToast } from "./toast";
 
 export type ReactionKind = "like" | "dislike" | "save" | "share";
 export type SubjectType = "style" | "look";
@@ -41,6 +42,7 @@ export function ReactionBar({
 }) {
   const [active, setActive] = useState<Set<ReactionKind>>(new Set(initial));
   const [shared, setShared] = useState(false);
+  const toast = useToast();
 
   async function send(kind: ReactionKind, on: boolean) {
     await fetch("/api/reactions", {
@@ -60,6 +62,8 @@ export function ReactionBar({
 
       if (on) {
         next.add(kind);
+        if (kind === "save") toast("Saved to your looks");
+        if (kind === "dislike") toast("Noted — you'll see less of this");
         // A like and a dislike are one opinion, not two.
         if (kind === "like") next.delete("dislike");
         if (kind === "dislike") next.delete("like");
@@ -82,6 +86,7 @@ export function ReactionBar({
     if (ok) {
       setShared(true);
       void send("share", true);
+      toast(share.available() ? "Shared" : "Link copied");
     }
   }
 
