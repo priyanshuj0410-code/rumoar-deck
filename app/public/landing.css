@@ -387,7 +387,7 @@ svg {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(190px, 1fr);
-  gap: clamp(0.75rem, 1.2vw, 1.25rem);
+  gap: clamp(0.35rem, 0.55vw, 0.6rem);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding-left: 0;
@@ -492,7 +492,12 @@ svg {
 
 /* overlay variant — label sits on the photograph */
 .card--overlay .card__image {
-  aspect-ratio: 5 / 8;
+  aspect-ratio: 1 / 1.95;
+}
+
+/* Wider columns too: at the same width a taller frame only reads as narrower. */
+.rail[data-rail="places"] {
+  grid-auto-columns: minmax(210px, 1fr);
 }
 
 .card__overlay {
@@ -745,7 +750,8 @@ svg {
     padding-right: 0;
   }
 
-  .rail {
+  .rail,
+  .rail[data-rail="places"] {
     grid-auto-columns: minmax(190px, 46vw);
   }
 
