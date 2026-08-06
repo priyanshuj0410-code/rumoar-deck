@@ -34,11 +34,14 @@ export function ReactionBar({
   subjectId,
   title,
   initial = [],
+  extra,
 }: {
   subjectType: SubjectType;
   subjectId: string;
   title: string;
   initial?: ReactionKind[];
+  /** An action that belongs to this item, sitting with share on the right. */
+  extra?: { glyph: string; label: string; onClick: () => void; busy?: boolean };
 }) {
   const [active, setActive] = useState<Set<ReactionKind>>(new Set(initial));
   const [shared, setShared] = useState(false);
@@ -117,11 +120,26 @@ export function ReactionBar({
         );
       })}
 
+      {extra && (
+        <button
+          onClick={extra.onClick}
+          aria-label={extra.label}
+          title={extra.label}
+          disabled={extra.busy}
+          className={`w-10 h-10 flex items-center justify-center transition-colors ml-auto
+                      ${extra.busy ? "opacity-40" : "text-mute hover:text-ink"}`}
+        >
+          <span className="mi text-[21px]" aria-hidden>
+            {extra.glyph}
+          </span>
+        </button>
+      )}
+
       <button
         onClick={onShare}
         aria-label={ICONS.share.label}
         title={ICONS.share.label}
-        className={`w-10 h-10 flex items-center justify-center transition-colors ml-auto
+        className={`w-10 h-10 flex items-center justify-center transition-colors ${extra ? "" : "ml-auto"}
                     ${shared ? "text-ink" : "text-mute hover:text-ink"}`}
       >
         <span className="mi text-[21px]" aria-hidden>

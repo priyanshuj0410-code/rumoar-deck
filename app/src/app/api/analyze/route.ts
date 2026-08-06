@@ -246,7 +246,7 @@ export async function POST(request: Request) {
           return;
         }
 
-        send({ t: "status", v: "Reading undertone, depth and contrast" });
+        send({ t: "status", v: "Reading colour, build and proportion" });
 
         const request = {
           turns: [

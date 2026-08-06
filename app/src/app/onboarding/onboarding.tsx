@@ -6,6 +6,7 @@ import { camera, haptics, type PickedImage } from "@/lib/platform";
 import { createClient } from "@/lib/supabase/client";
 import { readEvents } from "@/lib/ndjson";
 import { PhotoCapture } from "@/components/photo-capture";
+import { Modal } from "@/components/modal";
 import { ReactionBar } from "@/components/reaction-bar";
 import { BODY_SHAPES, FACE_SHAPES, ShapeReading } from "@/components/shape-diagram";
 import { readableOn, SWATCH_RING } from "@/lib/colour";
@@ -387,6 +388,7 @@ function AnalysisStep({
 
   const [note, setNote] = useState("");
   const [adding, setAdding] = useState(false);
+  const [refining, setRefining] = useState(false);
   const [added, setAdded] = useState(0);
 
   const run = useCallback(async (refinement?: string) => {
@@ -472,7 +474,7 @@ function AnalysisStep({
           <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />
           {status}
         </p>
-        <h1 className="text-[28px] mt-2">Reading your colouring</h1>
+        <h1 className="text-[28px] mt-2">Reading you</h1>
 
         <div className="mt-5" aria-live="polite">
           {revealed > 0 ? (
@@ -651,35 +653,55 @@ function AnalysisStep({
           </Row>
         )}
 
-        {/* Refinement. The read is a starting point, and he knows things the photos
-            cannot show — how he tans, what light the photos were taken in. */}
+        {/* Behind a button. Permanently open, this input sat under the reading it was
+            about and made the screen feel like a form rather than a result. */}
         <Row label="Not quite right?">
+          <button className="btn btn-ghost btn-sm" onClick={() => setRefining(true)}>
+            <span className="mi text-[18px]" aria-hidden>
+              tune
+            </span>
+            Refine the analysis
+          </button>
+          {added > 0 && (
+            <p className="text-[12px] text-mute mt-2">
+              {added} more {added === 1 ? "photo" : "photos"} added. They&rsquo;ll be used on the
+              next run.
+            </p>
+          )}
+        </Row>
+
+        <Modal open={refining} title="Refine the analysis" onClose={() => setRefining(false)}>
           <form
             onSubmit={(event) => {
               event.preventDefault();
               const trimmed = note.trim();
               if (!trimmed) return;
               setNote("");
+              setRefining(false);
+              scrollToTop();
               void run(trimmed);
             }}
           >
+            <p className="text-mute text-sm leading-relaxed">
+              Tell me what to reconsider. You know things the photos can&rsquo;t show.
+            </p>
             <label htmlFor="refine" className="sr-only">
-              Tell the analyser what to reconsider
+              What should the analysis reconsider?
             </label>
             <textarea
               id="refine"
-              className="field h-auto py-3 min-h-[80px] resize-none w-full"
+              className="field h-auto py-3 min-h-[96px] resize-none w-full mt-3"
               placeholder="I tan easily and never suit icy tones. The photos were under warm indoor light."
               value={note}
               onChange={(event) => setNote(event.target.value)}
             />
-            <div className="flex flex-wrap gap-2.5 mt-2.5">
-              <button className="btn btn-sm" disabled={!note.trim()}>
+            <div className="flex flex-col gap-2.5 mt-3">
+              <button className="btn w-full" disabled={!note.trim()}>
                 Analyse again
               </button>
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost w-full"
                 onClick={uploadMore}
                 disabled={adding}
               >
@@ -689,19 +711,13 @@ function AnalysisStep({
                 {adding ? "Uploading…" : "Add more photos"}
               </button>
             </div>
-            {added > 0 && (
-              <p className="text-[12px] text-mute mt-2">
-                {added} more {added === 1 ? "photo" : "photos"} added. They&rsquo;ll be used on the
-                next run.
-              </p>
-            )}
             {error && (
-              <p role="alert" className="text-[13px] text-mute mt-2">
+              <p role="alert" className="text-[13px] text-mute mt-3">
                 {error}
               </p>
             )}
           </form>
-        </Row>
+        </Modal>
 
         <p className="text-[11px] text-mute leading-snug py-4">
           Colour analysis from photos is affected by lighting and camera white balance. Treat this
@@ -819,6 +835,7 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [reworking, setReworking] = useState(false);
+  const [reworkOpen, setReworkOpen] = useState(false);
 
   const render = useCallback(async () => {
     setFailed(null);
@@ -899,13 +916,6 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
           </div>
         )}
 
-        {url && (
-          <div className="absolute inset-x-0 bottom-0 p-4 pt-10 bg-gradient-to-t from-ink/85 to-transparent text-paper">
-            <h2 className="font-display text-[22px] font-semibold leading-tight">{style.name}</h2>
-            {style.one_liner && <p className="text-[13px] opacity-90 mt-0.5">{style.one_liner}</p>}
-          </div>
-        )}
-
       </div>
 
       {/* The palette is the direction, not a garnish on it: full width, named, and
@@ -920,12 +930,12 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
           {style.palette.map((colour) => (
             <li
               key={colour.hex}
+              // No ring here. These blocks butt against each other at full width, so a
+              // hairline on each draws a grid of lines through the band — the swatches
+              // already separate themselves by being different colours. The ring stays
+              // on the analysis swatches, which sit apart on white and need an edge.
               className="min-h-[76px] p-2.5 flex flex-col justify-end"
-              style={{
-                background: colour.hex,
-                color: readableOn(colour.hex),
-                boxShadow: SWATCH_RING,
-              }}
+              style={{ background: colour.hex, color: readableOn(colour.hex) }}
             >
               <span className="text-[12px] font-medium leading-tight">{colour.name}</span>
               <span className="font-mono text-[10px] opacity-70 mt-0.5">{colour.hex}</span>
@@ -934,16 +944,6 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
         </ul>
       )}
 
-      {!url && (
-        <h2 className="text-[21px] mt-3">
-          {style.name}
-          {style.one_liner && (
-            <span className="block text-mute text-sm font-normal leading-relaxed mt-1">
-              {style.one_liner}
-            </span>
-          )}
-        </h2>
-      )}
 
       {failed ? (
         <div className="mt-2">
@@ -959,7 +959,17 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
           )}
         </div>
       ) : (
-        <ReactionBar subjectType="style" subjectId={style.id} title={style.name} />
+        <ReactionBar
+          subjectType="style"
+          subjectId={style.id}
+          title={style.name}
+          extra={{
+            glyph: "auto_awesome",
+            label: `Rework ${style.name}`,
+            onClick: () => setReworkOpen(true),
+            busy: reworking,
+          }}
+        />
       )}
 
       <h2 className="text-[21px] mt-2">{style.name}</h2>
@@ -980,31 +990,37 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
 
       {/* One direction at a time. A note here reworks this card only — the other two
           are someone else's argument and should not move because of it. */}
-      <form
-        className="mt-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void rework();
-        }}
+      <Modal
+        open={reworkOpen}
+        title={`Rework ${style.name}`}
+        onClose={() => setReworkOpen(false)}
       >
-        <label htmlFor={`note-${style.id}`} className="sr-only">
-          Suggest a change to {style.name}
-        </label>
-        <textarea
-          id={`note-${style.id}`}
-          className="field h-auto py-2.5 min-h-[64px] resize-none w-full text-[14px]"
-          placeholder="Too formal for me — same colours, softer shapes."
-          value={note}
-          onChange={(event) => setNote(event.target.value)}
-          disabled={reworking}
-        />
-        <button className="btn btn-ghost btn-sm mt-2" disabled={!note.trim() || reworking}>
-          <span className="mi text-[18px]" aria-hidden>
-            auto_awesome
-          </span>
-          {reworking ? "Reworking…" : "Rework this direction"}
-        </button>
-      </form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            setReworkOpen(false);
+            void rework();
+          }}
+        >
+          <p className="text-mute text-sm leading-relaxed">
+            Say what to change. Only this direction moves — the other two stay as they are.
+          </p>
+          <label htmlFor={`note-${style.id}`} className="sr-only">
+            Suggest a change to {style.name}
+          </label>
+          <textarea
+            id={`note-${style.id}`}
+            className="field h-auto py-3 min-h-[96px] resize-none w-full mt-3"
+            placeholder="Too formal for me — same colours, softer shapes."
+            value={note}
+            onChange={(event) => setNote(event.target.value)}
+            disabled={reworking}
+          />
+          <button className="btn w-full mt-3" disabled={!note.trim() || reworking}>
+            {reworking ? "Reworking…" : "Rework this direction"}
+          </button>
+        </form>
+      </Modal>
 
       {style.refinements?.length > 0 && (
         <ul className="mt-2 flex flex-col gap-1">

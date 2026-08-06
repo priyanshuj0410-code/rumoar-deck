@@ -179,6 +179,17 @@
   }
 }
 
+@keyframes sheetin {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes breathe {
   0%,
   100% {
@@ -200,6 +211,12 @@
 }
 .animate-toast {
   animation: toastin 0.32s var(--ease-brand) both;
+}
+.animate-sheet {
+  animation: sheetin 0.3s var(--ease-brand) both;
+}
+.animate-fade {
+  animation: fadein 0.25s var(--ease-brand) both;
 }
 
 /* Every tappable surface answers the finger. Without this, a tile that navigates and a
