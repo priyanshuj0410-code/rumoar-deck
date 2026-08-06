@@ -22,7 +22,9 @@ export default async function SettingsPage() {
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
           <dt className="text-mute text-sm">Season</dt>
-          <dd className="text-sm text-right">{profile?.analysis?.season ?? "—"}</dd>
+          <dd className="text-sm text-right">
+            {profile?.analysis?.season ?? "—"}
+          </dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
           <dt className="text-mute text-sm">Colouring</dt>
@@ -34,9 +36,28 @@ export default async function SettingsPage() {
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
           <dt className="text-mute text-sm">Metals</dt>
-          <dd className="text-sm text-right">{profile?.analysis?.metals ?? "—"}</dd>
+          <dd className="text-sm text-right">
+            {profile?.analysis?.metals ?? "—"}
+          </dd>
         </div>
       </dl>
+
+      {profile?.analysis ? (
+        <section className="mt-8">
+          <h2 className="k">Take it with you</h2>
+          <a
+            href="/report"
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-ghost btn-sm mt-3"
+          >
+            <span className="mi text-[18px]" aria-hidden>
+              download
+            </span>
+            Download the report
+          </a>
+        </section>
+      ) : null}
 
       {profile?.analysis?.best_colours?.length ? (
         <section className="mt-8">
@@ -53,7 +74,9 @@ export default async function SettingsPage() {
                   role="img"
                   aria-label={colour.name}
                 />
-                <span className="text-[11px] leading-tight block mt-1">{colour.name}</span>
+                <span className="text-[11px] leading-tight block mt-1">
+                  {colour.name}
+                </span>
               </li>
             ))}
           </ul>
@@ -62,7 +85,8 @@ export default async function SettingsPage() {
             {profile.analysed_at
               ? ` on ${new Date(profile.analysed_at).toLocaleDateString("en-IN")}`
               : ""}
-            . Lighting affects this — treat it as a strong starting point, not a verdict.
+            . Lighting affects this — treat it as a strong starting point, not a
+            verdict.
           </p>
         </section>
       ) : null}

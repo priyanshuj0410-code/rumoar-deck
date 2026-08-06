@@ -314,6 +314,42 @@ Rules this encodes:
 Failures (upload, session) keep `role="alert"` and ink body text. Findings like the above
 are `role="status"` and mute. The screen must never blur the two.
 
+## 7.2 The printed surface
+
+The reading is downloadable as **one side of A4** at `/report`. There is no PDF library and
+there will not be one: the document is HTML with a print stylesheet, and "download" is the
+browser's own print-to-PDF, which is the only route that works identically on desktop and
+on an installed iOS PWA.
+
+Rules that make it survive a printer:
+
+- **Colour is drawn, not painted.** Every swatch is an inline SVG `<rect>`, never a CSS
+  background — browsers strip backgrounds unless the user finds the "Background graphics"
+  checkbox, and it is off by default. The hairline edge is a second `<rect>` inside the
+  same SVG so a cream swatch cannot become a hole in the page, and so the edge cannot be
+  dropped independently of the fill.
+- **The hex is printed under every colour.** Uncalibrated printers lie; colour is never the
+  sole carrier of information.
+- **Absolute units only** — mm and pt, never `em` or `rem`. A slow webfont must not be able
+  to reflow the sheet onto a second page. Fallback stacks are metrics-close
+  (`"Clash Display", "Space Grotesk"` / `"Space Mono", ui-monospace, "Courier New"`).
+- **The palette sizes itself.** Band height is derived from the number of colours so the
+  column always fills — eight thin stripes and four fat ones are wrong for the same reason.
+- **Print after the fonts, not before.** `Promise.race([document.fonts.ready, 2500ms])`,
+  with the button reading "Preparing…" meanwhile.
+- **`document.title` is the filename.** Set it before `window.print()`; a report saved as
+  "localhost" is a report nobody finds again.
+- **Say what CSS cannot fix.** Chrome prints its own URL and date into the margin and no
+  stylesheet suppresses it, so the helper line tells the user where the switch is.
+- **Have an answer for no printer.** "Copy the palette" writes a plain-text block of names
+  and hexes to the clipboard; "Send the link" uses the platform share sheet.
+- **Never the user's photographs.** They are private to the app.
+
+What the sheet carries: season, the four axis words, the palette light-to-dark, what to
+avoid, metal, fit rules, build and face, hair and beard. What it deliberately drops: the
+summary paragraph, the feature read, the user's own corrections, and the confidence number
+whenever it is above 0.75 — a good number is decoration, only bad news earns ink.
+
 ## 8. The editorial surface (landing page)
 
 The marketing page at `/` is **deliberately not** the product system above. It is a
@@ -355,5 +391,7 @@ list.
 - **2026-08-06** — Desktop composition pass ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). § 3 rewritten: the content column became a CSS container, the measures were raised and centred, and capture, analysis and the product detail were recomposed rather than widened.
 
 - **2026-08-07** — Photo capture recomposed ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). Subject moved to the left column and the flow to the right; the back link removed in favour of the tiles; § 7.1 added for the angle-check finding, which replaced a full-bleed alert box under both panes. Fixed a live defect where the camera-permission notice and the action stack were declared in the same desktop grid cell and overlapped.
+
+- **2026-08-07** — Downloadable report added at `/report` ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)); § 7.2 records the print rules. The analysis footer now carries both actions behind a scrim, and the "Skip these" eyebrow aligns to the chip row rather than to a flex baseline resolved from a swatch's bottom edge.
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)

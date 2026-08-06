@@ -733,8 +733,8 @@ function AnalysisStep({
         </ul>
 
         {analysis.avoid_colours.length > 0 && (
-          <div className="mt-5 lg:mt-8 lg:flex lg:items-baseline lg:gap-6">
-            <h3 className="k lg:shrink-0 lg:pt-1">Skip these</h3>
+          <div className="mt-5 lg:mt-8 lg:flex lg:items-center lg:gap-6">
+            <h3 className="k lg:shrink-0">Skip these</h3>
             <ul className="flex flex-wrap gap-2 lg:gap-5 mt-2 lg:mt-0">
               {analysis.avoid_colours.map((colour) => (
                 <li
@@ -849,18 +849,20 @@ function AnalysisStep({
           </Row>
         )}
 
-        {/* Behind a button. Permanently open, this input sat under the reading it was
-            about and made the screen feel like a form rather than a result. */}
-        <Row label="Not quite right?">
-          <button
+        {/* The reading is worth keeping. A print stylesheet turns it into a PDF on every
+            platform we ship to, which is the only route that needs no dependency. */}
+        <Row label="Keep a copy">
+          <a
+            href="/report"
+            target="_blank"
+            rel="noreferrer"
             className="btn btn-ghost btn-sm"
-            onClick={() => setRefining(true)}
           >
             <span className="mi text-[18px]" aria-hidden>
-              tune
+              download
             </span>
-            Refine the analysis
-          </button>
+            Download the report
+          </a>
           {added > 0 && (
             <p className="text-[12px] text-mute mt-2">
               {added} more {added === 1 ? "photo" : "photos"} added.
@@ -929,17 +931,34 @@ function AnalysisStep({
         </p>
       </div>
 
-      <div
-        className="sticky bottom-0 bg-paper pt-3 pb-[calc(8px+env(safe-area-inset-bottom))]
-                   lg:border-t lg:border-line lg:pt-5 lg:pb-8 lg:flex lg:justify-end"
-      >
-        <button
-          className="btn w-full lg:w-auto lg:px-14"
-          onClick={() => onDone(analysis)}
-          disabled={pending}
+      {/* Paper over live content, so it needs a scrim: without one the text scrolling
+          underneath is sliced off mid-line by the hairline. */}
+      <div className="sticky bottom-0 mt-2">
+        <div
+          aria-hidden
+          className="h-8 bg-gradient-to-t from-paper to-transparent pointer-events-none"
+        />
+        <div
+          className="bg-paper border-t border-line pt-4 pb-[calc(14px+env(safe-area-inset-bottom))]
+                     lg:pt-5 lg:pb-8 flex flex-col gap-2.5 lg:flex-row lg:justify-end lg:gap-3"
         >
-          Generate my styles
-        </button>
+          <button
+            className="btn btn-ghost w-full lg:w-auto lg:px-7 order-2 lg:order-1"
+            onClick={() => setRefining(true)}
+          >
+            <span className="mi text-[18px]" aria-hidden>
+              tune
+            </span>
+            Refine the analysis
+          </button>
+          <button
+            className="btn w-full lg:w-auto lg:px-14 order-1 lg:order-2"
+            onClick={() => onDone(analysis)}
+            disabled={pending}
+          >
+            Generate my styles
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -1051,17 +1070,23 @@ function StylesStep({
         )}
       </div>
 
-      <div
-        className="sticky bottom-0 bg-paper pt-3 pb-[calc(8px+env(safe-area-inset-bottom))] mt-6
-                   lg:border-t lg:border-line lg:pt-5 lg:pb-8 lg:mt-12 lg:flex lg:justify-end"
-      >
-        <button
-          className="btn w-full lg:w-auto lg:px-14"
-          onClick={onDone}
-          disabled={pending || styles.length === 0}
+      <div className="sticky bottom-0 mt-6 lg:mt-12">
+        <div
+          aria-hidden
+          className="h-8 bg-gradient-to-t from-paper to-transparent pointer-events-none"
+        />
+        <div
+          className="bg-paper border-t border-line pt-4 pb-[calc(14px+env(safe-area-inset-bottom))]
+                     lg:pt-5 lg:pb-8 lg:flex lg:justify-end"
         >
-          {pending ? "Finishing…" : "Open my app"}
-        </button>
+          <button
+            className="btn w-full lg:w-auto lg:px-14"
+            onClick={onDone}
+            disabled={pending || styles.length === 0}
+          >
+            {pending ? "Finishing…" : "Open my app"}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -37,4 +37,9 @@ export function readableOn(hex: string): string {
 }
 
 /** A hairline that reads on a pale swatch and vanishes on a dark one. */
+/** Light first. In a shop you scan a palette by depth, not by the order a model returned. */
+export function byLightness(a: string, b: string): number {
+  return (luminance(b) ?? 0) - (luminance(a) ?? 0);
+}
+
 export const SWATCH_RING = "inset 0 0 0 1px rgba(23,23,27,0.16)";
