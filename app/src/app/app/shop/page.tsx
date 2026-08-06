@@ -10,9 +10,9 @@ export default async function ShopPage() {
   const [products, saved] = await Promise.all([getProducts(), getSavedProductIds()]);
 
   return (
-    <div className="px-4 sm:px-6 xl:px-8 py-6 max-w-[880px]">
+    <div className="px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10 max-w-[1120px]">
       <p className="k">Shop</p>
-      <h1 className="text-[26px] mt-1">The keystones</h1>
+      <h1 className="text-[26px] @3xl:text-[38px] mt-1">The keystones</h1>
       <p className="text-mute text-sm leading-relaxed mt-2 max-w-[46ch]">
         Nine pieces, chosen so one of them finishes most of what you already own.
       </p>
@@ -24,7 +24,7 @@ export default async function ShopPage() {
           body="Nothing has been loaded yet. Run the seed script and the nine keystones appear here."
         />
       ) : (
-        <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-6">
+        <ul className="grid grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 gap-2.5 @4xl:gap-4 mt-6">
           {products.map((product) => {
             const url = catalogUrl(product.image_path);
             const isSaved = saved.has(product.id);

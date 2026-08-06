@@ -6,6 +6,7 @@ plane_issues:
   - RUM-1 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/c75cbaa1-6120-4fe4-af86-c5e51c93d169
   - RUM-7 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/668b1e8e-f0a7-4d9f-a059-eada57a2077c
   - RUM-9 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7df04b78-6464-450a-89e0-d56ff89828e9
+  - RUM-14 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5
 ---
 
 # RUMOAR Design System — "Engine"
@@ -156,16 +157,59 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
 
 ## 3. Layout
 
-Three breakpoints. The phone frame from the prototype is **removed** in the product.
+The phone frame from the prototype is **removed** in the product. Desktop is not the phone
+layout with air around it: every screen either recomposes or it does not deserve the width.
+
+### 3.1 The shell
 
 | Range | Layout |
 |---|---|
-| `< 768px` | Single column. Bottom tab bar (`--tabh`). Stylist is a full-screen view. Product grids 2-up. |
-| `768–1119px` | Single column, 640px max content width, centred. Tab bar becomes a top segmented nav. Grids 3-up. |
-| `≥ 1120px` | Two-pane: 88px icon rail (left) · content (fluid, max 880px) · persistent 380px stylist column (right). Grids 3–4-up. No tab bar. |
+| `< 1024px` | Single column. Bottom tab bar (`--tabh`). Stylist is a full-screen view. |
+| `≥ 1024px` | Three-pane: 88px icon rail (left) · content column (fluid) · persistent 380px stylist (right). No tab bar. |
+| `≥ 1536px` | Same, stylist widens to 440px. |
 
 Desktop keeps the stylist visible at all times — the conversation is the product's centre
 of gravity, not a modal. On mobile it is a tab.
+
+### 3.2 Breakpoints answer to the column, not the window
+
+The content column sits between a fixed rail and a fixed stylist, so its width never
+tracked the viewport: at a 1280px window the column is only 812px. Viewport breakpoints
+inside it described the wrong box. **The content column is a CSS container** (`@container`
+on `<main>` in `AppShell`), and everything inside it uses container variants:
+
+| Variant | Column width | Typical use |
+|---|---|---|
+| `@lg` | 512px | padding step |
+| `@xl` | 576px | looks grid → 2-up |
+| `@2xl` | 672px | product grid → 3-up |
+| `@3xl` | 768px | headings scale up; PDP splits two-up |
+| `@4xl` | 896px | product grid → 4-up; looks → 3-up; wide padding |
+| `@6xl` | 1152px | wardrobe → 5-up |
+
+Viewport breakpoints (`lg:`, `2xl:`) stay for the **shell itself** — what appears and
+disappears — and for onboarding, which has no rail beside it.
+
+### 3.3 Measures
+
+Content is capped and centred (`mx-auto`) rather than left-shunted against the rail:
+1120px for grid screens, 980px for the product detail, 620px for settings. Onboarding runs
+440px on mobile, 1160px at `lg`, 1320px at `xl` — the last step so three style cards stay
+at least as wide as the phone shows them.
+
+### 3.4 Screens that recompose
+
+- **Photo capture** — two panes: copy, progress tiles and actions left; the subject frame
+  right, spanning both rows at `min(62vh, 560px)`. DOM order stays the mobile order.
+- **Analysis** — a masthead (season at 68px left, confidence as its byline right), then a
+  full-width colour band with named swatches and hex, then the readings in two columns
+  (`columns-2`, `break-inside-avoid` per section).
+- **Styles** — three directions across three columns.
+- **Product detail** — image left, price and actions right, image sticky while the right
+  column scrolls.
+
+Forward CTAs stay sticky, but on desktop they right-align above a hairline instead of
+running the full width of the page.
 
 Safe areas: pad with `env(safe-area-inset-bottom)` on the tab bar and composer so the PWA
 clears the iOS home indicator and Android gesture bar.
@@ -272,5 +316,7 @@ list.
   name/vibe/occasions form are removed. Lazyweb coverage for colour-analysis result
   screens was weak (top similarity 0.36), so these patterns are derived from this system
   rather than from external evidence.
+
+- **2026-08-06** — Desktop composition pass ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). § 3 rewritten: the content column became a CSS container, the measures were raised and centred, and capture, analysis and the product detail were recomposed rather than widened.
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)

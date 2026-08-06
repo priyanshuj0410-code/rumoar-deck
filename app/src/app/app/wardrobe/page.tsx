@@ -13,11 +13,11 @@ export default async function WardrobePage() {
   );
 
   return (
-    <div className="px-4 sm:px-6 xl:px-8 py-6 max-w-[880px]">
+    <div className="px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10 max-w-[1120px]">
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="k">Wardrobe</p>
-          <h1 className="text-[26px] mt-1">
+          <h1 className="text-[26px] @3xl:text-[38px] mt-1">
             {items.length} {items.length === 1 ? "piece" : "pieces"}
           </h1>
         </div>
@@ -31,7 +31,7 @@ export default async function WardrobePage() {
           body="Photograph a few pieces and RUMOAR names them for you. Three or four is enough to start styling."
         />
       ) : (
-        <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5 mt-6">
+        <ul className="grid grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @6xl:grid-cols-5 gap-2.5 @4xl:gap-4 mt-6">
           {items.map((item) => {
             const url = item.image_path ? signed[item.image_path] : null;
             return (

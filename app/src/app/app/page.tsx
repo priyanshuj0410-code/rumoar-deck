@@ -15,9 +15,9 @@ export default async function TodayPage() {
   );
 
   return (
-    <div className="px-6 xl:px-8 py-8 max-w-[880px]">
+    <div className="px-6 mx-auto @2xl:px-8 @4xl:px-10 py-8 @4xl:py-12 max-w-[1120px]">
       <p className="k">Today</p>
-      <h1 className="text-[32px] mt-2">
+      <h1 className="text-[32px] @3xl:text-[46px] mt-2 @3xl:mt-3">
         {profile?.display_name ? `Evening, ${profile.display_name}` : "Evening"}
       </h1>
       <p className="text-mute text-sm leading-relaxed mt-3 max-w-[52ch]">
@@ -41,14 +41,14 @@ export default async function TodayPage() {
         </Link>
       </div>
 
-      <h2 className="text-[21px] mt-12">Your looks</h2>
+      <h2 className="text-[21px] @3xl:text-[26px] mt-12">Your looks</h2>
       {looks.length === 0 ? (
         <p className="text-mute text-sm leading-relaxed mt-3 max-w-[46ch]">
           Nothing styled yet. Tell the stylist where you&rsquo;re headed and the looks will
           collect here.
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 mt-4">
+        <div className="grid gap-3 @xl:grid-cols-2 @4xl:grid-cols-3 mt-4">
           {looks.slice(0, 6).map((look) => {
             const url = look.image_path ? signed[look.image_path] : null;
             return (

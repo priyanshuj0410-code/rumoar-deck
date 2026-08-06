@@ -56,7 +56,7 @@ export function Onboarding({ profile }: { profile: Profile }) {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col max-w-[440px] mx-auto w-full px-5 py-6">
+    <div className="min-h-dvh flex flex-col w-full mx-auto max-w-[440px] lg:max-w-[1160px] xl:max-w-[1320px] px-5 lg:px-10 py-6 lg:py-10">
       {stage === "photos" && (
         <div className="flex-1 flex flex-col justify-center py-6">
           <PhotosStep onDone={() => go("analysis")} />
@@ -287,19 +287,22 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         </div>
       )}
 
-      <ShotTiles
-        shots={shots}
-        current={index}
-        onPick={(next) => {
-          setIndex(next);
-          scrollToTop();
-        }}
-      />
-
       <PhotoCapture
         key={index}
         title={SHOTS[index].label}
         hint={SHOTS[index].hint}
+        // The tiles travel with the copy: on desktop they belong in the left pane beside
+        // the subject, not stranded above the whole layout.
+        lead={
+          <ShotTiles
+            shots={shots}
+            current={index}
+            onPick={(next) => {
+              setIndex(next);
+              scrollToTop();
+            }}
+          />
+        }
         existing={current}
         busy={busy}
         nextLabel={complete ? "Start my analysis" : "Next"}
@@ -474,11 +477,12 @@ function AnalysisStep({
           <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />
           {status}
         </p>
-        <h1 className="text-[28px] mt-2">Reading you</h1>
+        <h1 className="text-[28px] lg:text-[52px] mt-2 lg:mt-3">Reading you</h1>
 
-        <div className="mt-5" aria-live="polite">
+        {/* A measure, not a width. Across 1080px of desktop this prose would be unreadable. */}
+        <div className="mt-5 lg:mt-8 lg:max-w-[60ch]" aria-live="polite">
           {revealed > 0 ? (
-            <p className="text-[17px] leading-relaxed whitespace-pre-wrap">
+            <p className="text-[17px] lg:text-[19px] leading-relaxed whitespace-pre-wrap">
               {prose.slice(0, revealed)}
               <span className="inline-block w-[2px] h-[1.1em] bg-ink align-[-2px] ml-0.5 animate-pulse" />
             </p>
@@ -496,8 +500,8 @@ function AnalysisStep({
 
   if (error && !analysis) {
     return (
-      <div className="flex-1 flex flex-col justify-center">
-        <h1 className="text-[28px]">That didn&rsquo;t work.</h1>
+      <div className="flex-1 flex flex-col justify-center lg:max-w-[440px]">
+        <h1 className="text-[28px] lg:text-[38px]">That didn&rsquo;t work.</h1>
         <p className="text-mute text-sm leading-relaxed mt-3">{error}</p>
         <div className="flex flex-col gap-2.5 mt-6">
           <button className="btn w-full" onClick={() => void run()}>
@@ -519,15 +523,22 @@ function AnalysisStep({
     <div className="flex-1 flex flex-col pt-6">
       <BackLink label="Photos" onBack={onBack} />
 
-      <p className="k mt-4">Your analysis</p>
-      <h1 className="text-[32px] mt-2">{analysis.season}</h1>
-      <p className="text-mute text-sm leading-relaxed mt-2">
-        {analysis.undertone} undertone · {analysis.depth} depth · {analysis.contrast} contrast ·{" "}
-        {analysis.chroma}
-      </p>
+      {/* The season is the headline and the confidence is its byline, so on a wide screen
+          they share one band rather than queueing up a narrow column. */}
+      <header className="mt-4 lg:mt-8 lg:grid lg:grid-cols-[1.15fr_1fr] lg:gap-x-14 lg:items-end">
+        <div>
+          <p className="k">Your analysis</p>
+          <h1 className="text-[32px] lg:text-[68px] leading-[1.05] lg:leading-[0.94] mt-2 lg:mt-4">
+            {analysis.season}
+          </h1>
+          <p className="text-mute text-sm lg:text-[15px] leading-relaxed mt-2 lg:mt-4">
+            {analysis.undertone} undertone · {analysis.depth} depth · {analysis.contrast} contrast ·{" "}
+            {analysis.chroma}
+          </p>
+        </div>
 
-      <div className="mt-6">
-        <Row label="Confidence">
+        <section className="mt-6 lg:mt-0 py-4 lg:py-0 border-t lg:border-t-0 border-line">
+          <h2 className="k mb-2">Confidence</h2>
           <div className="flex items-center gap-3">
             <div className="h-0.5 bg-line flex-1">
               <div className="h-full bg-ink" style={{ width: `${confidence}%` }} />
@@ -537,44 +548,55 @@ function AnalysisStep({
           {analysis.caveat && (
             <p className="text-mute text-[13px] leading-relaxed mt-2">{analysis.caveat}</p>
           )}
-        </Row>
+        </section>
+      </header>
 
-        <Row label="Your colours">
-          <ul className="grid grid-cols-4 gap-2">
-            {analysis.best_colours.map((colour) => (
-              <li key={colour.hex}>
-                <span
-                  className="block aspect-square"
-                  // A hairline ring, not a border: it renders the pale swatches visible
-                  // without inseting them, and disappears against the dark ones.
-                  style={{ background: colour.hex, boxShadow: SWATCH_RING }}
-                  role="img"
-                  aria-label={colour.name}
-                />
-                <span className="text-[11px] leading-tight block mt-1">{colour.name}</span>
-              </li>
-            ))}
-          </ul>
-        </Row>
+      {/* Colour is the whole point of the reading, so on desktop it takes the full measure
+          instead of being rationed a column. */}
+      <section className="py-4 lg:pt-10 lg:pb-8 border-t border-line lg:mt-8">
+        <h2 className="k mb-2 lg:mb-4">Your colours</h2>
+        <ul className="grid grid-cols-4 gap-2 lg:grid-cols-6 lg:gap-3">
+          {analysis.best_colours.map((colour) => (
+            <li key={colour.hex}>
+              <span
+                className="block aspect-square lg:aspect-[4/5]"
+                // A hairline ring, not a border: it renders the pale swatches visible
+                // without inseting them, and disappears against the dark ones.
+                style={{ background: colour.hex, boxShadow: SWATCH_RING }}
+                role="img"
+                aria-label={colour.name}
+              />
+              <span className="text-[11px] lg:text-[13px] leading-tight block mt-1 lg:mt-2">
+                {colour.name}
+              </span>
+              <span className="hidden lg:block font-mono text-[10px] text-mute mt-0.5">
+                {colour.hex.toUpperCase()}
+              </span>
+            </li>
+          ))}
+        </ul>
 
         {analysis.avoid_colours.length > 0 && (
-          <Row label="Skip these">
-            <ul className="flex flex-wrap gap-2">
+          <div className="mt-5 lg:mt-8 lg:flex lg:items-baseline lg:gap-6">
+            <h3 className="k lg:shrink-0 lg:pt-1">Skip these</h3>
+            <ul className="flex flex-wrap gap-2 lg:gap-5 mt-2 lg:mt-0">
               {analysis.avoid_colours.map((colour) => (
-                <li key={colour.hex} className="flex items-center gap-1.5">
+                <li key={colour.hex} className="flex items-center gap-1.5 lg:gap-2">
                   <span
-                    className="w-4 h-4 block"
+                    className="w-4 h-4 lg:w-5 lg:h-5 block"
                     style={{ background: colour.hex, boxShadow: SWATCH_RING }}
                     role="img"
                     aria-label={colour.name}
                   />
-                  <span className="text-[12px]">{colour.name}</span>
+                  <span className="text-[12px] lg:text-[13px]">{colour.name}</span>
                 </li>
               ))}
             </ul>
-          </Row>
+          </div>
         )}
+      </section>
 
+      <div className="lg:columns-2 lg:gap-x-14">
         <Row label="Metals">
           <p className="text-sm">{analysis.metals}</p>
         </Row>
@@ -725,8 +747,15 @@ function AnalysisStep({
         </p>
       </div>
 
-      <div className="sticky bottom-0 bg-paper pt-3 pb-[calc(8px+env(safe-area-inset-bottom))]">
-        <button className="btn w-full" onClick={() => onDone(analysis)} disabled={pending}>
+      <div
+        className="sticky bottom-0 bg-paper pt-3 pb-[calc(8px+env(safe-area-inset-bottom))]
+                   lg:border-t lg:border-line lg:pt-5 lg:pb-8 lg:flex lg:justify-end"
+      >
+        <button
+          className="btn w-full lg:w-auto lg:px-14"
+          onClick={() => onDone(analysis)}
+          disabled={pending}
+        >
           Generate my styles
         </button>
       </div>
@@ -736,7 +765,8 @@ function AnalysisStep({
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <section className="py-4 border-t border-line">
+    // break-inside-avoid so a section is never split down the middle of a column.
+    <section className="py-4 border-t border-line break-inside-avoid">
       <h2 className="k mb-2">{label}</h2>
       {children}
     </section>
@@ -789,11 +819,17 @@ function StylesStep({
         {running && <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />}
         {running ? status : "Built for your colouring"}
       </p>
-      <h1 className="text-[28px] mt-2">Three directions.</h1>
+      <h1 className="text-[28px] lg:text-[56px] lg:leading-[0.98] mt-2 lg:mt-3">
+        Three directions.
+      </h1>
 
       {/* The page itself scrolls. An inner overflow container here produced a second
           scrollbar inside the first — two things to drag, neither obviously the right one. */}
-      <div className="mt-5 flex flex-col gap-8" aria-live="polite">
+      <div
+        className="mt-5 lg:mt-10 flex flex-col gap-8
+                   lg:grid lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14 lg:items-start"
+        aria-live="polite"
+      >
         {styles.map((style) => (
           <StyleCard key={style.id} style={style} />
         ))}
@@ -815,8 +851,15 @@ function StylesStep({
         )}
       </div>
 
-      <div className="sticky bottom-0 bg-paper pt-3 pb-[calc(8px+env(safe-area-inset-bottom))] mt-6">
-        <button className="btn w-full" onClick={onDone} disabled={pending || styles.length === 0}>
+      <div
+        className="sticky bottom-0 bg-paper pt-3 pb-[calc(8px+env(safe-area-inset-bottom))] mt-6
+                   lg:border-t lg:border-line lg:pt-5 lg:pb-8 lg:mt-12 lg:flex lg:justify-end"
+      >
+        <button
+          className="btn w-full lg:w-auto lg:px-14"
+          onClick={onDone}
+          disabled={pending || styles.length === 0}
+        >
           {pending ? "Finishing…" : "Open my app"}
         </button>
       </div>

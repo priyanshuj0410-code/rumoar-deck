@@ -6,6 +6,8 @@ import { camera, haptics, type Facing, type PickedImage } from "@/lib/platform";
 type Props = {
   title: string;
   hint: string;
+  /** Rendered above the heading — the shot tiles, which belong with the copy on desktop. */
+  lead?: React.ReactNode;
   existing?: PickedImage | null;
   onCaptured: (image: PickedImage) => void;
   onNext: () => void;
@@ -28,6 +30,7 @@ const UNSUPPORTED_COPY = "This browser won't open the camera here. Upload a phot
 export function PhotoCapture({
   title,
   hint,
+  lead,
   existing,
   onCaptured,
   onNext,
@@ -99,15 +102,24 @@ export function PhotoCapture({
   }
 
   return (
-    <div className="flex flex-col">
-      <div>
-        <h1 className="text-[26px]">{title}</h1>
-        <p className="text-mute text-[13px] leading-relaxed mt-1">{hint}</p>
+    <div
+      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]
+                 lg:grid-rows-[auto_1fr] lg:gap-x-14 lg:items-start"
+    >
+      {/* DOM order is the mobile order — copy, subject, actions. Desktop re-places them:
+          copy and actions stack in the left column, the subject spans both rows on the
+          right. */}
+      <div className="lg:col-start-1 lg:row-start-1 lg:self-start">
+        {lead}
+        <h1 className="text-[26px] lg:text-[34px]">{title}</h1>
+        <p className="text-mute text-[13px] lg:text-[15px] leading-relaxed mt-1 lg:mt-3 lg:max-w-[40ch]">
+          {hint}
+        </p>
       </div>
 
       {/* Capped, and centred. A full-bleed hero pushed every control below the fold and
           made the step look like it had nothing to do. */}
-      <div className="relative w-full h-[clamp(300px,46vh,440px)] bg-wash overflow-hidden mt-4">
+      <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2 relative w-full h-[clamp(300px,46vh,440px)] lg:h-[min(62vh,560px)] bg-wash overflow-hidden mt-4 lg:mt-0">
         {live ? (
           <>
             <video
@@ -136,21 +148,25 @@ export function PhotoCapture({
             className="w-full h-full object-contain"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-8 text-center">
             <span className="mi text-[28px] text-mute" aria-hidden>
               person
             </span>
+            <span className="k text-mute">Head to feet in frame</span>
           </div>
         )}
       </div>
 
       {notice && (
-        <p role="alert" className="text-[13px] text-mute leading-relaxed mt-3">
+        <p
+          role="alert"
+          className="text-[13px] text-mute leading-relaxed mt-3 lg:col-start-1 lg:row-start-2 lg:mt-0 lg:mb-3"
+        >
           {notice}
         </p>
       )}
 
-      <div className="mt-4">
+      <div className="mt-4 lg:mt-8 lg:col-start-1 lg:row-start-2 lg:self-start">
         {live ? (
           <div className="flex flex-col gap-2.5">
             <button className="btn w-full" onClick={shoot}>

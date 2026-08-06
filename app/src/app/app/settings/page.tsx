@@ -7,7 +7,7 @@ export default async function SettingsPage() {
   const [profile, user] = await Promise.all([getProfile(), getUser()]);
 
   return (
-    <div className="px-4 sm:px-6 xl:px-8 py-6 max-w-[560px]">
+    <div className="px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10 max-w-[620px]">
       <p className="k">Settings</p>
       <h1 className="text-[26px] mt-1">Your account</h1>
 

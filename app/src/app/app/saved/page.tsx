@@ -28,9 +28,9 @@ export default async function SavedPage() {
   const empty = looks.length === 0 && products.length === 0;
 
   return (
-    <div className="px-4 sm:px-6 xl:px-8 py-6 max-w-[880px]">
+    <div className="px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10 max-w-[1120px]">
       <p className="k">Saved</p>
-      <h1 className="text-[26px] mt-1">Kept for later</h1>
+      <h1 className="text-[26px] @3xl:text-[38px] mt-1">Kept for later</h1>
 
       {empty && (
         <EmptyState
@@ -44,7 +44,7 @@ export default async function SavedPage() {
       {looks.length > 0 && (
         <section className="mt-8">
           <h2 className="k">Looks</h2>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 mt-3">
+          <div className="grid gap-3 @xl:grid-cols-2 @4xl:grid-cols-3 mt-3">
             {looks.map((look) => {
               const url = look.image_path ? signed[look.image_path] : null;
               return (
@@ -88,7 +88,7 @@ export default async function SavedPage() {
       {products.length > 0 && (
         <section className="mt-10">
           <h2 className="k">Pieces</h2>
-          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-3">
+          <ul className="grid grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 gap-2.5 @4xl:gap-4 mt-3">
             {products.map((product) => {
               const url = catalogUrl(product.image_path);
               return (
