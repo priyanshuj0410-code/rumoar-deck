@@ -8,6 +8,7 @@ import { readEvents } from "@/lib/ndjson";
 import { PhotoCapture } from "@/components/photo-capture";
 import { ReactionBar } from "@/components/reaction-bar";
 import { BODY_SHAPES, FACE_SHAPES, ShapeReading } from "@/components/shape-diagram";
+import { readableOn, SWATCH_RING } from "@/lib/colour";
 import type { ColourAnalysis, OnboardingStage, Profile, StyleSuggestion } from "@/lib/types";
 import { addPhotos, finishOnboarding, savePhotos, setStage } from "./actions";
 
@@ -522,10 +523,7 @@ function AnalysisStep({
                   className="block aspect-square"
                   // A hairline ring, not a border: it renders the pale swatches visible
                   // without inseting them, and disappears against the dark ones.
-                  style={{
-                    background: colour.hex,
-                    boxShadow: "inset 0 0 0 1px rgba(23,23,27,0.16)",
-                  }}
+                  style={{ background: colour.hex, boxShadow: SWATCH_RING }}
                   role="img"
                   aria-label={colour.name}
                 />
@@ -542,10 +540,7 @@ function AnalysisStep({
                 <li key={colour.hex} className="flex items-center gap-1.5">
                   <span
                     className="w-4 h-4 block"
-                    style={{
-                      background: colour.hex,
-                      boxShadow: "inset 0 0 0 1px rgba(23,23,27,0.16)",
-                    }}
+                    style={{ background: colour.hex, boxShadow: SWATCH_RING }}
                     role="img"
                     aria-label={colour.name}
                   />
@@ -857,21 +852,33 @@ function StyleCard({ style }: { style: StyleSuggestion }) {
           </div>
         )}
 
-        {style.palette.length > 0 && (
-          <ul className="absolute top-3 right-3 flex flex-col gap-1">
-            {style.palette.map((colour) => (
-              <li
-                key={colour.hex}
-                className="w-5 h-5 shadow-[0_1px_4px_rgba(0,0,0,.25)]"
-                style={{ background: colour.hex }}
-                role="img"
-                aria-label={colour.name}
-                title={colour.name}
-              />
-            ))}
-          </ul>
-        )}
       </div>
+
+      {/* The palette is the direction, not a garnish on it: full width, named, and
+          carrying its own hex. Twenty-pixel chips in the photo's corner read as
+          decoration. */}
+      {style.palette.length > 0 && (
+        <ul
+          className="grid"
+          role="list"
+          style={{ gridTemplateColumns: `repeat(${style.palette.length}, minmax(0, 1fr))` }}
+        >
+          {style.palette.map((colour) => (
+            <li
+              key={colour.hex}
+              className="min-h-[76px] p-2.5 flex flex-col justify-end"
+              style={{
+                background: colour.hex,
+                color: readableOn(colour.hex),
+                boxShadow: SWATCH_RING,
+              }}
+            >
+              <span className="text-[12px] font-medium leading-tight">{colour.name}</span>
+              <span className="font-mono text-[10px] opacity-70 mt-0.5">{colour.hex}</span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!url && (
         <h2 className="text-[21px] mt-3">
