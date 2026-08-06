@@ -217,12 +217,13 @@ own language:
 | Ink | #17171B | #1B1B1B |
 | Display | Clash Display | Instrument Serif, italic as the only accent |
 | Body | General Sans | Inter |
-| Geometry | square, radius 0 | rounded, 18/28px, pill buttons |
+| Geometry | square, radius 0 | **square, radius 0** — the one rule both surfaces share |
 | Depth | flat, hairlines | soft stacked shadow |
 
 Both are legitimate; they serve different jobs. The product is an instrument and stays
-plain. The landing page is a magazine and is allowed warmth, curve and air. **Do not
-migrate tokens between them in either direction.**
+plain. The landing page is a magazine and is allowed warmth and air — but **not curve**:
+sharp corners are the brand's strongest signal and hold across every surface. **Do not
+migrate the other tokens between them in either direction.**
 
 Rules that do carry across: one primary action per screen (here, every CTA is the same
 "Style me"), colour is never the sole carrier of meaning, `prefers-reduced-motion` is
