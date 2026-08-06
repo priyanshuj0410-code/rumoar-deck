@@ -13,7 +13,13 @@ const nextConfig: NextConfig = {
   async rewrites() {
     // The landing page is hand-built HTML/CSS/JS in public/ — an editorial surface
     // with its own visual language, deliberately outside the app's component system.
-    return [{ source: "/", destination: "/landing.html" }];
+    // beforeFiles: "/" has no page, so an afterFiles rewrite is reached too late and
+    // the request 404s in production before it is ever considered.
+    return {
+      beforeFiles: [{ source: "/", destination: "/landing.html" }],
+      afterFiles: [],
+      fallback: [],
+    };
   },
   async headers() {
     return [
