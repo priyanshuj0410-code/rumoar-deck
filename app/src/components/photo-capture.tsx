@@ -9,7 +9,6 @@ type Props = {
   existing?: PickedImage | null;
   onCaptured: (image: PickedImage) => void;
   onNext: () => void;
-  onBack?: () => void;
   nextLabel: string;
   busy?: boolean;
 };
@@ -32,7 +31,6 @@ export function PhotoCapture({
   existing,
   onCaptured,
   onNext,
-  onBack,
   nextLabel,
   busy = false,
 }: Props) {
@@ -116,9 +114,12 @@ export function PhotoCapture({
               ref={videoRef}
               playsInline
               muted
+              aria-label="Camera preview"
               // Mirroring the preview only. The captured frame is never mirrored.
               className={`w-full h-full object-contain ${facing === "user" ? "-scale-x-100" : ""}`}
-            />
+            >
+              <track kind="captions" />
+            </video>
             <div
               aria-hidden
               className="absolute inset-x-[16%] inset-y-[5%] border border-paper/70 pointer-events-none"
@@ -158,14 +159,17 @@ export function PhotoCapture({
               </span>
               Capture
             </button>
-            <div className="flex gap-6 text-[13px] text-mute pt-0.5">
+            <div className="flex gap-2.5">
               <button
-                className="hover:text-ink transition-colors"
+                className="btn btn-ghost flex-1"
                 onClick={() => start(facing === "user" ? "environment" : "user")}
               >
-                Flip camera
+                <span className="mi text-[18px]" aria-hidden>
+                  cameraswitch
+                </span>
+                Flip
               </button>
-              <button className="hover:text-ink transition-colors" onClick={stop}>
+              <button className="btn btn-ghost flex-1" onClick={stop}>
                 Cancel
               </button>
             </div>
@@ -175,19 +179,25 @@ export function PhotoCapture({
             <button className="btn w-full" onClick={onNext} disabled={busy}>
               {busy ? "Uploading…" : nextLabel}
             </button>
-            {/* Secondary actions are text, not buttons. Two black blocks on one screen
-                means neither of them is the primary one. */}
-            <div className="flex gap-6 text-[13px] text-mute pt-0.5">
+            {/* Ghost buttons, not text links: they are real alternatives to Next, and
+                only one ink block on the screen keeps the primary unambiguous. */}
+            <div className="flex gap-2.5">
               {camera.supportsLive() && (
                 <button
-                  className="hover:text-ink transition-colors"
+                  className="btn btn-ghost flex-1"
                   onClick={() => start(facing)}
                   disabled={opening}
                 >
+                  <span className="mi text-[18px]" aria-hidden>
+                    photo_camera
+                  </span>
                   Retake
                 </button>
               )}
-              <button className="hover:text-ink transition-colors" onClick={upload}>
+              <button className="btn btn-ghost flex-1" onClick={upload}>
+                <span className="mi text-[18px]" aria-hidden>
+                  upload
+                </span>
                 Choose another
               </button>
             </div>
@@ -217,20 +227,10 @@ export function PhotoCapture({
           </div>
         )}
 
-        <div className="flex items-center gap-4 mt-5">
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors"
-            >
-              <span className="mi text-[18px] -ml-0.5" aria-hidden>
-                arrow_back
-              </span>
-              Back
-            </button>
-          )}
-          <span className="text-[11px] text-mute">Private to your account</span>
-        </div>
+        <p className="text-[11px] text-mute leading-snug mt-5">
+          Only you ever see these. They&rsquo;re read for colouring and fit, then kept
+          private — never shown to anyone else, never used to train anything.
+        </p>
       </div>
     </div>
   );

@@ -107,8 +107,9 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
 - **Empty state** (`.emptymsg`) — 44/24px padding, centred, `--mute` 14px/1.6.
 - **One primary action per screen.** The primary is whatever moves you forward *from the
   current state* — "Take photo" on an empty step becomes "Next" once a photo exists.
-  Secondary actions are text links, not a second ink block: two black full-width buttons
-  on one screen means neither is primary. Cap: one `.btn`, one `.btn-ghost`, then text.
+  Secondary actions are `.btn-ghost` — real buttons, since they are real alternatives —
+  but never a second ink block: two black full-width buttons on one screen means neither
+  is primary. Cap: one `.btn`, up to two `.btn-ghost` side by side, then text links.
 - **Media is capped, not full-bleed.** A hero image runs to `max-w-[280px]` centred at 3:4.
   Letting it fill the column pushes every control below the fold and makes a step look
   like it has nothing to do.
@@ -141,9 +142,9 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
   (2px × 24px per stage, `--ink` filled / `--line` empty) with no numerals; a numeric
   "n of N" belongs only to a step that owns a sub-sequence, such as the three photos.
   Two numeric counters on one screen read as one broken counter.
-- **Back** — a single left-aligned text link at the top of the step content, never in the
-  header. Header controls that appear conditionally shift the wordmark and break its
-  alignment with the body text.
+- **Back** — a single left-aligned text link at the **top** of the step content, on every
+  step, labelled with where it goes ("← Front") rather than just "Back". Never in a header:
+  a control that appears conditionally there shifts everything beside it.
 - **Guided capture** (`PhotoCapture`) — one shot per screen: `LABEL · n of N` eyebrow,
   display heading, hint, then a 1:1-ish live viewport with a full-body framing rectangle
   inset 18%/6% in `--paper` at 70% opacity. Camera opens only on an explicit tap, never on

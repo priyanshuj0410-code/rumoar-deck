@@ -39,6 +39,18 @@ export type ColourAnalysis = {
   season_confidence: number;
   features: { skin: string; hair: string; eyes: string };
   build: { frame: string; proportions: string; fit_notes: string };
+  /**
+   * Everything that drives fit and silhouette rather than colour. Each field carries its
+   * own styling consequence, because "rectangle build" on its own tells him nothing.
+   */
+  physique: {
+    body_shape: string;
+    body_shape_styling: string;
+    face_shape: string;
+    face_shape_styling: string;
+    hair: { colour: string; length: string; texture: string; styling: string };
+    beard: { present: boolean; colour: string; length: string; styling: string };
+  };
   best_colours: Swatch[];
   avoid_colours: Swatch[];
   metals: "gold" | "silver" | "both";

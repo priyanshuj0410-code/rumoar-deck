@@ -48,10 +48,6 @@ export function Onboarding({ profile }: { profile: Profile }) {
 
   return (
     <div className="min-h-dvh flex flex-col max-w-[440px] mx-auto w-full px-5 py-6">
-      <header className="flex-none">
-        <span className="k">RUMOAR</span>
-      </header>
-
       {stage === "photos" && (
         <div className="flex-1 flex flex-col justify-center py-6">
           <PhotosStep onDone={() => go("analysis")} />
@@ -121,17 +117,15 @@ function ShotTiles({
       {SHOTS.map((shot, index) => {
         const image = shots[index];
         const active = index === current;
-        const locked = !image && index > current;
         return (
           <li key={shot.label}>
             <button
               onClick={() => onPick(index)}
-              disabled={locked}
               aria-current={active ? "step" : undefined}
               aria-label={
-                image ? `${shot.label} — taken. Redo it.` : `${shot.label} — not taken yet`
+                image ? `${shot.label} — taken. Go to it.` : `${shot.label} — not taken yet`
               }
-              className={`block text-left ${locked ? "opacity-35" : ""}`}
+              className="block text-left"
             >
               {/* The ring goes on the image only. Wrapping the label in it made the
                   pair read as a text input with the shot name typed into it. */}
@@ -180,15 +174,47 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mismatches, setMismatches] = useState<{ index: number; detected: string }[] | null>(null);
 
   const current = shots[index];
   const isLast = index === SHOTS.length - 1;
+  const complete = shots.every(Boolean);
 
-  async function finish() {
+  /**
+   * Confirms each shot is the angle it claims to be. A side photo filed as the front
+   * skews every read built on it, and nothing downstream would ever reveal that.
+   */
+  async function checkAngles(images: PickedImage[]): Promise<boolean> {
+    try {
+      const response = await fetch("/api/verify-shots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ images: images.map((image) => image.dataUrl) }),
+      });
+      const json = (await response.json()) as {
+        checked?: boolean;
+        mismatches?: { index: number; detected: string }[];
+      };
+      if (!json.checked || !json.mismatches?.length) return true;
+      setMismatches(json.mismatches);
+      return false;
+    } catch {
+      // The check is a safeguard, not a gate.
+      return true;
+    }
+  }
+
+  async function finish(skipCheck = false) {
     setError(null);
+    setMismatches(null);
     setBusy(true);
 
     const images = shots.filter((s): s is PickedImage => s !== null);
+
+    if (!skipCheck && !(await checkAngles(images))) {
+      setBusy(false);
+      return;
+    }
 
     const supabase = createClient();
     const {
@@ -240,6 +266,12 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="flex flex-col">
+      {index > 0 && (
+        <div className="mb-4">
+          <BackLink label={SHOTS[index - 1].label} onBack={() => setIndex(index - 1)} />
+        </div>
+      )}
+
       <ShotTiles shots={shots} current={index} onPick={setIndex} />
 
       <PhotoCapture
@@ -248,14 +280,13 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         hint={SHOTS[index].hint}
         existing={current}
         busy={busy}
-        nextLabel={isLast ? "Read my colouring" : "Next"}
+        nextLabel={complete ? "Read my colouring" : "Next"}
         onCaptured={(image) =>
           setShots((all) => all.map((shot, i) => (i === index ? image : shot)))
         }
-        onBack={index > 0 ? () => setIndex(index - 1) : undefined}
         onNext={() => {
           haptics.tap();
-          if (isLast) void finish();
+          if (isLast || complete) void finish();
           else setIndex(index + 1);
         }}
       />
@@ -264,6 +295,31 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         <p role="alert" className="text-sm leading-relaxed mt-3">
           {error}
         </p>
+      )}
+
+      {mismatches && (
+        <div role="alert" className="border border-line p-4 mt-4">
+          <p className="text-sm leading-relaxed">
+            {mismatches.length === 1
+              ? `The ${SHOTS[mismatches[0].index].label.toLowerCase()} photo looks like a ${mismatches[0].detected} shot.`
+              : `${mismatches.length} photos don't look like the angle they're filed under.`}{" "}
+            The read is built on these, so it's worth a look.
+          </p>
+          <div className="flex gap-2.5 mt-3">
+            <button
+              className="btn btn-sm flex-1"
+              onClick={() => {
+                setIndex(mismatches[0].index);
+                setMismatches(null);
+              }}
+            >
+              Fix {SHOTS[mismatches[0].index].label.toLowerCase()}
+            </button>
+            <button className="btn btn-ghost btn-sm flex-1" onClick={() => void finish(true)}>
+              Use them anyway
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -498,6 +554,48 @@ function AnalysisStep({
         {analysis.build.fit_notes && (
           <Row label="Fit">
             <p className="text-sm leading-relaxed">{analysis.build.fit_notes}</p>
+          </Row>
+        )}
+
+        {/* Each reading carries its consequence. The shape on its own is trivia; what it
+            means for a shoulder line or a collar spread is the product. */}
+        {analysis.physique?.body_shape && (
+          <Row label="Build">
+            <p className="text-[13px] text-mute">{analysis.physique.body_shape}</p>
+            <p className="text-sm leading-relaxed mt-1">{analysis.physique.body_shape_styling}</p>
+          </Row>
+        )}
+
+        {analysis.physique?.face_shape && (
+          <Row label="Face">
+            <p className="text-[13px] text-mute">{analysis.physique.face_shape}</p>
+            <p className="text-sm leading-relaxed mt-1">{analysis.physique.face_shape_styling}</p>
+          </Row>
+        )}
+
+        {analysis.physique?.hair?.colour && (
+          <Row label="Hair">
+            <p className="text-[13px] text-mute">
+              {[
+                analysis.physique.hair.colour,
+                analysis.physique.hair.length,
+                analysis.physique.hair.texture,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+            <p className="text-sm leading-relaxed mt-1">{analysis.physique.hair.styling}</p>
+          </Row>
+        )}
+
+        {analysis.physique?.beard?.present && analysis.physique.beard.colour && (
+          <Row label="Beard">
+            <p className="text-[13px] text-mute">
+              {[analysis.physique.beard.colour, analysis.physique.beard.length]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+            <p className="text-sm leading-relaxed mt-1">{analysis.physique.beard.styling}</p>
           </Row>
         )}
 

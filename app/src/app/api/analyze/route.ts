@@ -27,9 +27,21 @@ const PROMPT = [
   "",
   `Name the closest of the twelve seasons: ${SEASONS.join(", ")}.`,
   "",
-  "Also give practical fit notes from the full-body shots — frame, proportions, and what",
-  "cuts and lengths sit well. Clothing fit only. Never comment on weight, attractiveness,",
-  "fitness or health, and never guess age, ethnicity or origin.",
+  "Then read everything that drives FIT and SILHOUETTE rather than colour, from the front,",
+  "side and back shots together:",
+  "- body shape (rectangle, triangle, inverted triangle, oval, trapezoid) and what that",
+  "  means for jacket structure, shoulder line, trouser rise and where a hem should sit",
+  "- face shape (oval, round, square, heart, oblong, diamond) and what it means for collar",
+  "  spread, lapel width, glasses and cap shape, and how much volume to wear near the face",
+  "- hair colour, length and texture, and what it means for the colours worn next to it",
+  "- beard, if present: colour, length, and what it means for neckline and collar height",
+  "",
+  "Every one of those must carry its consequence. 'Rectangle build' on its own tells him",
+  "nothing; 'rectangle build, so a structured shoulder and a defined waist do the work a",
+  "belt cannot' is the job.",
+  "",
+  "Clothing and grooming only. Never comment on weight, attractiveness, fitness or health,",
+  "and never guess age, ethnicity or origin.",
   "",
   "OUTPUT IN TWO PARTS.",
   "",
@@ -48,6 +60,14 @@ const PROMPT = [
     season_confidence: 0.72,
     features: { skin: "", hair: "", eyes: "" },
     build: { frame: "", proportions: "", fit_notes: "" },
+    physique: {
+      body_shape: "",
+      body_shape_styling: "",
+      face_shape: "",
+      face_shape_styling: "",
+      hair: { colour: "", length: "", texture: "", styling: "" },
+      beard: { present: true, colour: "", length: "", styling: "" },
+    },
     best_colours: [{ name: "Deep olive", hex: "#3B4A2F", why: "" }],
     avoid_colours: [{ name: "Icy pastel pink", hex: "#F6D4DF", why: "" }],
     metals: "gold|silver|both",
@@ -93,6 +113,9 @@ function parse(raw: string): ColourAnalysis | null {
     const j = JSON.parse(match[0]) as Record<string, unknown>;
     const features = (j.features ?? {}) as Record<string, unknown>;
     const build = (j.build ?? {}) as Record<string, unknown>;
+    const physique = (j.physique ?? {}) as Record<string, unknown>;
+    const hair = (physique.hair ?? {}) as Record<string, unknown>;
+    const beard = (physique.beard ?? {}) as Record<string, unknown>;
     const confidence = Number(j.season_confidence);
 
     return {
@@ -111,6 +134,24 @@ function parse(raw: string): ColourAnalysis | null {
         frame: str(build.frame, 200),
         proportions: str(build.proportions, 200),
         fit_notes: str(build.fit_notes, 400),
+      },
+      physique: {
+        body_shape: str(physique.body_shape, 60),
+        body_shape_styling: str(physique.body_shape_styling, 400),
+        face_shape: str(physique.face_shape, 60),
+        face_shape_styling: str(physique.face_shape_styling, 400),
+        hair: {
+          colour: str(hair.colour, 60),
+          length: str(hair.length, 60),
+          texture: str(hair.texture, 60),
+          styling: str(hair.styling, 400),
+        },
+        beard: {
+          present: beard.present !== false && Boolean(str(beard.length, 60) || str(beard.colour, 60)),
+          colour: str(beard.colour, 60),
+          length: str(beard.length, 60),
+          styling: str(beard.styling, 400),
+        },
       },
       best_colours: swatches(j.best_colours, 8),
       avoid_colours: swatches(j.avoid_colours, 4),
