@@ -2,12 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  // The landing page is static HTML in public/. A next.config rewrite serves it
-  // correctly under `next start` but not on Vercel, whose router resolves "/" against
-  // the app routes first and 404s. Middleware runs on every matched request, so the
-  // rewrite here is the one that actually holds in both places.
+  // The landing page is static HTML in public/. Vercel serves it with the extension
+  // stripped (/landing); `next start` serves it only at its literal path. Rewriting to
+  // the extensionless form and mapping that to the file in next.config makes one target
+  // correct in both.
   if (request.nextUrl.pathname === "/") {
-    return NextResponse.rewrite(new URL("/landing.html", request.url));
+    return NextResponse.rewrite(new URL("/landing", request.url));
   }
 
   return updateSession(request);

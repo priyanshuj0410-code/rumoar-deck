@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/**" }]
       : [],
   },
+  async rewrites() {
+    // Only load-bearing locally: on Vercel the static file already answers /landing.
+    return { beforeFiles: [{ source: "/landing", destination: "/landing.html" }] };
+  },
   async headers() {
     return [
       {
