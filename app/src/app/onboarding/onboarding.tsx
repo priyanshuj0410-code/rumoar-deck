@@ -518,6 +518,11 @@ function AnalysisStep({
   if (!analysis) return null;
 
   const confidence = Math.round(analysis.season_confidence * 100);
+  // The model returns anywhere from five to a dozen colours. A fixed six-across band
+  // strands the seventh alone on a second row with a metre of white beside it, so the
+  // band takes its column count from the palette and only wraps once it has to.
+  const swatches = analysis.best_colours.length;
+  const band = swatches <= 8 ? swatches : Math.ceil(swatches / 2);
 
   return (
     <div className="flex-1 flex flex-col pt-6">
@@ -555,7 +560,11 @@ function AnalysisStep({
           instead of being rationed a column. */}
       <section className="py-4 lg:pt-10 lg:pb-8 border-t border-line lg:mt-8">
         <h2 className="k mb-2 lg:mb-4">Your colours</h2>
-        <ul className="grid grid-cols-4 gap-2 lg:grid-cols-6 lg:gap-3">
+        <ul
+          className="grid grid-cols-4 gap-2 lg:gap-3
+                     lg:[grid-template-columns:repeat(var(--band),minmax(0,1fr))]"
+          style={{ "--band": band } as React.CSSProperties}
+        >
           {analysis.best_colours.map((colour) => (
             <li key={colour.hex}>
               <span
