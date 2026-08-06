@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { readEvents } from "@/lib/ndjson";
 import { PhotoCapture } from "@/components/photo-capture";
 import { ReactionBar } from "@/components/reaction-bar";
+import { BODY_SHAPES, FACE_SHAPES, ShapeReading } from "@/components/shape-diagram";
 import type { ColourAnalysis, OnboardingStage, Profile, StyleSuggestion } from "@/lib/types";
 import { addPhotos, finishOnboarding, savePhotos, setStage } from "./actions";
 
@@ -280,7 +281,7 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         hint={SHOTS[index].hint}
         existing={current}
         busy={busy}
-        nextLabel={complete ? "Read my colouring" : "Next"}
+        nextLabel={complete ? "Start my analysis" : "Next"}
         onCaptured={(image) =>
           setShots((all) => all.map((shot, i) => (i === index ? image : shot)))
         }
@@ -519,7 +520,12 @@ function AnalysisStep({
               <li key={colour.hex}>
                 <span
                   className="block aspect-square"
-                  style={{ background: colour.hex }}
+                  // A hairline ring, not a border: it renders the pale swatches visible
+                  // without inseting them, and disappears against the dark ones.
+                  style={{
+                    background: colour.hex,
+                    boxShadow: "inset 0 0 0 1px rgba(23,23,27,0.16)",
+                  }}
                   role="img"
                   aria-label={colour.name}
                 />
@@ -536,7 +542,10 @@ function AnalysisStep({
                 <li key={colour.hex} className="flex items-center gap-1.5">
                   <span
                     className="w-4 h-4 block"
-                    style={{ background: colour.hex }}
+                    style={{
+                      background: colour.hex,
+                      boxShadow: "inset 0 0 0 1px rgba(23,23,27,0.16)",
+                    }}
                     role="img"
                     aria-label={colour.name}
                   />
@@ -561,15 +570,23 @@ function AnalysisStep({
             means for a shoulder line or a collar spread is the product. */}
         {analysis.physique?.body_shape && (
           <Row label="Build">
-            <p className="text-[13px] text-mute">{analysis.physique.body_shape}</p>
-            <p className="text-sm leading-relaxed mt-1">{analysis.physique.body_shape_styling}</p>
+            <ShapeReading
+              shapes={BODY_SHAPES}
+              value={analysis.physique.body_shape}
+              note={analysis.physique.body_shape_styling}
+              otherLabel="See the other builds"
+            />
           </Row>
         )}
 
         {analysis.physique?.face_shape && (
           <Row label="Face">
-            <p className="text-[13px] text-mute">{analysis.physique.face_shape}</p>
-            <p className="text-sm leading-relaxed mt-1">{analysis.physique.face_shape_styling}</p>
+            <ShapeReading
+              shapes={FACE_SHAPES}
+              value={analysis.physique.face_shape}
+              note={analysis.physique.face_shape_styling}
+              otherLabel="See the other face shapes"
+            />
           </Row>
         )}
 

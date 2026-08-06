@@ -46,7 +46,10 @@ export default async function SettingsPage() {
               <li key={colour.hex}>
                 <span
                   className="block aspect-square"
-                  style={{ background: colour.hex }}
+                  style={{
+                    background: colour.hex,
+                    boxShadow: "inset 0 0 0 1px rgba(23,23,27,0.16)",
+                  }}
                   role="img"
                   aria-label={colour.name}
                 />
