@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
       ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/**" }]
       : [],
   },
+  async rewrites() {
+    // The landing page is hand-built HTML/CSS/JS in public/ — an editorial surface
+    // with its own visual language, deliberately outside the app's component system.
+    return [{ source: "/", destination: "/landing.html" }];
+  },
   async headers() {
     return [
       {

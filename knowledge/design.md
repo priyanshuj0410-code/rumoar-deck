@@ -205,7 +205,34 @@ Patterns validated against real products via Lazyweb (Jul 2026):
 RUMOAR's departure from all of them is the square geometry and the monochrome restraint —
 that stays.
 
-## 7. Change log
+## 7. The editorial surface (landing page)
+
+The marketing page at `/` is **deliberately not** the product system above. It is a
+separate, hand-built surface — `app/public/landing.{html,css,js}`, no framework — with its
+own language:
+
+| | Product UI | Editorial surface |
+|---|---|---|
+| Ground | `--paper` #FFFFFF | `--bg` #F7F5F2, warm |
+| Ink | #17171B | #1B1B1B |
+| Display | Clash Display | Instrument Serif, italic as the only accent |
+| Body | General Sans | Inter |
+| Geometry | square, radius 0 | rounded, 18/28px, pill buttons |
+| Depth | flat, hairlines | soft stacked shadow |
+
+Both are legitimate; they serve different jobs. The product is an instrument and stays
+plain. The landing page is a magazine and is allowed warmth, curve and air. **Do not
+migrate tokens between them in either direction.**
+
+Rules that do carry across: one primary action per screen (here, every CTA is the same
+"Style me"), colour is never the sole carrier of meaning, `prefers-reduced-motion` is
+honoured, and generated or illustrative imagery is labelled honestly.
+
+Section rhythm is one idea per screen, on a single `--section-y` scale, with alternating
+composition — hero split, card row, bleeding rail, split, centred close. Never a feature
+list.
+
+## 8. Change log
 
 - **2026-08-04** — Created. Audited from `rumoar-app.html` + `build_deck.js`; added the
   three-breakpoint responsive layout and accessibility rules for the productisation.

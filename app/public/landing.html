@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>RUMOAR — Don’t just reach places. Arrive in style.</title>
+    <meta
+      name="description"
+      content="RUMOAR is an AI personal stylist for Indian men. It learns your wardrobe, your lifestyle, the weather and the occasion, then tells you exactly what to wear."
+    />
+    <meta name="theme-color" content="#F7F5F2" />
+
+    <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="/landing.css" />
+
+    <!--
+      IMAGE MANIFEST — every src below is a one-line swap.
+      Each slot is marked with data-slot so the whole set can be found at a glance.
+
+        hero            portrait, full body, generous headroom   3:4 or taller
+        moment-office   lifestyle, workday                       4:5
+        moment-dinner   lifestyle, evening                       4:5
+        moment-airport  lifestyle, travel                        4:5
+        moment-wedding  lifestyle, celebration                   4:5
+        moment-coffee   lifestyle, weekend                       4:5
+        place-mumbai    location / weather, monsoon              3:4
+        place-delhi     location / weather, winter               3:4
+        place-goa       location / weather, coastal              3:4
+        place-jaipur    location / weather, heat                 3:4
+        place-bangalore location / weather, evening              3:4
+        closing         portrait, editorial, room for stillness  16:10 or wider
+
+      The current srcs are real RUMOAR photography, reused across slots so the page is
+      never broken while the final set is shot.
+    -->
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <!-- ───────────────────────────── masthead ───────────────────────────── -->
+    <header class="masthead">
+      <a class="wordmark" href="/" aria-label="RUMOAR, home">RUMOAR</a>
+      <a class="btn btn--small" href="/app">Style me</a>
+    </header>
+
+    <main id="main">
+      <!-- ───────────────────────── 1 · hero ───────────────────────── -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__copy">
+          <h1 class="hero__title" id="hero-title">
+            Don’t just reach places.<br />
+            <em>Arrive in style.</em>
+          </h1>
+
+          <p class="hero__lede">
+            Your AI stylist for every moment,<br />
+            every season,<br />
+            every version of you.
+          </p>
+
+          <a class="btn btn--large" href="/app">Style me</a>
+
+          <p class="hero__note">Learns your wardrobe in under 2 minutes.</p>
+        </div>
+
+        <div class="hero__frame">
+          <img
+            class="hero__image"
+            data-slot="hero"
+            data-parallax
+            src="/samples/styled/you.jpg"
+            width="896"
+            height="1120"
+            alt="A man standing against a sunlit concrete wall in a linen shirt, trousers and a leather satchel"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+      </section>
+
+      <!-- ───────────────────────── 2 · moments ───────────────────────── -->
+      <section class="section" aria-labelledby="moments-title">
+        <h2 class="statement reveal" id="moments-title">
+          Life moves.<br />
+          <em>Your style should too.</em>
+        </h2>
+
+        <ul class="moments reveal" role="list">
+          <li class="card">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="moment-office"
+                src="/samples/feed/1.jpg"
+                width="618"
+                height="1100"
+                alt="Weekday tailoring: an unstructured jacket worn over a fine knit"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Office</figcaption>
+            </figure>
+          </li>
+          <li class="card">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="moment-dinner"
+                src="/samples/feed/2.jpg"
+                width="828"
+                height="1100"
+                alt="Evening dressing: a dark shirt worn open with tapered trousers"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Dinner</figcaption>
+            </figure>
+          </li>
+          <li class="card">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="moment-airport"
+                src="/samples/feed/3.jpg"
+                width="828"
+                height="1100"
+                alt="Travel dressing: layered neutrals with a soft shoulder bag"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Airport</figcaption>
+            </figure>
+          </li>
+          <li class="card">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="moment-wedding"
+                src="/samples/styled/peak.jpg"
+                width="718"
+                height="1120"
+                alt="Celebration dressing: a considered kurta silhouette with quiet accessories"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Wedding</figcaption>
+            </figure>
+          </li>
+          <li class="card">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="moment-coffee"
+                src="/samples/styled/catalog.jpg"
+                width="896"
+                height="1120"
+                alt="Weekend dressing: a relaxed shirt, easy trousers and leather loafers"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Coffee</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ───────────────────────── 3 · places ───────────────────────── -->
+      <section class="section" aria-labelledby="places-title">
+        <div class="section__head reveal">
+          <h2 class="statement" id="places-title">
+            Whatever the weather,<br />
+            <em>we’ve got your back.</em>
+          </h2>
+
+          <div class="rail__controls">
+            <button class="iconbtn" type="button" data-rail-prev aria-label="Previous places">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M15 5l-7 7 7 7" />
+              </svg>
+            </button>
+            <button class="iconbtn" type="button" data-rail-next aria-label="More places">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <ul class="rail reveal" role="list" tabindex="0" aria-label="Places and seasons">
+          <li class="card card--wide">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="place-mumbai"
+                src="/samples/feed/3.jpg"
+                width="828"
+                height="1100"
+                alt="Monsoon dressing in Mumbai: quick-drying layers and closed footwear"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Mumbai Monsoon</figcaption>
+            </figure>
+          </li>
+          <li class="card card--wide">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="place-delhi"
+                src="/samples/feed/1.jpg"
+                width="618"
+                height="1100"
+                alt="Winter dressing in Delhi: wool layers over a warm base"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Delhi Winter</figcaption>
+            </figure>
+          </li>
+          <li class="card card--wide">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="place-goa"
+                src="/samples/styled/catalog.jpg"
+                width="896"
+                height="1120"
+                alt="Coastal dressing in Goa: open linen and light leather"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Goa Vacation</figcaption>
+            </figure>
+          </li>
+          <li class="card card--wide">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="place-jaipur"
+                src="/samples/styled/you.jpg"
+                width="896"
+                height="1120"
+                alt="Summer dressing in Jaipur: loose weaves in pale, heat-reflecting tones"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Jaipur Summer</figcaption>
+            </figure>
+          </li>
+          <li class="card card--wide">
+            <figure class="card__figure">
+              <img
+                class="card__image"
+                data-slot="place-bangalore"
+                src="/samples/feed/2.jpg"
+                width="828"
+                height="1100"
+                alt="Evening dressing in Bangalore: a light overshirt for a cool night"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="card__label">Bangalore Evening</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ───────────────────────── 4 · how it reasons ───────────────────────── -->
+      <section class="section split" aria-labelledby="reco-title">
+        <div class="split__copy reveal">
+          <h2 class="statement statement--tight" id="reco-title">
+            Personalised recommendations.<br />
+            <em>Thoughtfully styled for you.</em>
+          </h2>
+
+          <p class="prose">
+            RUMOAR reads your wardrobe, your week and the sky outside, then puts together
+            something you already own — and tells you why it works. No endless scrolling. No
+            trends you didn’t ask for.
+          </p>
+
+          <a class="btn btn--large" href="/app">Style me</a>
+        </div>
+
+        <div class="flow reveal" aria-label="How a recommendation is built">
+          <article class="flowcard">
+            <p class="flowcard__eyebrow">The occasion</p>
+            <p class="flowcard__body">Dinner in Bandra. 29°, humid. You’ll be outside by the water.</p>
+          </article>
+
+          <div class="flow__link" aria-hidden="true"></div>
+
+          <article class="flowcard flowcard--outfit">
+            <p class="flowcard__eyebrow">Tonight</p>
+            <ul class="flowcard__list" role="list">
+              <li>Ecru linen shirt, sleeves rolled</li>
+              <li>Deep olive trousers</li>
+              <li>Brown leather loafers</li>
+              <li>Full-grain sling, worn short</li>
+            </ul>
+          </article>
+
+          <div class="flow__link" aria-hidden="true"></div>
+
+          <article class="flowcard">
+            <p class="flowcard__eyebrow">Why</p>
+            <p class="flowcard__body">
+              Linen breathes in the humidity, and the olive sits close to your warm undertone —
+              so the shirt reads clean rather than stark against your skin.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── 5 · closing ───────────────────────── -->
+      <section class="closing" aria-labelledby="closing-title">
+        <figure class="closing__frame reveal">
+          <img
+            class="closing__image"
+            data-slot="closing"
+            src="/samples/styled/peak.jpg"
+            width="718"
+            height="1120"
+            alt="A man dressed with quiet confidence, photographed in warm afternoon light"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <div class="closing__copy reveal">
+          <h2 class="statement" id="closing-title">Your style journey<br /><em>starts here.</em></h2>
+          <p class="prose prose--centre">
+            Three photographs. Two minutes. A stylist that already knows what’s in your wardrobe.
+          </p>
+          <a class="btn btn--large" href="/app">Style me</a>
+        </div>
+      </section>
+    </main>
+
+    <!-- ───────────────────────────── footer ───────────────────────────── -->
+    <footer class="footer">
+      <a class="wordmark" href="/" aria-label="RUMOAR, home">RUMOAR</a>
+      <nav class="footer__nav" aria-label="Footer">
+        <a href="https://instagram.com/rumoar" rel="noopener noreferrer" target="_blank">Instagram</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </nav>
+    </footer>
+
+    <script src="/landing.js" defer></script>
+  </body>
+</html>
