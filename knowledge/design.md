@@ -199,8 +199,11 @@ at least as wide as the phone shows them.
 
 ### 3.4 Screens that recompose
 
-- **Photo capture** — two panes: copy, progress tiles and actions left; the subject frame
-  right, spanning both rows at `min(62vh, 560px)`. DOM order stays the mobile order.
+- **Photo capture** — two panes: the subject frame holds the left column across both rows
+  at `min(64vh, 600px)`; the flow — tiles, title, hint, actions, privacy line — runs down
+  the right. DOM order stays the mobile order. There is no back link: the thumbnail tiles
+  are the navigation, and a second way back only made the two disagree about which one
+  meant "previous".
 - **Analysis** — a masthead (season at 68px left, confidence as its byline right), then a
   full-width colour band with named swatches and hex, then the readings in two columns
   (`columns-2`, `break-inside-avoid` per section).
@@ -279,6 +282,38 @@ Rules that apply across all nine:
   tile that navigates and a tile that does nothing feel identical at the moment of contact.
 - All of it is off under `prefers-reduced-motion`.
 
+### 7.1 Invalid: a finding, not an alert
+
+When a check disagrees with the user rather than failing, it must not arrive as a box
+bolted under the composition. The screen already has slots — eyebrow, title, hint, action
+stack — and the finding changes **what they say**, not what is on the page:
+
+| Slot | Normal | Under review |
+|---|---|---|
+| eyebrow | — | `SECOND LOOK · 1 OF 2` |
+| title | `Side` | `Is this your side shot?` |
+| hint | the shooting instruction | what the model read, and that keeping it is fine |
+| actions | `Next` + retake/upload | `Retake side` ink, `Keep it` ghost — same silhouette |
+| subject | the photograph | the same photograph, captioned `FILED AS SIDE · READS AS FRONT` |
+
+Rules this encodes:
+- **Jump to the evidence.** The step index moves to the shot in question so the tile, the
+  question and the photograph all agree.
+- **The tiles carry "which one".** A queried tile keeps its badge — we still have the
+  photo — and swaps `check` for `question_mark`, and its label goes ink even when it is
+  not the active step.
+- **A judgement is remembered; a replacement is not.** Only an explicit "Keep it" is
+  memoised, so the same photo is never queried twice, while a retake is new evidence and
+  gets checked like any other shot. Without this the check never terminates.
+- **Never a gate.** The escape sits directly under the primary, same height, same width.
+- **Two findings that are each other are a reorder, not a re-shoot.** Two shots each
+  detected as the other's angle offer `Swap them`, and nothing needs photographing again.
+- **A caption plate, not a label across the picture.** The reading sits under the frame
+  behind a hairline, in the mono eyebrow face.
+
+Failures (upload, session) keep `role="alert"` and ink body text. Findings like the above
+are `role="status"` and mute. The screen must never blur the two.
+
 ## 8. The editorial surface (landing page)
 
 The marketing page at `/` is **deliberately not** the product system above. It is a
@@ -318,5 +353,7 @@ list.
   rather than from external evidence.
 
 - **2026-08-06** — Desktop composition pass ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). § 3 rewritten: the content column became a CSS container, the measures were raised and centred, and capture, analysis and the product detail were recomposed rather than widened.
+
+- **2026-08-07** — Photo capture recomposed ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). Subject moved to the left column and the flow to the right; the back link removed in favour of the tiles; § 7.1 added for the angle-check finding, which replaced a full-bleed alert box under both panes. Fixed a live defect where the camera-permission notice and the action stack were declared in the same desktop grid cell and overlapped.
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)

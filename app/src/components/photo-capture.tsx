@@ -8,6 +8,12 @@ type Props = {
   hint: string;
   /** Rendered above the heading — the shot tiles, which belong with the copy on desktop. */
   lead?: React.ReactNode;
+  /** Replaces the state-derived button stack. The privacy line below it stays. */
+  actions?: React.ReactNode;
+  /** A caption printed on the photograph itself, in the frame's existing caption slot. */
+  band?: string;
+  /** A failure that belongs to the step rather than the camera. */
+  problem?: string | null;
   existing?: PickedImage | null;
   onCaptured: (image: PickedImage) => void;
   onNext: () => void;
@@ -17,7 +23,8 @@ type Props = {
 
 const DENIED_COPY =
   "Camera access is blocked for this site. Allow it in your browser settings, or upload instead.";
-const UNSUPPORTED_COPY = "This browser won't open the camera here. Upload a photo instead.";
+const UNSUPPORTED_COPY =
+  "This browser won't open the camera here. Upload a photo instead.";
 
 /**
  * One shot, and every action for it.
@@ -31,6 +38,9 @@ export function PhotoCapture({
   title,
   hint,
   lead,
+  actions,
+  band,
+  problem,
   existing,
   onCaptured,
   onNext,
@@ -68,7 +78,9 @@ export function PhotoCapture({
         }
       });
     } catch (error) {
-      setNotice((error as Error).message === "denied" ? DENIED_COPY : UNSUPPORTED_COPY);
+      setNotice(
+        (error as Error).message === "denied" ? DENIED_COPY : UNSUPPORTED_COPY,
+      );
       setLive(false);
     } finally {
       setOpening(false);
@@ -103,13 +115,13 @@ export function PhotoCapture({
 
   return (
     <div
-      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]
+      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]
                  lg:grid-rows-[auto_1fr] lg:gap-x-14 lg:items-start"
     >
       {/* DOM order is the mobile order — copy, subject, actions. Desktop re-places them:
-          copy and actions stack in the left column, the subject spans both rows on the
-          right. */}
-      <div className="lg:col-start-1 lg:row-start-1 lg:self-start">
+          the subject holds the left column across both rows and the flow runs down the
+          right, so the eye lands on the photograph first and the controls sit beside it. */}
+      <div className="lg:col-start-2 lg:row-start-1 lg:self-start">
         {lead}
         <h1 className="text-[26px] lg:text-[34px]">{title}</h1>
         <p className="text-mute text-[13px] lg:text-[15px] leading-relaxed mt-1 lg:mt-3 lg:max-w-[40ch]">
@@ -119,55 +131,74 @@ export function PhotoCapture({
 
       {/* Capped, and centred. A full-bleed hero pushed every control below the fold and
           made the step look like it had nothing to do. */}
-      <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2 relative w-full h-[clamp(300px,46vh,440px)] lg:h-[min(62vh,560px)] bg-wash overflow-hidden mt-4 lg:mt-0">
-        {live ? (
-          <>
-            <video
-              ref={videoRef}
-              playsInline
-              muted
-              aria-label="Camera preview"
-              // Mirroring the preview only. The captured frame is never mirrored.
-              className={`w-full h-full object-contain ${facing === "user" ? "-scale-x-100" : ""}`}
-            >
-              <track kind="captions" />
-            </video>
-            <div
-              aria-hidden
-              className="absolute inset-x-[16%] inset-y-[5%] border border-paper/70 pointer-events-none"
-            />
-            <span className="absolute bottom-2 inset-x-0 text-center k text-paper drop-shadow">
-              Head to feet in frame
-            </span>
-          </>
-        ) : preview ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={preview}
-            alt={`Your ${title.toLowerCase()} photo`}
-            className="w-full h-full object-contain"
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-8 text-center">
-            <span className="mi text-[28px] text-mute" aria-hidden>
-              person
-            </span>
-            <span className="k text-mute">Head to feet in frame</span>
-          </div>
+      <div className="lg:col-start-1 lg:row-start-1 lg:row-span-2 mt-4 lg:mt-0">
+        <div className="relative w-full h-[clamp(300px,46vh,440px)] lg:h-[min(64vh,600px)] bg-wash overflow-hidden">
+          {live ? (
+            <>
+              <video
+                ref={videoRef}
+                playsInline
+                muted
+                aria-label="Camera preview"
+                // Mirroring the preview only. The captured frame is never mirrored.
+                className={`w-full h-full object-contain ${facing === "user" ? "-scale-x-100" : ""}`}
+              >
+                <track kind="captions" />
+              </video>
+              <div
+                aria-hidden
+                className="absolute inset-x-[16%] inset-y-[5%] border border-paper/70 pointer-events-none"
+              />
+              <span className="absolute bottom-2 inset-x-0 text-center k text-paper drop-shadow">
+                Head to feet in frame
+              </span>
+            </>
+          ) : preview ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={preview}
+                alt={`Your ${title.toLowerCase()} photo`}
+                className="w-full h-full object-contain"
+              />
+            </>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-8 text-center">
+              <span className="mi text-[28px] text-mute" aria-hidden>
+                person
+              </span>
+              <span className="k text-mute">Head to feet in frame</span>
+            </div>
+          )}
+        </div>
+
+        {/* A plate under the picture, not a label across it. The claim is about what is in
+          the photograph, so it is captioned like one. */}
+        {band && (
+          <p className="border-t border-line px-3 py-2.5 k text-ink">{band}</p>
         )}
       </div>
 
-      {notice && (
-        <p
-          role="alert"
-          className="text-[13px] text-mute leading-relaxed mt-3 lg:col-start-1 lg:row-start-2 lg:mt-0 lg:mb-3"
-        >
-          {notice}
-        </p>
-      )}
+      <div className="mt-4 lg:mt-8 lg:col-start-2 lg:row-start-2 lg:self-start">
+        {/* Inside the stack, not beside it: as a sibling grid item this shared a cell with
+            the buttons and rendered on top of them. */}
+        {problem && (
+          <p role="alert" className="text-[14px] leading-relaxed mb-3">
+            {problem}
+          </p>
+        )}
+        {notice && (
+          <p
+            role="alert"
+            className="text-[13px] text-mute leading-relaxed mb-3"
+          >
+            {notice}
+          </p>
+        )}
 
-      <div className="mt-4 lg:mt-8 lg:col-start-1 lg:row-start-2 lg:self-start">
-        {live ? (
+        {actions ? (
+          actions
+        ) : live ? (
           <div className="flex flex-col gap-2.5">
             <button className="btn w-full" onClick={shoot}>
               <span className="mi text-[20px]" aria-hidden>
@@ -178,7 +209,9 @@ export function PhotoCapture({
             <div className="flex gap-2.5">
               <button
                 className="btn btn-ghost flex-1"
-                onClick={() => start(facing === "user" ? "environment" : "user")}
+                onClick={() =>
+                  start(facing === "user" ? "environment" : "user")
+                }
               >
                 <span className="mi text-[18px]" aria-hidden>
                   cameraswitch
@@ -222,7 +255,11 @@ export function PhotoCapture({
           <div className="flex flex-col gap-2.5">
             {camera.supportsLive() ? (
               <>
-                <button className="btn w-full" onClick={() => start(facing)} disabled={opening}>
+                <button
+                  className="btn w-full"
+                  onClick={() => start(facing)}
+                  disabled={opening}
+                >
                   <span className="mi text-[20px]" aria-hidden>
                     photo_camera
                   </span>
@@ -244,8 +281,9 @@ export function PhotoCapture({
         )}
 
         <p className="text-[11px] text-mute leading-snug mt-5">
-          Only you ever see these. They&rsquo;re read for colouring and fit, then kept
-          private — never shown to anyone else, never used to train anything.
+          Only you ever see these. They&rsquo;re read for colouring and fit,
+          then kept private — never shown to anyone else, never used to train
+          anything.
         </p>
       </div>
     </div>

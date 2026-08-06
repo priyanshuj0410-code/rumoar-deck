@@ -8,9 +8,18 @@ import { readEvents } from "@/lib/ndjson";
 import { PhotoCapture } from "@/components/photo-capture";
 import { Modal } from "@/components/modal";
 import { ReactionBar } from "@/components/reaction-bar";
-import { BODY_SHAPES, FACE_SHAPES, ShapeReading } from "@/components/shape-diagram";
+import {
+  BODY_SHAPES,
+  FACE_SHAPES,
+  ShapeReading,
+} from "@/components/shape-diagram";
 import { readableOn, SWATCH_RING } from "@/lib/colour";
-import type { ColourAnalysis, OnboardingStage, Profile, StyleSuggestion } from "@/lib/types";
+import type {
+  ColourAnalysis,
+  OnboardingStage,
+  Profile,
+  StyleSuggestion,
+} from "@/lib/types";
 import { addPhotos, finishOnboarding, savePhotos, setStage } from "./actions";
 
 const SHOTS = [
@@ -34,13 +43,18 @@ function normalise(stage: OnboardingStage): OnboardingStage {
 
 /** Instant, not smooth: a new screen should already be at its top, not travel there. */
 function scrollToTop() {
-  if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+  if (typeof window !== "undefined")
+    window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 export function Onboarding({ profile }: { profile: Profile }) {
   const router = useRouter();
-  const [stage, setLocalStage] = useState<OnboardingStage>(normalise(profile.onboarding_stage));
-  const [analysis, setAnalysis] = useState<ColourAnalysis | null>(profile.analysis ?? null);
+  const [stage, setLocalStage] = useState<OnboardingStage>(
+    normalise(profile.onboarding_stage),
+  );
+  const [analysis, setAnalysis] = useState<ColourAnalysis | null>(
+    profile.analysis ?? null,
+  );
   const [pending, startTransition] = useTransition();
 
   function go(next: OnboardingStage) {
@@ -112,13 +126,18 @@ function BackLink({ label, onBack }: { label: string; onBack: () => void }) {
  * The three shots are the progress indicator. A separate bar or counter alongside them
  * is a second answer to a question the tiles already answer.
  */
+type Mismatch = { index: number; detected: string };
+
 function ShotTiles({
   shots,
   current,
+  flagged = [],
   onPick,
 }: {
   shots: (PickedImage | null)[];
   current: number;
+  /** Shots the angle check has queried. The strip is where "which one" gets answered. */
+  flagged?: Mismatch[];
   onPick: (index: number) => void;
 }) {
   return (
@@ -126,26 +145,40 @@ function ShotTiles({
       {SHOTS.map((shot, index) => {
         const image = shots[index];
         const active = index === current;
+        const flag = flagged.find((m) => m.index === index);
         return (
           <li key={shot.label}>
             <button
               onClick={() => onPick(index)}
               aria-current={active ? "step" : undefined}
               aria-label={
-                image ? `${shot.label} — taken. Go to it.` : `${shot.label} — not taken yet`
+                flag
+                  ? `${shot.label} — taken, but it looks like a ${flag.detected} shot. Go to it.`
+                  : image
+                    ? `${shot.label} — taken. Go to it.`
+                    : `${shot.label} — not taken yet`
               }
-              className="block text-left"
+              className="block text-left group"
             >
               {/* The ring goes on the image only. Wrapping the label in it made the
                   pair read as a text input with the shot name typed into it. */}
               <span
-                className={`block w-[58px] aspect-[3/4] bg-wash overflow-hidden relative ${
-                  active ? "shadow-[inset_0_0_0_2px_var(--color-ink)]" : ""
-                }`}
+                // These are the only way back on this screen, so they answer to a hover
+                // rather than sitting there looking like a progress readout.
+                className={`block w-[58px] lg:w-[68px] aspect-[3/4] bg-wash overflow-hidden relative
+                            transition-shadow ${
+                              active
+                                ? "shadow-[inset_0_0_0_2px_var(--color-ink)]"
+                                : "group-hover:shadow-[inset_0_0_0_1px_var(--color-mute)]"
+                            }`}
               >
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={image.dataUrl} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={image.dataUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <span className="absolute inset-0 flex items-center justify-center">
                     <span className="mi text-[16px] text-mute" aria-hidden>
@@ -157,16 +190,23 @@ function ShotTiles({
                   <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-ink text-paper flex items-center justify-center">
                     <span
                       className="mi text-[11px]"
-                      style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'opsz' 20" }}
+                      style={{
+                        fontVariationSettings:
+                          "'FILL' 1, 'wght' 500, 'opsz' 20",
+                      }}
                       aria-hidden
                     >
-                      check
+                      {flag ? "question_mark" : "check"}
                     </span>
                   </span>
                 )}
               </span>
               <span
-                className={`text-[10px] mt-1 block tracking-wide ${active ? "text-ink" : "text-mute"}`}
+                // A queried tile keeps its ink label even when it is not the step you are
+                // on, so two outstanding flags are legible across the strip at a glance.
+                className={`text-[10px] lg:text-[11px] mt-1 block tracking-wide transition-colors ${
+                  active || flag ? "text-ink" : "text-mute group-hover:text-ink"
+                }`}
               >
                 {shot.label}
               </span>
@@ -179,15 +219,34 @@ function ShotTiles({
 }
 
 function PhotosStep({ onDone }: { onDone: () => void }) {
-  const [shots, setShots] = useState<(PickedImage | null)[]>([null, null, null]);
+  const [shots, setShots] = useState<(PickedImage | null)[]>([
+    null,
+    null,
+    null,
+  ]);
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mismatches, setMismatches] = useState<{ index: number; detected: string }[] | null>(null);
+  const [mismatches, setMismatches] = useState<Mismatch[]>([]);
+  // A judgement, not a cache: only an explicit "Keep it" lands here, so a photo the user
+  // has already vouched for is never queried twice, while a *replacement* is new evidence
+  // and gets checked like any other shot.
+  const [kept, setKept] = useState<number[]>([]);
 
   const current = shots[index];
   const isLast = index === SHOTS.length - 1;
   const complete = shots.every(Boolean);
+
+  const flag = mismatches.find((m) => m.index === index) ?? null;
+  const seat = mismatches.findIndex((m) => m.index === index) + 1;
+  // Two shots each detected as the other's angle are not bad photographs — they are the
+  // right photographs in the wrong order, and that is a reorder, not a re-shoot.
+  const swapped =
+    mismatches.length === 2 &&
+    mismatches[0].detected.toLowerCase() ===
+      SHOTS[mismatches[1].index].label.toLowerCase() &&
+    mismatches[1].detected.toLowerCase() ===
+      SHOTS[mismatches[0].index].label.toLowerCase();
 
   /**
    * Confirms each shot is the angle it claims to be. A side photo filed as the front
@@ -202,10 +261,17 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
       });
       const json = (await response.json()) as {
         checked?: boolean;
-        mismatches?: { index: number; detected: string }[];
+        mismatches?: Mismatch[];
       };
       if (!json.checked || !json.mismatches?.length) return true;
-      setMismatches(json.mismatches);
+
+      const fresh = json.mismatches.filter((m) => !kept.includes(m.index));
+      if (!fresh.length) return true;
+
+      // The tiles are the navigation, so the question and the highlighted tile have to
+      // agree — and the photograph being questioned has to be the one on screen.
+      setMismatches(fresh);
+      setIndex(fresh[0].index);
       return false;
     } catch {
       // The check is a safeguard, not a gate.
@@ -215,7 +281,7 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
 
   async function finish(skipCheck = false) {
     setError(null);
-    setMismatches(null);
+    setMismatches([]);
     setBusy(true);
 
     const images = shots.filter((s): s is PickedImage => s !== null);
@@ -250,7 +316,9 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         const small = await camera.resize(image.file, 768);
         await supabase.storage
           .from("wardrobe")
-          .upload(path.replace(/\.jpg$/, "-sm.jpg"), small, { contentType: "image/jpeg" });
+          .upload(path.replace(/\.jpg$/, "-sm.jpg"), small, {
+            contentType: "image/jpeg",
+          });
       }
     }
 
@@ -273,35 +341,135 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
     onDone();
   }
 
-  return (
-    <div className="flex flex-col">
-      {index > 0 && (
-        <div className="mb-4">
-          <BackLink
-            label={SHOTS[index - 1].label}
-            onBack={() => {
-              setIndex(index - 1);
-              scrollToTop();
-            }}
-          />
-        </div>
-      )}
+  /** Drops the flag on `at` and moves to whatever is still outstanding. */
+  function clearFlag(at: number, vouched: boolean) {
+    const rest = mismatches.filter((m) => m.index !== at);
+    if (vouched) setKept((all) => (all.includes(at) ? all : [...all, at]));
+    setMismatches(rest);
+    if (rest.length > 0) {
+      setIndex(rest[0].index);
+      scrollToTop();
+    }
+  }
 
+  const label = SHOTS[index].label;
+
+  return (
+    // No back link. The tiles are the navigation on this screen — a second way back
+    // beside them only made the two disagree about which one meant "previous".
+    <div className="flex flex-col">
+      {/* The angle check does not add a region to this screen. It changes what the four
+          slots in the flow pane say — eyebrow, title, hint, actions — and jumps to the
+          photograph in question, so the evidence is already on the left. */}
       <PhotoCapture
         key={index}
-        title={SHOTS[index].label}
-        hint={SHOTS[index].hint}
-        // The tiles travel with the copy: on desktop they belong in the left pane beside
+        title={
+          flag
+            ? swapped
+              ? "Are these the right way round?"
+              : `Is this your ${label.toLowerCase()} shot?`
+            : label
+        }
+        hint={
+          flag
+            ? swapped
+              ? `${SHOTS[mismatches[0].index].label} and ${SHOTS[mismatches[1].index].label} look swapped. Nothing needs re-shooting — we can put them the right way round.`
+              : `It reads as a ${flag.detected} shot. If we've got that wrong, keep it and carry on.`
+            : SHOTS[index].hint
+        }
+        band={
+          flag ? `Filed as ${label} · reads as ${flag.detected}` : undefined
+        }
+        problem={error}
+        // The tiles travel with the copy: on desktop they belong in the flow pane beside
         // the subject, not stranded above the whole layout.
         lead={
-          <ShotTiles
-            shots={shots}
-            current={index}
-            onPick={(next) => {
-              setIndex(next);
-              scrollToTop();
-            }}
-          />
+          <>
+            <ShotTiles
+              shots={shots}
+              current={index}
+              flagged={mismatches}
+              onPick={(next) => {
+                setIndex(next);
+                scrollToTop();
+              }}
+            />
+            {flag && (
+              <p className="k mb-2" role="status">
+                Second look
+                {mismatches.length > 1 && !swapped
+                  ? ` · ${seat} of ${mismatches.length}`
+                  : ""}
+                <span className="sr-only">
+                  {swapped
+                    ? ". Two photos look swapped. You can put them the right way round, or keep them as they are."
+                    : `. Your ${label.toLowerCase()} photo looks like a ${flag.detected} shot. You can retake it, or keep it.`}
+                </span>
+              </p>
+            )}
+          </>
+        }
+        actions={
+          flag ? (
+            <div className="flex flex-col gap-2.5">
+              {swapped ? (
+                <>
+                  <button
+                    className="btn w-full"
+                    onClick={() => {
+                      const [a, b] = mismatches;
+                      setShots((all) =>
+                        all.map((shot, i) =>
+                          i === a.index
+                            ? all[b.index]
+                            : i === b.index
+                              ? all[a.index]
+                              : shot,
+                        ),
+                      );
+                      setMismatches([]);
+                    }}
+                  >
+                    <span className="mi text-[19px]" aria-hidden>
+                      swap_horiz
+                    </span>
+                    Swap them
+                  </button>
+                  <button
+                    className="btn btn-ghost w-full"
+                    onClick={() => {
+                      setKept(mismatches.map((m) => m.index));
+                      setMismatches([]);
+                    }}
+                  >
+                    Keep them as they are
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Retaking drops back into the ordinary empty step, which is where the
+                      instruction for getting this shot right already lives. */}
+                  <button
+                    className="btn w-full"
+                    onClick={() => {
+                      setShots((all) =>
+                        all.map((shot, i) => (i === index ? null : shot)),
+                      );
+                      clearFlag(index, false);
+                    }}
+                  >
+                    Retake {label.toLowerCase()}
+                  </button>
+                  <button
+                    className="btn btn-ghost w-full"
+                    onClick={() => clearFlag(index, true)}
+                  >
+                    Keep it
+                  </button>
+                </>
+              )}
+            </div>
+          ) : undefined
         }
         existing={current}
         busy={busy}
@@ -318,37 +486,6 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
           }
         }}
       />
-
-      {error && (
-        <p role="alert" className="text-sm leading-relaxed mt-3">
-          {error}
-        </p>
-      )}
-
-      {mismatches && (
-        <div role="alert" className="border border-line p-4 mt-4">
-          <p className="text-sm leading-relaxed">
-            {mismatches.length === 1
-              ? `The ${SHOTS[mismatches[0].index].label.toLowerCase()} photo looks like a ${mismatches[0].detected} shot.`
-              : `${mismatches.length} photos don't look like the angle they're filed under.`}{" "}
-            The read is built on these, so it's worth a look.
-          </p>
-          <div className="flex gap-2.5 mt-3">
-            <button
-              className="btn btn-sm flex-1"
-              onClick={() => {
-                setIndex(mismatches[0].index);
-                setMismatches(null);
-              }}
-            >
-              Fix {SHOTS[mismatches[0].index].label.toLowerCase()}
-            </button>
-            <button className="btn btn-ghost btn-sm flex-1" onClick={() => void finish(true)}>
-              Use them anyway
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -400,7 +537,9 @@ function AnalysisStep({
     setProse("");
     buffered.current = "";
     setRevealed(0);
-    setStatus(refinement ? "Taking your note into account" : "Opening your photos");
+    setStatus(
+      refinement ? "Taking your note into account" : "Opening your photos",
+    );
 
     try {
       const response = await fetch("/api/analyze", {
@@ -414,10 +553,10 @@ function AnalysisStep({
         if (event.t === "text") {
           buffered.current += event.v;
           setProse(buffered.current);
-        }
-        else if (event.t === "status") setStatus(event.v);
+        } else if (event.t === "status") setStatus(event.v);
         else if (event.t === "error") setError(event.message);
-        else if (event.t === "done") setAnalysis(event.payload as ColourAnalysis);
+        else if (event.t === "done")
+          setAnalysis(event.payload as ColourAnalysis);
       });
     } catch {
       setError("Couldn't reach the analyser. Check your connection.");
@@ -474,7 +613,10 @@ function AnalysisStep({
       <div className="flex-1 flex flex-col pt-6">
         <BackLink label="Photos" onBack={onBack} />
         <p className="k flex items-center gap-2 mt-4">
-          <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />
+          <span
+            className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse"
+            aria-hidden
+          />
           {status}
         </p>
         <h1 className="text-[28px] lg:text-[52px] mt-2 lg:mt-3">Reading you</h1>
@@ -537,8 +679,8 @@ function AnalysisStep({
             {analysis.season}
           </h1>
           <p className="text-mute text-sm lg:text-[15px] leading-relaxed mt-2 lg:mt-4">
-            {analysis.undertone} undertone · {analysis.depth} depth · {analysis.contrast} contrast ·{" "}
-            {analysis.chroma}
+            {analysis.undertone} undertone · {analysis.depth} depth ·{" "}
+            {analysis.contrast} contrast · {analysis.chroma}
           </p>
         </div>
 
@@ -546,12 +688,17 @@ function AnalysisStep({
           <h2 className="k mb-2">Confidence</h2>
           <div className="flex items-center gap-3">
             <div className="h-0.5 bg-line flex-1">
-              <div className="h-full bg-ink" style={{ width: `${confidence}%` }} />
+              <div
+                className="h-full bg-ink"
+                style={{ width: `${confidence}%` }}
+              />
             </div>
             <span className="font-mono text-[12px]">{confidence}%</span>
           </div>
           {analysis.caveat && (
-            <p className="text-mute text-[13px] leading-relaxed mt-2">{analysis.caveat}</p>
+            <p className="text-mute text-[13px] leading-relaxed mt-2">
+              {analysis.caveat}
+            </p>
           )}
         </section>
       </header>
@@ -590,14 +737,19 @@ function AnalysisStep({
             <h3 className="k lg:shrink-0 lg:pt-1">Skip these</h3>
             <ul className="flex flex-wrap gap-2 lg:gap-5 mt-2 lg:mt-0">
               {analysis.avoid_colours.map((colour) => (
-                <li key={colour.hex} className="flex items-center gap-1.5 lg:gap-2">
+                <li
+                  key={colour.hex}
+                  className="flex items-center gap-1.5 lg:gap-2"
+                >
                   <span
                     className="w-4 h-4 lg:w-5 lg:h-5 block"
                     style={{ background: colour.hex, boxShadow: SWATCH_RING }}
                     role="img"
                     aria-label={colour.name}
                   />
-                  <span className="text-[12px] lg:text-[13px]">{colour.name}</span>
+                  <span className="text-[12px] lg:text-[13px]">
+                    {colour.name}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -612,7 +764,9 @@ function AnalysisStep({
 
         {analysis.build.fit_notes && (
           <Row label="Fit">
-            <p className="text-sm leading-relaxed">{analysis.build.fit_notes}</p>
+            <p className="text-sm leading-relaxed">
+              {analysis.build.fit_notes}
+            </p>
           </Row>
         )}
 
@@ -651,20 +805,28 @@ function AnalysisStep({
                 .filter(Boolean)
                 .join(" · ")}
             </p>
-            <p className="text-sm leading-relaxed mt-1">{analysis.physique.hair.styling}</p>
+            <p className="text-sm leading-relaxed mt-1">
+              {analysis.physique.hair.styling}
+            </p>
           </Row>
         )}
 
-        {analysis.physique?.beard?.present && analysis.physique.beard.colour && (
-          <Row label="Beard">
-            <p className="text-[13px] text-mute">
-              {[analysis.physique.beard.colour, analysis.physique.beard.length]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-            <p className="text-sm leading-relaxed mt-1">{analysis.physique.beard.styling}</p>
-          </Row>
-        )}
+        {analysis.physique?.beard?.present &&
+          analysis.physique.beard.colour && (
+            <Row label="Beard">
+              <p className="text-[13px] text-mute">
+                {[
+                  analysis.physique.beard.colour,
+                  analysis.physique.beard.length,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+              <p className="text-sm leading-relaxed mt-1">
+                {analysis.physique.beard.styling}
+              </p>
+            </Row>
+          )}
 
         {analysis.notes && (
           <Row label="In short">
@@ -676,7 +838,10 @@ function AnalysisStep({
           <Row label="Your notes so far">
             <ul className="flex flex-col gap-1.5">
               {analysis.refinements.map((entry, index) => (
-                <li key={index} className="text-[13px] text-mute leading-relaxed">
+                <li
+                  key={index}
+                  className="text-[13px] text-mute leading-relaxed"
+                >
                   &ldquo;{entry}&rdquo;
                 </li>
               ))}
@@ -687,7 +852,10 @@ function AnalysisStep({
         {/* Behind a button. Permanently open, this input sat under the reading it was
             about and made the screen feel like a form rather than a result. */}
         <Row label="Not quite right?">
-          <button className="btn btn-ghost btn-sm" onClick={() => setRefining(true)}>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setRefining(true)}
+          >
             <span className="mi text-[18px]" aria-hidden>
               tune
             </span>
@@ -695,13 +863,17 @@ function AnalysisStep({
           </button>
           {added > 0 && (
             <p className="text-[12px] text-mute mt-2">
-              {added} more {added === 1 ? "photo" : "photos"} added. They&rsquo;ll be used on the
-              next run.
+              {added} more {added === 1 ? "photo" : "photos"} added.
+              They&rsquo;ll be used on the next run.
             </p>
           )}
         </Row>
 
-        <Modal open={refining} title="Refine the analysis" onClose={() => setRefining(false)}>
+        <Modal
+          open={refining}
+          title="Refine the analysis"
+          onClose={() => setRefining(false)}
+        >
           <form
             onSubmit={(event) => {
               event.preventDefault();
@@ -714,7 +886,8 @@ function AnalysisStep({
             }}
           >
             <p className="text-mute text-sm leading-relaxed">
-              Tell me what to reconsider. You know things the photos can&rsquo;t show.
+              Tell me what to reconsider. You know things the photos can&rsquo;t
+              show.
             </p>
             <label htmlFor="refine" className="sr-only">
               What should the analysis reconsider?
@@ -751,8 +924,8 @@ function AnalysisStep({
         </Modal>
 
         <p className="text-[11px] text-mute leading-snug py-4">
-          Colour analysis from photos is affected by lighting and camera white balance. Treat this
-          as a strong starting point, not a verdict.
+          Colour analysis from photos is affected by lighting and camera white
+          balance. Treat this as a strong starting point, not a verdict.
         </p>
       </div>
 
@@ -772,7 +945,13 @@ function AnalysisStep({
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     // break-inside-avoid so a section is never split down the middle of a column.
     <section className="py-4 border-t border-line break-inside-avoid">
@@ -805,12 +984,17 @@ function StylesStep({
 
         await readEvents(response.body, (event) => {
           if (cancelled) return;
-          if (event.t === "style") setStyles((current) => [...current, event.style as StyleSuggestion]);
+          if (event.t === "style")
+            setStyles((current) => [
+              ...current,
+              event.style as StyleSuggestion,
+            ]);
           else if (event.t === "status") setStatus(event.v);
           else if (event.t === "error") setError(event.message);
         });
       } catch {
-        if (!cancelled) setError("Couldn't reach the stylist. Check your connection.");
+        if (!cancelled)
+          setError("Couldn't reach the stylist. Check your connection.");
       } finally {
         if (!cancelled) setRunning(false);
       }
@@ -825,7 +1009,12 @@ function StylesStep({
     <div className="flex-1 flex flex-col pt-6">
       <BackLink label="Analysis" onBack={onBack} />
       <p className="k flex items-center gap-2 mt-4">
-        {running && <span className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse" aria-hidden />}
+        {running && (
+          <span
+            className="w-1.5 h-1.5 bg-ink rounded-full animate-pulse"
+            aria-hidden
+          />
+        )}
         {running ? status : "Built for your colouring"}
       </p>
       <h1 className="text-[28px] lg:text-[56px] lg:leading-[0.98] mt-2 lg:mt-3">
@@ -845,13 +1034,15 @@ function StylesStep({
 
         {/* Placeholders for the directions still generating, so the page has shape. */}
         {running &&
-          Array.from({ length: Math.max(0, 3 - styles.length) }).map((_, index) => (
-            <div key={`pending-${index}`} className="flex flex-col gap-2">
-              <span className="skel h-6 w-[52%] block" />
-              <span className="skel h-4 w-[72%] block" />
-              <span className="skel aspect-[3/4] w-full block mt-2" />
-            </div>
-          ))}
+          Array.from({ length: Math.max(0, 3 - styles.length) }).map(
+            (_, index) => (
+              <div key={`pending-${index}`} className="flex flex-col gap-2">
+                <span className="skel h-6 w-[52%] block" />
+                <span className="skel h-4 w-[72%] block" />
+                <span className="skel aspect-[3/4] w-full block mt-2" />
+              </div>
+            ),
+          )}
 
         {error && (
           <p role="alert" className="text-sm text-mute leading-relaxed">
@@ -883,7 +1074,10 @@ function StylesStep({
 function StyleCard({ style: initial }: { style: StyleSuggestion }) {
   const [style, setStyle] = useState(initial);
   const [url, setUrl] = useState<string | null>(null);
-  const [failed, setFailed] = useState<{ message: string; reason?: string } | null>(null);
+  const [failed, setFailed] = useState<{
+    message: string;
+    reason?: string;
+  } | null>(null);
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [reworking, setReworking] = useState(false);
@@ -897,9 +1091,17 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: style.id }),
       });
-      const json = (await response.json()) as { url?: string; message?: string; reason?: string };
+      const json = (await response.json()) as {
+        url?: string;
+        message?: string;
+        reason?: string;
+      };
       if (json.url) setUrl(json.url);
-      else setFailed({ message: json.message ?? "Couldn't render that one.", reason: json.reason });
+      else
+        setFailed({
+          message: json.message ?? "Couldn't render that one.",
+          reason: json.reason,
+        });
     } catch {
       setFailed({ message: "Couldn't reach the renderer." });
     }
@@ -917,7 +1119,10 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: style.id, note: trimmed }),
       });
-      const json = (await response.json()) as { style?: StyleSuggestion; message?: string };
+      const json = (await response.json()) as {
+        style?: StyleSuggestion;
+        message?: string;
+      };
       if (json.style) {
         setStyle(json.style);
         setNote("");
@@ -967,7 +1172,6 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
             <span className="k">Dressing you…</span>
           </div>
         )}
-
       </div>
 
       {/* The palette is the direction, not a garnish on it: full width, named, and
@@ -977,7 +1181,9 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
         <ul
           className="grid"
           role="list"
-          style={{ gridTemplateColumns: `repeat(${style.palette.length}, minmax(0, 1fr))` }}
+          style={{
+            gridTemplateColumns: `repeat(${style.palette.length}, minmax(0, 1fr))`,
+          }}
         >
           {style.palette.map((colour) => (
             <li
@@ -989,13 +1195,16 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
               className="min-h-[76px] p-2.5 flex flex-col justify-end"
               style={{ background: colour.hex, color: readableOn(colour.hex) }}
             >
-              <span className="text-[12px] font-medium leading-tight">{colour.name}</span>
-              <span className="font-mono text-[10px] opacity-70 mt-0.5">{colour.hex}</span>
+              <span className="text-[12px] font-medium leading-tight">
+                {colour.name}
+              </span>
+              <span className="font-mono text-[10px] opacity-70 mt-0.5">
+                {colour.hex}
+              </span>
             </li>
           ))}
         </ul>
       )}
-
 
       {failed ? (
         <div className="mt-2">
@@ -1007,7 +1216,9 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
           </div>
           {failed.reason && (
             // The upstream reason, verbatim. Without it a render failure is a guess.
-            <p className="text-[11px] text-mute/80 font-mono mt-1.5 break-all">{failed.reason}</p>
+            <p className="text-[11px] text-mute/80 font-mono mt-1.5 break-all">
+              {failed.reason}
+            </p>
           )}
         </div>
       ) : (
@@ -1026,7 +1237,9 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
 
       <h2 className="text-[21px] mt-2">{style.name}</h2>
       {style.one_liner && (
-        <p className="text-mute text-sm leading-relaxed mt-1">{style.one_liner}</p>
+        <p className="text-mute text-sm leading-relaxed mt-1">
+          {style.one_liner}
+        </p>
       )}
 
       <button
@@ -1055,7 +1268,8 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
           }}
         >
           <p className="text-mute text-sm leading-relaxed">
-            Say what to change. Only this direction moves — the other two stay as they are.
+            Say what to change. Only this direction moves — the other two stay
+            as they are.
           </p>
           <label htmlFor={`note-${style.id}`} className="sr-only">
             Suggest a change to {style.name}
@@ -1068,7 +1282,10 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
             onChange={(event) => setNote(event.target.value)}
             disabled={reworking}
           />
-          <button className="btn w-full mt-3" disabled={!note.trim() || reworking}>
+          <button
+            className="btn w-full mt-3"
+            disabled={!note.trim() || reworking}
+          >
             {reworking ? "Reworking…" : "Rework this direction"}
           </button>
         </form>
@@ -1092,7 +1309,10 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
           {style.key_pieces.length > 0 && (
             <ul className="mt-3 flex flex-wrap gap-1.5">
               {style.key_pieces.map((piece) => (
-                <li key={piece} className="text-[12px] border border-line px-2 py-1">
+                <li
+                  key={piece}
+                  className="text-[12px] border border-line px-2 py-1"
+                >
                   {piece}
                 </li>
               ))}
@@ -1100,7 +1320,8 @@ function StyleCard({ style: initial }: { style: StyleSuggestion }) {
           )}
           {url && (
             <p className="text-[11px] text-mute mt-3 leading-snug">
-              Generated from your photo — an impression of the direction, not real garments.
+              Generated from your photo — an impression of the direction, not
+              real garments.
             </p>
           )}
         </div>
