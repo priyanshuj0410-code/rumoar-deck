@@ -1,7 +1,7 @@
 /* ============================================================================
    RUMOAR — landing page behaviour
-   Three things only: sections fade up as they enter, the hero image drifts on
-   scroll, and the places rail can be driven by its arrows. Nothing here is
+   Four things: sections fade up, the hero drifts on scroll, the nav gains a rule
+   once the page moves, and the rails can be driven by their arrows. None of it is
    required for the page to be readable or usable.
    ========================================================================= */
 
@@ -14,8 +14,7 @@
   const reveals = document.querySelectorAll(".reveal");
 
   if (reduceMotion.matches || !("IntersectionObserver" in window)) {
-    // No observer, no preference for motion: show everything immediately. The
-    // content must never depend on the animation having run.
+    // Content must never depend on the animation having run.
     reveals.forEach((el) => el.classList.add("is-visible"));
   } else {
     const observer = new IntersectionObserver(
@@ -26,49 +25,46 @@
           observer.unobserve(entry.target);
         });
       },
-      // Fire a little before the element arrives, so it is already settled by
-      // the time it is properly in view.
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
     );
-
     reveals.forEach((el) => observer.observe(el));
   }
 
-  /* ── hero parallax ──────────────────────────────────────────────────── */
+  /* ── nav rule + hero parallax ───────────────────────────────────────── */
+  const nav = document.querySelector("[data-nav]");
   const hero = document.querySelector("[data-parallax]");
+  const MAX_SCALE = 0.05;
+  let ticking = false;
 
-  if (hero && !reduceMotion.matches) {
-    const MAX_SCALE = 0.05; // 5% over the height of the hero
-    let ticking = false;
+  const onFrame = () => {
+    ticking = false;
 
-    const update = () => {
-      ticking = false;
-      const frame = hero.parentElement;
-      if (!frame) return;
+    if (nav) nav.classList.toggle("is-stuck", window.scrollY > 8);
 
-      const { top, height } = frame.getBoundingClientRect();
+    if (hero && !reduceMotion.matches) {
+      const section = hero.parentElement;
+      if (!section) return;
+      const { top, height } = section.getBoundingClientRect();
       // 0 while the hero is at rest, 1 once it has scrolled fully past.
       const progress = Math.min(Math.max(-top / (height || 1), 0), 1);
       hero.style.transform = `scale(${1 + progress * MAX_SCALE})`;
-    };
+    }
+  };
 
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    };
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(onFrame);
+  };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    update();
-  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+  onFrame();
 
-  /* ── places rail ────────────────────────────────────────────────────── */
-  const rail = document.querySelector(".rail");
-  const prev = document.querySelector("[data-rail-prev]");
-  const next = document.querySelector("[data-rail-next]");
+  /* ── rails ──────────────────────────────────────────────────────────── */
+  document.querySelectorAll("[data-rail]").forEach((rail) => {
+    const next = document.querySelector(`[data-rail-next="${rail.dataset.rail}"]`);
 
-  if (rail && prev && next) {
     const step = () => {
       const card = rail.querySelector(".card");
       if (!card) return rail.clientWidth * 0.8;
@@ -76,34 +72,33 @@
       return card.getBoundingClientRect().width + gap;
     };
 
-    const syncControls = () => {
-      const max = rail.scrollWidth - rail.clientWidth - 1;
-      prev.disabled = rail.scrollLeft <= 0;
-      next.disabled = rail.scrollLeft >= max;
+    const sync = () => {
+      if (!next) return;
+      // Hidden rather than greyed at the end: the control has nothing left to do.
+      next.disabled = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 1;
     };
 
-    const scrollBy = (direction) =>
+    const advance = (direction) =>
       rail.scrollBy({
         left: direction * step(),
         behavior: reduceMotion.matches ? "auto" : "smooth",
       });
 
-    prev.addEventListener("click", () => scrollBy(-1));
-    next.addEventListener("click", () => scrollBy(1));
-    rail.addEventListener("scroll", syncControls, { passive: true });
-    window.addEventListener("resize", syncControls, { passive: true });
+    next?.addEventListener("click", () => advance(1));
+    rail.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync, { passive: true });
 
     // The rail is focusable, so it must answer the arrow keys too.
     rail.addEventListener("keydown", (event) => {
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        scrollBy(1);
+        advance(1);
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        scrollBy(-1);
+        advance(-1);
       }
     });
 
-    syncControls();
-  }
+    sync();
+  });
 })();
