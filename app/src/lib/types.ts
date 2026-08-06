@@ -76,6 +76,8 @@ export type StyleSuggestion = {
   occasions: string[];
   image_path: string | null;
   created_at: string;
+  /** Every note the user has written about this direction, oldest first. */
+  refinements: string[];
 };
 
 export type Profile = {

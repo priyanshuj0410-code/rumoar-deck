@@ -291,11 +291,15 @@ export async function PATCH(request: Request) {
     const generated = await generateImage({
       prompt: [
         "Keep the man in the image exactly as he is: same face, same skin tone, same hair,",
-        "same body shape, same height and build, same pose. Do not beautify, slim, lighten",
-        "or age him. Photorealistic, full-length, clean neutral off-white studio backdrop.",
+        "same body shape, same height and build. Do not beautify, slim, lighten or age him.",
+        "Photorealistic, full-length, shot on a 50mm lens at eye level.",
         `Dress him in this style — ${suggestion.name}: ${suggestion.one_liner ?? ""}`,
         `Garments: ${suggestion.key_pieces.join(", ")}.`,
         `Use this colour palette only: ${suggestion.palette.map((p) => `${p.name} (${p.hex})`).join(", ")}.`,
+        // A studio sweep shows the clothes; a real place shows the life they are for.
+        `Place him somewhere real and Indian that suits ${suggestion.occasions[0] ?? "this look"}`,
+        "— a city street, a courtyard, a cafe, a venue — in natural light, with the",
+        "background softly out of focus. Never a plain studio backdrop.",
         "Clothes should fit properly and look like real garments, not costume.",
       ].join(" "),
       images: [reference],
@@ -335,6 +339,112 @@ export async function PATCH(request: Request) {
     return NextResponse.json(
       { error: "render_failed", reason: reason.slice(0, 4000), message },
       { status: error instanceof GeminiError ? error.status : 502 },
+    );
+  }
+}
+
+/**
+ * Refine one direction from a note the user wrote about it.
+ *
+ * The note is authoritative — he is telling us the direction missed. It is kept twice:
+ * on the style, so the next generation has the whole conversation, and in
+ * `style_feedback`, so the notes can be read across users to improve the prompt itself.
+ */
+export async function PUT(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "not signed in" }, { status: 401 });
+
+  const body = (await request.json().catch(() => null)) as { id?: string; note?: string } | null;
+  const id = body?.id;
+  const note = body?.note?.trim().slice(0, 500);
+  if (!id || !note) return NextResponse.json({ error: "id and note required" }, { status: 400 });
+
+  const [{ data: style }, { data: profile }, { data: catalog }] = await Promise.all([
+    supabase.from("style_suggestions").select("*").eq("id", id).maybeSingle(),
+    supabase.from("profiles").select("analysis").eq("id", user.id).single(),
+    supabase.from("products").select("*").eq("active", true),
+  ]);
+
+  const current = style as StyleSuggestion | null;
+  const analysis = profile?.analysis as ColourAnalysis | null;
+  if (!current || !analysis) return NextResponse.json({ error: "not found" }, { status: 404 });
+
+  const products = (catalog ?? []) as Product[];
+  const notes = [...(current.refinements ?? []), note];
+
+  // Recorded before the regeneration, and with the name copied in: the row this note is
+  // about is the one we are about to overwrite.
+  await supabase.from("style_feedback").insert({
+    user_id: user.id,
+    style_id: current.id,
+    style_name: current.name,
+    note,
+  });
+
+  const refinePrompt = [
+    prompt(analysis, products),
+    "",
+    "THIS IS A REVISION OF ONE DIRECTION, not a new set. Return exactly ONE JSON object",
+    "on a single line, in the same shape.",
+    "",
+    "The direction as it stands:",
+    JSON.stringify({
+      name: current.name,
+      one_liner: current.one_liner,
+      why_it_works: current.why_it_works,
+      palette: current.palette,
+      key_pieces: current.key_pieces,
+      occasions: current.occasions,
+    }),
+    "",
+    "What he has asked for, oldest first:",
+    ...notes.map((entry) => `- "${entry}"`),
+    "",
+    "Change what he asked to change and leave the rest alone. He knows his own life, so",
+    "where his note conflicts with your reasoning, follow the note. Keep the palette",
+    "inside his analysis regardless — that is the one thing a preference cannot override,",
+    "and say so in why_it_works if his request pulls against it.",
+  ].join("\n");
+
+  try {
+    const raw = await chat({
+      turns: [{ role: "user", text: refinePrompt }],
+      model: TEXT_MODEL,
+      thinking: "high",
+      timeoutMs: 50_000,
+    });
+
+    const validSlugs = new Set(products.map((p) => p.slug));
+    const parsed =
+      raw
+        .split("\n")
+        .map((line) => parseLine(line, validSlugs))
+        .find((entry): entry is ParsedStyle => entry !== null) ?? null;
+
+    if (!parsed) throw new GeminiError("unparseable revision", 502);
+
+    // The old render no longer matches the direction, so it goes with it.
+    if (current.image_path) {
+      await supabase.storage.from("looks").remove([current.image_path]);
+    }
+
+    const { data: updated } = await supabase
+      .from("style_suggestions")
+      .update({ ...parsed, refinements: notes, image_path: null })
+      .eq("id", current.id)
+      .eq("user_id", user.id)
+      .select()
+      .single();
+
+    return NextResponse.json({ style: updated as StyleSuggestion });
+  } catch (error) {
+    const status = error instanceof GeminiError ? error.status : 502;
+    return NextResponse.json(
+      { error: "refine_failed", message: "Couldn't rework that one. Try again in a moment." },
+      { status },
     );
   }
 }

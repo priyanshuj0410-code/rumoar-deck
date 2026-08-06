@@ -16,15 +16,17 @@ const KEEP_HIM = [
   "Keep the man in the first image exactly as he is: same face, same skin tone, same hair,",
   "same body shape, same pose, same expression. Do not beautify, slim, lighten or age him.",
   "Photorealistic, natural light, sharp focus, full-length or three-quarter framing.",
+  "Place him in a real setting — street, courtyard, cafe or venue — with the background",
+  "softly out of focus. Never a plain studio backdrop.",
 ].join(" ");
 
 const REVEAL_PROMPTS = [
   // Stage 0 — him, normalised onto a clean backdrop so all three shots read as a series.
-  `${KEEP_HIM} Keep the clothes he is already wearing exactly as they are. Place him against a clean, neutral off-white studio backdrop with soft even lighting. Do not add or remove any garment or accessory.`,
+  `${KEEP_HIM} Keep the clothes he is already wearing exactly as they are. Do not add or remove any garment or accessory.`,
   // Stage 1 — one keystone piece added, nothing else touched.
-  `${KEEP_HIM} Keep every garment he is wearing exactly as it is. Add only the accessory shown in the second image, worn naturally and correctly scaled. Same neutral off-white studio backdrop. Change nothing else.`,
+  `${KEEP_HIM} Keep every garment he is wearing exactly as it is. Add only the accessory shown in the second image, worn naturally and correctly scaled. Change nothing else.`,
   // Stage 2 — the fully finished version.
-  `${KEEP_HIM} Keep his garments as they are. Add the accessories shown in the following images, worn together naturally and correctly scaled, styled the way a confident dresser would wear them. Same neutral off-white studio backdrop. Do not change his clothes.`,
+  `${KEEP_HIM} Keep his garments as they are. Add the accessories shown in the following images, worn together naturally and correctly scaled, styled the way a confident dresser would wear them. Do not change his clothes.`,
 ];
 
 const TRYON_PROMPT = `${KEEP_HIM} Keep every garment he is wearing exactly as it is. Add only the product shown in the second image, worn naturally, correctly scaled and correctly oriented for how that item is actually carried or worn. Keep his original background. Change nothing else.`;

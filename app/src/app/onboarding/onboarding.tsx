@@ -31,6 +31,11 @@ function normalise(stage: OnboardingStage): OnboardingStage {
   return STAGES.includes(stage) ? stage : "photos";
 }
 
+/** Instant, not smooth: a new screen should already be at its top, not travel there. */
+function scrollToTop() {
+  if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+}
+
 export function Onboarding({ profile }: { profile: Profile }) {
   const router = useRouter();
   const [stage, setLocalStage] = useState<OnboardingStage>(normalise(profile.onboarding_stage));
@@ -42,6 +47,7 @@ export function Onboarding({ profile }: { profile: Profile }) {
     // to change, and the analysis step would otherwise show a stale result and never
     // re-run.
     if (next === "photos") setAnalysis(null);
+    scrollToTop();
     startTransition(async () => {
       await setStage(next);
       setLocalStage(next);
@@ -270,11 +276,24 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
     <div className="flex flex-col">
       {index > 0 && (
         <div className="mb-4">
-          <BackLink label={SHOTS[index - 1].label} onBack={() => setIndex(index - 1)} />
+          <BackLink
+            label={SHOTS[index - 1].label}
+            onBack={() => {
+              setIndex(index - 1);
+              scrollToTop();
+            }}
+          />
         </div>
       )}
 
-      <ShotTiles shots={shots} current={index} onPick={setIndex} />
+      <ShotTiles
+        shots={shots}
+        current={index}
+        onPick={(next) => {
+          setIndex(next);
+          scrollToTop();
+        }}
+      />
 
       <PhotoCapture
         key={index}
@@ -289,7 +308,10 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         onNext={() => {
           haptics.tap();
           if (isLast || complete) void finish();
-          else setIndex(index + 1);
+          else {
+            setIndex(index + 1);
+            scrollToTop();
+          }
         }}
       />
 
@@ -790,10 +812,13 @@ function StylesStep({
  * Image first. The rationale is real work and worth keeping, but it belongs behind a tap —
  * what he wants to know at a glance is whether he'd wear it.
  */
-function StyleCard({ style }: { style: StyleSuggestion }) {
+function StyleCard({ style: initial }: { style: StyleSuggestion }) {
+  const [style, setStyle] = useState(initial);
   const [url, setUrl] = useState<string | null>(null);
   const [failed, setFailed] = useState<{ message: string; reason?: string } | null>(null);
   const [open, setOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [reworking, setReworking] = useState(false);
 
   const render = useCallback(async () => {
     setFailed(null);
@@ -810,6 +835,35 @@ function StyleCard({ style }: { style: StyleSuggestion }) {
       setFailed({ message: "Couldn't reach the renderer." });
     }
   }, [style.id]);
+
+  async function rework() {
+    const trimmed = note.trim();
+    if (!trimmed) return;
+
+    setReworking(true);
+    setFailed(null);
+    try {
+      const response = await fetch("/api/styles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: style.id, note: trimmed }),
+      });
+      const json = (await response.json()) as { style?: StyleSuggestion; message?: string };
+      if (json.style) {
+        setStyle(json.style);
+        setNote("");
+        // The old render belongs to the old direction; drop it and draw the new one.
+        setUrl(null);
+        void render();
+      } else {
+        setFailed({ message: json.message ?? "Couldn't rework that one." });
+      }
+    } catch {
+      setFailed({ message: "Couldn't reach the stylist." });
+    } finally {
+      setReworking(false);
+    }
+  }
 
   // Rendering starts on its own. Asking the user to press a button for something the
   // product should obviously do is just friction.
@@ -908,16 +962,59 @@ function StyleCard({ style }: { style: StyleSuggestion }) {
         <ReactionBar subjectType="style" subjectId={style.id} title={style.name} />
       )}
 
+      <h2 className="text-[21px] mt-2">{style.name}</h2>
+      {style.one_liner && (
+        <p className="text-mute text-sm leading-relaxed mt-1">{style.one_liner}</p>
+      )}
+
       <button
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-1"
+        className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-2"
       >
         <span className="mi text-[18px]" aria-hidden>
           {open ? "expand_less" : "expand_more"}
         </span>
         Why this works
       </button>
+
+      {/* One direction at a time. A note here reworks this card only — the other two
+          are someone else's argument and should not move because of it. */}
+      <form
+        className="mt-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void rework();
+        }}
+      >
+        <label htmlFor={`note-${style.id}`} className="sr-only">
+          Suggest a change to {style.name}
+        </label>
+        <textarea
+          id={`note-${style.id}`}
+          className="field h-auto py-2.5 min-h-[64px] resize-none w-full text-[14px]"
+          placeholder="Too formal for me — same colours, softer shapes."
+          value={note}
+          onChange={(event) => setNote(event.target.value)}
+          disabled={reworking}
+        />
+        <button className="btn btn-ghost btn-sm mt-2" disabled={!note.trim() || reworking}>
+          <span className="mi text-[18px]" aria-hidden>
+            auto_awesome
+          </span>
+          {reworking ? "Reworking…" : "Rework this direction"}
+        </button>
+      </form>
+
+      {style.refinements?.length > 0 && (
+        <ul className="mt-2 flex flex-col gap-1">
+          {style.refinements.map((entry, index) => (
+            <li key={index} className="text-[12px] text-mute leading-relaxed">
+              &ldquo;{entry}&rdquo;
+            </li>
+          ))}
+        </ul>
+      )}
 
       {open && (
         <div className="mt-2 animate-rise">
