@@ -227,6 +227,10 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Decided once, above PhotoCapture's `key`. See the prop's own note.
+  const [canLive, setCanLive] = useState(false);
+  useEffect(() => setCanLive(camera.supportsLive()), []);
+
   const [mismatches, setMismatches] = useState<Mismatch[]>([]);
   // A judgement, not a cache: only an explicit "Keep it" lands here, so a photo the user
   // has already vouched for is never queried twice, while a *replacement* is new evidence
@@ -381,6 +385,7 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
           flag ? `Filed as ${label} · reads as ${flag.detected}` : undefined
         }
         problem={error}
+        canLive={canLive}
         // The tiles travel with the copy: on desktop they belong in the flow pane beside
         // the subject, not stranded above the whole layout.
         lead={

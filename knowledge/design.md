@@ -420,4 +420,6 @@ list.
 
 - **2026-08-07** — Styles step rebuilt one-at-a-time in the intake two-pane ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)); § 7.1.1 added for streamed content that outruns its images. Render state lifted out of the card so the tiles can report it, and the reaction bar no longer disappears when a picture fails.
 
+- **2026-08-07** — iOS Safari camera fixed and sign-in reordered ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). The preview attaches in a callback ref rather than an animation frame, Capture waits for a frame that can actually be grabbed, and a stalled camera says why. Google leads the sign-in; see [the email runbook](runbooks/email-delivery.md).
+
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)
