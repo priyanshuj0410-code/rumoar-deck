@@ -153,10 +153,10 @@ function ShotTiles({
               aria-current={active ? "step" : undefined}
               aria-label={
                 flag
-                  ? `${shot.label} — taken, but it looks like a ${flag.detected} shot. Go to it.`
+                  ? `${shot.label}: taken, but it looks like a ${flag.detected} shot. Go to it.`
                   : image
-                    ? `${shot.label} — taken. Go to it.`
-                    : `${shot.label} — not taken yet`
+                    ? `${shot.label}: taken. Go to it.`
+                    : `${shot.label}: not taken yet`
               }
               className="block text-left group"
             >
@@ -377,7 +377,7 @@ function PhotosStep({ onDone }: { onDone: () => void }) {
         hint={
           flag
             ? swapped
-              ? `${SHOTS[mismatches[0].index].label} and ${SHOTS[mismatches[1].index].label} look swapped. Nothing needs re-shooting — we can put them the right way round.`
+              ? `${SHOTS[mismatches[0].index].label} and ${SHOTS[mismatches[1].index].label} look swapped. Nothing needs re-shooting. We can put them the right way round.`
               : `It reads as a ${flag.detected} shot. If we've got that wrong, keep it and carry on.`
             : SHOTS[index].hint
         }
@@ -1402,10 +1402,10 @@ function DirectionTiles({
                 !style
                   ? "Still to arrive"
                   : render.failed
-                    ? `${label} — didn't render. Go to it.`
+                    ? `${label}: didn't render. Go to it.`
                     : render.url
                       ? `${label}. Go to it.`
-                      : `${label} — still drawing. Go to it.`
+                      : `${label}: still drawing. Go to it.`
               }
               className="block text-left w-full group"
             >
@@ -1573,7 +1573,7 @@ function StyleDetail({
       )}
 
       <p className="text-micro text-mute mt-6 leading-snug lg:max-w-[52ch]">
-        Generated from your photo — an impression of the direction, not real
+        Generated from your photo: an impression of the direction, not real
         garments.
       </p>
 
@@ -1595,7 +1595,7 @@ function StyleDetail({
           }}
         >
           <p className="text-mute text-small leading-relaxed">
-            Say what to change. Only this direction moves — the others stay as
+            Say what to change. Only this direction moves. The others stay as
             they are.
           </p>
           <label htmlFor={`note-${style.id}`} className="sr-only">
@@ -1604,7 +1604,7 @@ function StyleDetail({
           <textarea
             id={`note-${style.id}`}
             className="field h-auto py-3 min-h-[96px] resize-none w-full mt-3"
-            placeholder="Too formal for me — same colours, softer shapes."
+            placeholder="Too formal for me. Same colours, softer shapes."
             value={note}
             onChange={(event) => setNote(event.target.value)}
             disabled={render.reworking}

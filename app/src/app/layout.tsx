@@ -3,7 +3,7 @@ import "./globals.css";
 import { ServiceWorker } from "@/components/service-worker";
 
 export const metadata: Metadata = {
-  title: "RUMOAR — your stylist, always on",
+  title: "RUMOAR: your stylist, always on",
   description:
     "RUMOAR learns what you already own and what you actually wear, then tells you exactly which accessory finishes the fit.",
   manifest: "/manifest.webmanifest",

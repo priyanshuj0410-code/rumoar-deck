@@ -191,7 +191,7 @@ export const camera = {
     if (!video.srcObject)
       return "The camera didn't attach to the preview. Try again, or upload a photo.";
     if (track && track.readyState === "ended")
-      return "The camera stopped. Another app may have taken it — close that and try again.";
+      return "The camera stopped. Another app may have taken it. Close that and try again.";
     if (track?.muted)
       return "The camera is paused. Come back to this tab, or upload a photo.";
     if (video.readyState < 2)

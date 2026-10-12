@@ -1,4 +1,4 @@
-export const metadata = { title: "Offline — RUMOAR" };
+export const metadata = { title: "Offline: RUMOAR" };
 
 export default function OfflinePage() {
   return (

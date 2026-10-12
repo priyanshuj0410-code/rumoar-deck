@@ -212,7 +212,7 @@ export async function POST() {
           t: "error",
           message:
             (error as Error).message === "timed_out"
-              ? "That took too long. Try again — it's usually quicker."
+              ? "That took too long. Try again. It's usually quicker."
               : "Couldn't put those together. Try again in a moment.",
         });
       } finally {

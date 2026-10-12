@@ -46,7 +46,7 @@ export function Controls({
     // The filename the browser offers comes from the document title, and a report called
     // "localhost" is a report nobody finds again.
     const previous = document.title;
-    document.title = `RUMOAR — ${name ?? "Colour report"} — ${analysis.season}`;
+    document.title = `RUMOAR: ${name ?? "Colour report"}, ${analysis.season}`;
     try {
       await Promise.race([
         document.fonts.ready,
@@ -61,7 +61,7 @@ export function Controls({
 
   async function copy() {
     const text = [
-      `RUMOAR — ${analysis.season}`,
+      `RUMOAR: ${analysis.season}`,
       `${analysis.undertone} · ${analysis.depth} · ${analysis.contrast} · ${analysis.chroma}`,
       "",
       "WEAR",
@@ -128,7 +128,7 @@ export function Controls({
           onClick={async () => {
             const ok = await share.send({
               title: "My RUMOAR colour report",
-              text: `${analysis.season} — my colour and fit read.`,
+              text: `${analysis.season}: my colour and fit read.`,
               url:
                 typeof window !== "undefined"
                   ? window.location.href
@@ -148,7 +148,7 @@ export function Controls({
       <p className="text-caption text-mute leading-relaxed mt-3">
         It prints on one side of A4. In Chrome, switch off &ldquo;Headers and
         footers&rdquo; under More settings, and leave &ldquo;Background
-        graphics&rdquo; as it is — the colours are drawn, not painted on.
+        graphics&rdquo; as it is. The colours are drawn, not painted on.
       </p>
     </div>
   );

@@ -144,7 +144,7 @@ export function ShapeReading({
                   }`}
                 >
                   {shape.label}
-                  {isYours && <span className="sr-only"> — this is yours</span>}
+                  {isYours && <span className="sr-only">, this is yours</span>}
                 </span>
               </li>
             );
