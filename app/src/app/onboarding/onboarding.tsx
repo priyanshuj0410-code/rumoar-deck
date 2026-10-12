@@ -110,7 +110,7 @@ function BackLink({ label, onBack }: { label: string; onBack: () => void }) {
   return (
     <button
       onClick={onBack}
-      className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors self-start"
+      className="hit flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors self-start"
     >
       <span className="mi text-[18px] -ml-0.5" aria-hidden>
         arrow_back
@@ -1505,7 +1505,7 @@ function StyleDetail({
           </div>
           {render.failed.reason && (
             // The upstream reason, verbatim. Without it a render failure is a guess.
-            <p className="text-[11px] text-mute/80 font-mono mt-1.5 break-all">
+            <p className="text-[11px] text-mute font-mono mt-1.5 break-all">
               {render.failed.reason}
             </p>
           )}
@@ -1530,7 +1530,7 @@ function StyleDetail({
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
-            className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-4"
+            className="hit flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-4"
           >
             <span className="mi text-[18px]" aria-hidden>
               {open ? "expand_less" : "expand_more"}

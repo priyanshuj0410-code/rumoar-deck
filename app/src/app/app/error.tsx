@@ -38,7 +38,7 @@ export default function AppError({
       </div>
 
       {error.digest && (
-        <p className="text-[11px] text-mute/80 font-mono mt-4">Reference {error.digest}</p>
+        <p className="text-[11px] text-mute font-mono mt-4">Reference {error.digest}</p>
       )}
     </div>
   );

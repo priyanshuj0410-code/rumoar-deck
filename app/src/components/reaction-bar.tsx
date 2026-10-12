@@ -104,7 +104,7 @@ export function ReactionBar({
             aria-pressed={on}
             aria-label={ICONS[kind].label}
             title={ICONS[kind].label}
-            className={`w-10 h-10 flex items-center justify-center transition-colors
+            className={`hit w-10 h-10 flex items-center justify-center transition-colors
                         ${on ? "text-ink" : "text-mute hover:text-ink"}`}
           >
             <span
@@ -126,7 +126,7 @@ export function ReactionBar({
           aria-label={extra.label}
           title={extra.label}
           disabled={extra.busy}
-          className={`w-10 h-10 flex items-center justify-center transition-colors ml-auto
+          className={`hit w-10 h-10 flex items-center justify-center transition-colors ml-auto
                       ${extra.busy ? "opacity-40" : "text-mute hover:text-ink"}`}
         >
           <span className="mi text-[21px]" aria-hidden>
@@ -139,7 +139,7 @@ export function ReactionBar({
         onClick={onShare}
         aria-label={ICONS.share.label}
         title={ICONS.share.label}
-        className={`w-10 h-10 flex items-center justify-center transition-colors ${extra ? "" : "ml-auto"}
+        className={`hit w-10 h-10 flex items-center justify-center transition-colors ${extra ? "" : "ml-auto"}
                     ${shared ? "text-ink" : "text-mute hover:text-ink"}`}
       >
         <span className="mi text-[21px]" aria-hidden>

@@ -78,7 +78,7 @@ export function InstallPrompt() {
           </p>
         )}
       </div>
-      <button onClick={dismiss} aria-label="Dismiss" className="mi text-[20px] text-mute">
+      <button onClick={dismiss} aria-label="Dismiss" className="hit mi text-[20px] text-mute">
         close
       </button>
     </div>

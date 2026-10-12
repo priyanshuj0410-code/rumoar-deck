@@ -19,7 +19,7 @@ export default async function ReportPage() {
         <div className="no-print">
           <Link
             href="/onboarding"
-            className="inline-flex items-center gap-1.5 text-sm text-mute hover:text-ink transition-colors"
+            className="hit inline-flex items-center gap-1.5 text-sm text-mute hover:text-ink transition-colors"
           >
             <span className="mi text-[20px]" aria-hidden>
               arrow_back

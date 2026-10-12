@@ -114,7 +114,7 @@ export function Stylist({ initialMessages, products, name }: Props) {
                 <button
                   key={chip}
                   onClick={() => send(chip)}
-                  className="text-left text-sm border border-line px-3 py-2.5 hover:bg-wash transition-colors"
+                  className="hit text-left text-sm border border-control px-3 py-2.5 hover:bg-wash transition-colors"
                 >
                   {chip}
                 </button>

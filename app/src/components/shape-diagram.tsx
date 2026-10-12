@@ -121,7 +121,7 @@ export function ShapeReading({
       <button
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-3"
+        className="hit flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-3"
       >
         <span className="mi text-[18px]" aria-hidden>
           {open ? "expand_less" : "expand_more"}

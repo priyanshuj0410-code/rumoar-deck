@@ -7,6 +7,7 @@ plane_issues:
   - RUM-7 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/668b1e8e-f0a7-4d9f-a059-eada57a2077c
   - RUM-9 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7df04b78-6464-450a-89e0-d56ff89828e9
   - RUM-14 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5
+  - RUM-15 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f
 ---
 
 # RUMOAR Design System — "Engine"
@@ -25,8 +26,9 @@ extend this file first, then build.
 | `--ink` | `#17171B` | Primary text, primary buttons, selection outline |
 | `--paper` | `#FFFFFF` | Surface / page background |
 | `--wash` | `#F4F3EF` | Recessed surface — cards, tiles, image wells, ghost buttons |
-| `--line` | `#E9E8E3` | Hairlines, input borders, slider track |
-| `--mute` | `#8C8B85` | Secondary text, inactive icons, placeholder |
+| `--line` | `#E9E8E3` | Hairlines, dividers, slider track. Never a control boundary: it is 1.23:1 on paper |
+| `--mute` | `#706F6A` | Secondary text, inactive icons, placeholder. 5.03:1 on paper, 4.53:1 on `--wash` |
+| `--control` | `#8C8B85` | Border of any control identified by its edge: inputs, textareas, outlined chips. 3.42:1 on paper, 3.08:1 on `--wash` |
 | `--volt` | `#6152F0` | Voltage accent — links, focus rings, live/active state |
 | `--peri` | `#B3ACEF` | Periwinkle — accents *on dark only* (toast icon, waveform) |
 | `--ok` | `#3E7D5A` | Success |
@@ -72,7 +74,7 @@ as its own literal text, so `favorite_border` appears on screen as the words
 panels, toasts, image wells. This is the strongest brand signal in the system.
 
 The only round things are: avatars/orbs, the mic and send buttons' circular variants,
-marker dots, the floating PDP back button (40px circle), and pills that are explicitly
+marker dots, the floating PDP back button (40px circle, 44px hit area), and pills that are explicitly
 capsule-shaped (`999px`) — the status island and filter chips.
 
 ### Spacing & sizing
@@ -84,14 +86,21 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
 |---|---|
 | `--btnh` | 52px (primary button / input / send) |
 | `--tabh` | 62px (mobile tab bar) |
-| Small button | 38px |
-| Icon button | 40px |
+| `--hit` | 44px (minimum hit area; `--spacing-hit`) |
+| Small button | 38px visual, 44px hit area |
+| Icon button | 40px visual, 44px hit area |
 | Min touch target | 44×44 |
+
+A control smaller than 44px keeps its visual size and takes its hit area from `.hit`: an
+invisible `::after`, centred on the control, at least `--hit` in each direction. `.btn-sm` has
+it built in and `IconSubmit` carries it. Put `.hit` on every icon button, text back link,
+toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbouring centres
+44px apart (the reaction bar's 40px boxes with a 4px gap do exactly that).
 
 ## 2. Components
 
 - **Button** — `.btn`: full-height `--btnh`, `--ink` on white, weight 500, 15px, square.
-  `.ghost` = `--wash` on `--ink`. `.sm` = 38px, 13px. Press: `scale(.975)`, `opacity .92`.
+  `.ghost` = `--wash` on `--ink`. `.sm` = 38px, 13px, with a 44px hit area. Press: `scale(.975)`, `opacity .92`.
 - **Card** (`.card`) — `--wash` surface, 1:1 thumb, meta block 11/12px padding; name at
   13.5px/600, price in mono 12px `--mute`.
 - **Tile** (`.wtile`) — wardrobe/selection tile. Selected state is `inset 0 0 0 2.5px
@@ -122,7 +131,7 @@ Gutters: 16px mobile, 24px tablet, 32px desktop. Grid gap: 10px.
   to read. **Pace the reveal client-side**: Gemini streams in very coarse chunks — often a
   whole reply in two frames — so piping the raw stream to the DOM still lands as a wall of
   text. Buffer what arrives and reveal it on a ~30ms tick, accelerating with the backlog.
-- **Reaction bar** — 40px targets: like · not-for-me · save on the left, share pushed
+- **Reaction bar**: 40px glyph boxes with 44px hit areas (`.hit`): like · not-for-me · save on the left, share pushed
   right. Active state fills the Material Symbol (`'FILL' 1`) rather than only changing
   colour, so it survives greyscale and colour blindness. Optimistic: the tap paints
   immediately and the request follows; a failed write is never surfaced as an error.
@@ -234,10 +243,20 @@ Honour `prefers-reduced-motion: reduce` — drop transforms and shimmer, keep op
 
 ## 5. Accessibility
 
-- Ink on paper is 15.9:1; `--mute` on `--wash` is 3.1:1 — **`--mute` is for supporting text
-  at 14px+ only**, never for body copy or anything below 14px that must be read.
-- `--volt` on paper is 6.4:1 — safe for links and focus rings.
-- Focus ring: 2px `--volt` outline with 2px offset. Never remove it on keyboard focus;
+- Ink on paper is 17.88:1 and on `--wash` 16.10:1.
+- `--mute` is 5.03:1 on paper and 4.53:1 on `--wash`, so it is text-safe at any size on those
+  two surfaces, and on the glass bars over paper or wash content (4.86:1 or more). It is not
+  text-safe on anything darker: on the `.skel` shimmer it is 4.37:1 down to 3.95:1, so a label
+  on a skeleton is `--ink` (`.skel .k` enforces it), and on `--ink` it is 3.55:1, enough for a
+  glyph such as the install prompt's dismiss icon but not for text. Never lower its alpha:
+  `text-mute/80` is 3.38:1 on paper. A bar floating over dark photography is not covered.
+- `--volt` is 5.29:1 on paper and 4.76:1 on `--wash`, safe for links and focus rings.
+- Control boundaries need 3:1 against the surface beside them. `--control` is 3.42:1 on paper
+  and 3.08:1 on `--wash`; `--line` is 1.23:1 and is for dividers only. `.field` and the
+  stylist's suggestion chips use `--control`.
+- Every control has a 44px hit area (see Spacing & sizing). Visual size may be smaller.
+- Focus ring: 2px `--volt` outline with 2px offset, 5.29:1 on paper, 4.76:1 on `--wash` and
+  3.38:1 on `--ink`. Never remove it on keyboard focus;
   desktop is a first-class target.
 - Selection, error and success states must carry an icon or shape, not colour alone.
 - All imagery (wardrobe, catalog, looks) requires alt text derived from the item label.
@@ -421,5 +440,7 @@ list.
 - **2026-08-07** — Styles step rebuilt one-at-a-time in the intake two-pane ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)); § 7.1.1 added for streamed content that outruns its images. Render state lifted out of the card so the tiles can report it, and the reaction bar no longer disappears when a picture fails.
 
 - **2026-08-07** — iOS Safari camera fixed and sign-in reordered ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). The preview attaches in a callback ref rather than an animation frame, Capture waits for a frame that can actually be grabbed, and a stalled camera says why. Google leads the sign-in; see [the email runbook](runbooks/email-delivery.md).
+
+- **2026-10-12**: P1 accessibility fixes from the design audit ([RUM-15](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f/)). `--mute` darkened from `#8C8B85` to `#706F6A`; `--control` added for input and chip borders while `--line` stays for dividers; every control under 44px gets a 44px hit area through `.hit`; the ratios in § 5 were recomputed (ink on paper is 17.88:1, volt on paper 5.29:1).
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)

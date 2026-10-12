@@ -126,7 +126,7 @@ export function AddWardrobeItem() {
               <p className="k">New pieces</p>
               <h2 className="text-[21px] mt-1">Check the names</h2>
             </div>
-            <button onClick={() => setDrafts([])} aria-label="Cancel" className="mi text-[24px]">
+            <button onClick={() => setDrafts([])} aria-label="Cancel" className="hit mi text-[24px]">
               close
             </button>
           </header>
