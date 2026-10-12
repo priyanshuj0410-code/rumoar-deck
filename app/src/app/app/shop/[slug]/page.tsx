@@ -26,7 +26,7 @@ export default async function ProductPage({ params }: Params) {
     <div className="max-w-[980px] px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10">
       <Link
         href="/app/shop"
-        className="hit inline-flex items-center gap-1.5 text-sm text-mute hover:text-ink transition-colors"
+        className="hit inline-flex items-center gap-1.5 text-small text-mute hover:text-ink transition-colors"
       >
         <span className="mi text-[20px]" aria-hidden>
           arrow_back
@@ -52,12 +52,12 @@ export default async function ProductPage({ params }: Params) {
         <div>
           <div className="py-5 @3xl:pt-0">
             <p className="k">{product.kind}</p>
-            <h1 className="text-[24px] @3xl:text-[34px] mt-1.5">{product.name}</h1>
-            <p className="font-mono text-[15px] @3xl:text-[17px] mt-1">
+            <h1 className="text-title @3xl:text-headline mt-1.5">{product.name}</h1>
+            <p className="font-mono text-body @3xl:text-body mt-1">
               {formatINR(product.price_inr)}
             </p>
             {product.description && (
-              <p className="text-mute text-sm leading-relaxed mt-4 max-w-[46ch]">
+              <p className="text-mute text-small leading-relaxed mt-4 max-w-[46ch]">
                 {product.description}
               </p>
             )}
@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: Params) {
 
           <TryOn slug={product.slug} name={product.name} />
 
-          <p className="text-[11px] text-mute mt-4 leading-snug">
+          <p className="text-micro text-mute mt-4 leading-snug">
             Checkout isn&rsquo;t live yet. Saving tells us what to stock first.
           </p>
         </div>

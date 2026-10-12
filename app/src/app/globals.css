@@ -16,6 +16,19 @@
   --font-sans: "General Sans", system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, monospace;
 
+  /* The type scale is closed: these eight are the only text sizes. Icon glyphs (.mi) are
+     sized separately. Reset the framework defaults so text-sm, text-lg and the rest cannot
+     compile. */
+  --text-*: initial;
+  --text-micro: 11px;
+  --text-caption: 12px;
+  --text-small: 14px;
+  --text-body: 16px;
+  --text-lead: 20px;
+  --text-title: 26px;
+  --text-headline: 34px;
+  --text-display: 52px;
+
   --ease-brand: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   --spacing-btn: 52px;
@@ -34,7 +47,7 @@
     background: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-size: 15px;
+    font-size: var(--text-body);
     /* The installed PWA must clear the iOS home indicator and Android gesture bar. */
     min-height: 100dvh;
     overscroll-behavior-y: none;
@@ -73,7 +86,7 @@
   /* Eyebrow */
   .k {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: var(--text-micro);
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--color-mute);
@@ -88,7 +101,7 @@
     background: var(--color-ink);
     color: #fff;
     font-weight: 500;
-    font-size: 15px;
+    font-size: var(--text-body);
     padding-inline: 20px;
     transition:
       transform 0.16s var(--ease-brand),
@@ -109,7 +122,7 @@
   }
   .btn-sm {
     height: 38px;
-    font-size: 13px;
+    font-size: var(--text-small);
     padding-inline: 14px;
   }
 
@@ -135,7 +148,7 @@
     background: var(--color-paper);
     border: 1px solid var(--color-control);
     padding-inline: 14px;
-    font-size: 15px;
+    font-size: var(--text-body);
     color: var(--color-ink);
   }
   .field::placeholder {

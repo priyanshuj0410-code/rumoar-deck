@@ -30,7 +30,7 @@ export default async function SavedPage() {
   return (
     <div className="px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10 max-w-[1120px]">
       <p className="k">Saved</p>
-      <h1 className="text-[26px] @3xl:text-[38px] mt-1">Kept for later</h1>
+      <h1 className="text-title @3xl:text-headline mt-1">Kept for later</h1>
 
       {empty && (
         <EmptyState
@@ -64,8 +64,8 @@ export default async function SavedPage() {
                   )}
 
                   <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-ink/80 to-transparent text-paper">
-                    <b className="font-display text-[17px] block">{look.title}</b>
-                    {look.subtitle && <span className="text-xs opacity-90">{look.subtitle}</span>}
+                    <b className="font-display text-body block">{look.title}</b>
+                    {look.subtitle && <span className="text-caption opacity-90">{look.subtitle}</span>}
                   </div>
 
                   <form action={toggleSavedLook} className="absolute top-2 right-2">
@@ -110,10 +110,10 @@ export default async function SavedPage() {
                       )}
                     </div>
                     <div className="px-3 py-2.5">
-                      <b className="text-[13.5px] font-semibold block leading-tight">
+                      <b className="text-small font-semibold block leading-tight">
                         {product.name}
                       </b>
-                      <span className="font-mono text-[12px] text-mute mt-1 block">
+                      <span className="font-mono text-caption text-mute mt-1 block">
                         {formatINR(product.price_inr)}
                       </span>
                     </div>

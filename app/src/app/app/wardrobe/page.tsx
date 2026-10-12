@@ -17,7 +17,7 @@ export default async function WardrobePage() {
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="k">Wardrobe</p>
-          <h1 className="text-[26px] @3xl:text-[38px] mt-1">
+          <h1 className="text-title @3xl:text-headline mt-1">
             {items.length} {items.length === 1 ? "piece" : "pieces"}
           </h1>
         </div>
@@ -52,8 +52,8 @@ export default async function WardrobePage() {
                   )}
                 </div>
                 <div className="px-2.5 py-2 flex-1">
-                  <span className="text-[12px] leading-tight block">{item.label}</span>
-                  <span className="k text-[9px]">{item.kind}</span>
+                  <span className="text-caption leading-tight block">{item.label}</span>
+                  <span className="k text-micro">{item.kind}</span>
                 </div>
 
                 <form action={deleteWardrobeItem} className="absolute top-1.5 right-1.5">

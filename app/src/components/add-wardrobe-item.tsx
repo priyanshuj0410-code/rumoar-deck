@@ -110,7 +110,7 @@ export function AddWardrobeItem() {
       </button>
 
       {error && (
-        <p role="alert" className="text-sm text-ink w-full mt-3">
+        <p role="alert" className="text-small text-ink w-full mt-3">
           {error}
         </p>
       )}
@@ -124,7 +124,7 @@ export function AddWardrobeItem() {
           <header className="flex-none px-4 py-4 border-b border-line flex items-start justify-between">
             <div>
               <p className="k">New pieces</p>
-              <h2 className="text-[21px] mt-1">Check the names</h2>
+              <h2 className="text-lead mt-1">Check the names</h2>
             </div>
             <button onClick={() => setDrafts([])} aria-label="Cancel" className="hit mi text-[24px]">
               close

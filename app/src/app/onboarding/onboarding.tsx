@@ -110,7 +110,7 @@ function BackLink({ label, onBack }: { label: string; onBack: () => void }) {
   return (
     <button
       onClick={onBack}
-      className="hit flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors self-start"
+      className="hit flex items-center gap-1 text-small text-mute hover:text-ink transition-colors self-start"
     >
       <span className="mi text-[18px] -ml-0.5" aria-hidden>
         arrow_back
@@ -204,7 +204,7 @@ function ShotTiles({
               <span
                 // A queried tile keeps its ink label even when it is not the step you are
                 // on, so two outstanding flags are legible across the strip at a glance.
-                className={`text-[10px] lg:text-[11px] mt-1 block tracking-wide transition-colors ${
+                className={`text-micro lg:text-micro mt-1 block tracking-wide transition-colors ${
                   active || flag ? "text-ink" : "text-mute group-hover:text-ink"
                 }`}
               >
@@ -624,12 +624,12 @@ function AnalysisStep({
           />
           {status}
         </p>
-        <h1 className="text-[28px] lg:text-[52px] mt-2 lg:mt-3">Reading you</h1>
+        <h1 className="text-title lg:text-display mt-2 lg:mt-3">Reading you</h1>
 
         {/* A measure, not a width. Across 1080px of desktop this prose would be unreadable. */}
         <div className="mt-5 lg:mt-8 lg:max-w-[60ch]" aria-live="polite">
           {revealed > 0 ? (
-            <p className="text-[17px] lg:text-[19px] leading-relaxed whitespace-pre-wrap">
+            <p className="text-body lg:text-lead leading-relaxed whitespace-pre-wrap">
               {prose.slice(0, revealed)}
               <span className="inline-block w-[2px] h-[1.1em] bg-ink align-[-2px] ml-0.5 animate-pulse" />
             </p>
@@ -648,8 +648,8 @@ function AnalysisStep({
   if (error && !analysis) {
     return (
       <div className="flex-1 flex flex-col justify-center lg:max-w-[440px]">
-        <h1 className="text-[28px] lg:text-[38px]">That didn&rsquo;t work.</h1>
-        <p className="text-mute text-sm leading-relaxed mt-3">{error}</p>
+        <h1 className="text-title lg:text-headline">That didn&rsquo;t work.</h1>
+        <p className="text-mute text-small leading-relaxed mt-3">{error}</p>
         <div className="flex flex-col gap-2.5 mt-6">
           <button className="btn w-full" onClick={() => void run()}>
             Try again
@@ -680,10 +680,10 @@ function AnalysisStep({
       <header className="mt-4 lg:mt-8 lg:grid lg:grid-cols-[1.15fr_1fr] lg:gap-x-14 lg:items-end">
         <div>
           <p className="k">Your analysis</p>
-          <h1 className="text-[32px] lg:text-[68px] leading-[1.05] lg:leading-[0.94] mt-2 lg:mt-4">
+          <h1 className="text-headline lg:text-display leading-[1.05] lg:leading-[0.94] mt-2 lg:mt-4">
             {analysis.season}
           </h1>
-          <p className="text-mute text-sm lg:text-[15px] leading-relaxed mt-2 lg:mt-4">
+          <p className="text-mute text-small lg:text-body leading-relaxed mt-2 lg:mt-4">
             {analysis.undertone} undertone · {analysis.depth} depth ·{" "}
             {analysis.contrast} contrast · {analysis.chroma}
           </p>
@@ -698,10 +698,10 @@ function AnalysisStep({
                 style={{ width: `${confidence}%` }}
               />
             </div>
-            <span className="font-mono text-[12px]">{confidence}%</span>
+            <span className="font-mono text-caption">{confidence}%</span>
           </div>
           {analysis.caveat && (
-            <p className="text-mute text-[13px] leading-relaxed mt-2">
+            <p className="text-mute text-small leading-relaxed mt-2">
               {analysis.caveat}
             </p>
           )}
@@ -727,10 +727,10 @@ function AnalysisStep({
                 role="img"
                 aria-label={colour.name}
               />
-              <span className="text-[11px] lg:text-[13px] leading-tight block mt-1 lg:mt-2">
+              <span className="text-micro lg:text-small leading-tight block mt-1 lg:mt-2">
                 {colour.name}
               </span>
-              <span className="hidden lg:block font-mono text-[10px] text-mute mt-0.5">
+              <span className="hidden lg:block font-mono text-micro text-mute mt-0.5">
                 {colour.hex.toUpperCase()}
               </span>
             </li>
@@ -752,7 +752,7 @@ function AnalysisStep({
                     role="img"
                     aria-label={colour.name}
                   />
-                  <span className="text-[12px] lg:text-[13px]">
+                  <span className="text-caption lg:text-small">
                     {colour.name}
                   </span>
                 </li>
@@ -764,12 +764,12 @@ function AnalysisStep({
 
       <div className="lg:columns-2 lg:gap-x-14">
         <Row label="Metals">
-          <p className="text-sm">{analysis.metals}</p>
+          <p className="text-small">{analysis.metals}</p>
         </Row>
 
         {analysis.build.fit_notes && (
           <Row label="Fit">
-            <p className="text-sm leading-relaxed">
+            <p className="text-small leading-relaxed">
               {analysis.build.fit_notes}
             </p>
           </Row>
@@ -801,7 +801,7 @@ function AnalysisStep({
 
         {analysis.physique?.hair?.colour && (
           <Row label="Hair">
-            <p className="text-[13px] text-mute">
+            <p className="text-small text-mute">
               {[
                 analysis.physique.hair.colour,
                 analysis.physique.hair.length,
@@ -810,7 +810,7 @@ function AnalysisStep({
                 .filter(Boolean)
                 .join(" · ")}
             </p>
-            <p className="text-sm leading-relaxed mt-1">
+            <p className="text-small leading-relaxed mt-1">
               {analysis.physique.hair.styling}
             </p>
           </Row>
@@ -819,7 +819,7 @@ function AnalysisStep({
         {analysis.physique?.beard?.present &&
           analysis.physique.beard.colour && (
             <Row label="Beard">
-              <p className="text-[13px] text-mute">
+              <p className="text-small text-mute">
                 {[
                   analysis.physique.beard.colour,
                   analysis.physique.beard.length,
@@ -827,7 +827,7 @@ function AnalysisStep({
                   .filter(Boolean)
                   .join(" · ")}
               </p>
-              <p className="text-sm leading-relaxed mt-1">
+              <p className="text-small leading-relaxed mt-1">
                 {analysis.physique.beard.styling}
               </p>
             </Row>
@@ -835,7 +835,7 @@ function AnalysisStep({
 
         {analysis.notes && (
           <Row label="In short">
-            <p className="text-sm leading-relaxed">{analysis.notes}</p>
+            <p className="text-small leading-relaxed">{analysis.notes}</p>
           </Row>
         )}
 
@@ -845,7 +845,7 @@ function AnalysisStep({
               {analysis.refinements.map((entry, index) => (
                 <li
                   key={index}
-                  className="text-[13px] text-mute leading-relaxed"
+                  className="text-small text-mute leading-relaxed"
                 >
                   &ldquo;{entry}&rdquo;
                 </li>
@@ -869,7 +869,7 @@ function AnalysisStep({
             Download the report
           </a>
           {added > 0 && (
-            <p className="text-[12px] text-mute mt-2">
+            <p className="text-caption text-mute mt-2">
               {added} more {added === 1 ? "photo" : "photos"} added.
               They&rsquo;ll be used on the next run.
             </p>
@@ -892,7 +892,7 @@ function AnalysisStep({
               void run(trimmed);
             }}
           >
-            <p className="text-mute text-sm leading-relaxed">
+            <p className="text-mute text-small leading-relaxed">
               Tell me what to reconsider. You know things the photos can&rsquo;t
               show.
             </p>
@@ -923,14 +923,14 @@ function AnalysisStep({
               </button>
             </div>
             {error && (
-              <p role="alert" className="text-[13px] text-mute mt-3">
+              <p role="alert" className="text-small text-mute mt-3">
                 {error}
               </p>
             )}
           </form>
         </Modal>
 
-        <p className="text-[11px] text-mute leading-snug py-4">
+        <p className="text-micro text-mute leading-snug py-4">
           Colour analysis from photos is affected by lighting and camera white
           balance. Treat this as a strong starting point, not a verdict.
         </p>
@@ -1192,8 +1192,8 @@ function StylesStep({
   if (error && styles.length === 0) {
     return (
       <div className="flex-1 flex flex-col justify-center lg:max-w-[440px]">
-        <h1 className="text-[28px] lg:text-[38px]">That didn&rsquo;t work.</h1>
-        <p className="text-mute text-sm leading-relaxed mt-3">{error}</p>
+        <h1 className="text-title lg:text-headline">That didn&rsquo;t work.</h1>
+        <p className="text-mute text-small leading-relaxed mt-3">{error}</p>
         <button className="btn w-full mt-6" onClick={onBack}>
           Back to the analysis
         </button>
@@ -1242,11 +1242,11 @@ function StylesStep({
 
           {current ? (
             <>
-              <h1 className="text-[26px] lg:text-[34px] mt-2 leading-[1.1]">
+              <h1 className="text-title lg:text-headline mt-2 leading-[1.1]">
                 {current.name || `Direction ${index + 1}`}
               </h1>
               {current.one_liner && (
-                <p className="text-mute text-[13px] lg:text-[15px] leading-relaxed mt-1 lg:mt-3 lg:max-w-[46ch]">
+                <p className="text-mute text-small lg:text-body leading-relaxed mt-1 lg:mt-3 lg:max-w-[46ch]">
                   {current.one_liner}
                 </p>
               )}
@@ -1307,10 +1307,10 @@ function StylesStep({
                     color: readableOn(colour.hex),
                   }}
                 >
-                  <span className="text-[12px] font-medium leading-tight">
+                  <span className="text-caption font-medium leading-tight">
                     {colour.name}
                   </span>
-                  <span className="font-mono text-[10px] opacity-70 mt-0.5">
+                  <span className="font-mono text-micro opacity-70 mt-0.5">
                     {colour.hex}
                   </span>
                 </li>
@@ -1444,7 +1444,7 @@ function DirectionTiles({
                 )}
               </span>
               <span
-                className={`text-[10px] lg:text-[11px] mt-1 block leading-tight line-clamp-2 transition-colors ${
+                className={`text-micro lg:text-micro mt-1 block leading-tight line-clamp-2 transition-colors ${
                   active ? "text-ink" : "text-mute group-hover:text-ink"
                 }`}
               >
@@ -1493,7 +1493,7 @@ function StyleDetail({
         // Above the reactions, never instead of them.
         <div className="mb-3">
           <div className="flex items-center gap-3">
-            <p className="text-[13px] text-mute flex-1">
+            <p className="text-small text-mute flex-1">
               {render.failed.message}
             </p>
             <button
@@ -1505,7 +1505,7 @@ function StyleDetail({
           </div>
           {render.failed.reason && (
             // The upstream reason, verbatim. Without it a render failure is a guess.
-            <p className="text-[11px] text-mute font-mono mt-1.5 break-all">
+            <p className="text-micro text-mute font-mono mt-1.5 break-all">
               {render.failed.reason}
             </p>
           )}
@@ -1530,7 +1530,7 @@ function StyleDetail({
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
-            className="hit flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-4"
+            className="hit flex items-center gap-1 text-small text-mute hover:text-ink transition-colors mt-4"
           >
             <span className="mi text-[18px]" aria-hidden>
               {open ? "expand_less" : "expand_more"}
@@ -1541,7 +1541,7 @@ function StyleDetail({
           {open && (
             <div className="mt-2 animate-rise">
               {style.why_it_works && (
-                <p className="text-sm lg:text-[15px] leading-relaxed lg:max-w-[62ch]">
+                <p className="text-small lg:text-body leading-relaxed lg:max-w-[62ch]">
                   {style.why_it_works}
                 </p>
               )}
@@ -1550,7 +1550,7 @@ function StyleDetail({
                   {style.key_pieces.map((piece) => (
                     <li
                       key={piece}
-                      className="text-[12px] border border-line px-2 py-1"
+                      className="text-caption border border-line px-2 py-1"
                     >
                       {piece}
                     </li>
@@ -1565,14 +1565,14 @@ function StyleDetail({
       {style.refinements?.length > 0 && (
         <ul className="mt-4 flex flex-col gap-1">
           {style.refinements.map((entry, index) => (
-            <li key={index} className="text-[12px] text-mute leading-relaxed">
+            <li key={index} className="text-caption text-mute leading-relaxed">
               &ldquo;{entry}&rdquo;
             </li>
           ))}
         </ul>
       )}
 
-      <p className="text-[11px] text-mute mt-6 leading-snug lg:max-w-[52ch]">
+      <p className="text-micro text-mute mt-6 leading-snug lg:max-w-[52ch]">
         Generated from your photo — an impression of the direction, not real
         garments.
       </p>
@@ -1594,7 +1594,7 @@ function StyleDetail({
             onRework(trimmed);
           }}
         >
-          <p className="text-mute text-sm leading-relaxed">
+          <p className="text-mute text-small leading-relaxed">
             Say what to change. Only this direction moves — the others stay as
             they are.
           </p>

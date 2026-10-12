@@ -92,7 +92,7 @@ export function Modal({
                    pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5 animate-sheet"
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 className="text-[19px]">{title}</h2>
+          <h2 className="text-lead">{title}</h2>
           <button
             onClick={onClose}
             aria-label="Close"

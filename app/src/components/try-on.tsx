@@ -60,7 +60,7 @@ export function TryOn({ slug, name }: { slug: string; name: string }) {
               className="w-full h-full object-cover animate-rise"
             />
           </div>
-          <figcaption className="text-[11px] text-mute mt-2 leading-snug">
+          <figcaption className="text-micro text-mute mt-2 leading-snug">
             Generated from your reference photo. It&rsquo;s an approximation of fit and scale,
             not a photograph of the real product on you.
           </figcaption>
@@ -81,7 +81,7 @@ export function TryOn({ slug, name }: { slug: string; name: string }) {
       )}
 
       {message && (
-        <p role="alert" className="text-sm text-mute leading-relaxed mt-3">
+        <p role="alert" className="text-small text-mute leading-relaxed mt-3">
           {message}
         </p>
       )}

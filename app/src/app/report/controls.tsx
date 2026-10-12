@@ -145,7 +145,7 @@ export function Controls({
       </div>
 
       {/* No CSS suppresses Chrome's own margin headers. Saying so is the only fix. */}
-      <p className="text-[12px] text-mute leading-relaxed mt-3">
+      <p className="text-caption text-mute leading-relaxed mt-3">
         It prints on one side of A4. In Chrome, switch off &ldquo;Headers and
         footers&rdquo; under More settings, and leave &ldquo;Background
         graphics&rdquo; as it is — the colours are drawn, not painted on.

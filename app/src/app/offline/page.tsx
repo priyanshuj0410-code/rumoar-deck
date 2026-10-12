@@ -6,8 +6,8 @@ export default function OfflinePage() {
       <span className="mi text-[34px] text-mute" aria-hidden>
         cloud_off
       </span>
-      <h1 className="text-[26px] mt-4">You&rsquo;re offline</h1>
-      <p className="text-mute text-sm leading-relaxed mt-3 max-w-[300px]">
+      <h1 className="text-title mt-4">You&rsquo;re offline</h1>
+      <p className="text-mute text-small leading-relaxed mt-3 max-w-[300px]">
         Your wardrobe is saved. Reconnect and everything picks up where it left off.
       </p>
     </main>

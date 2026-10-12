@@ -231,8 +231,8 @@ export function PhotoCapture({
           right, so the eye lands on the photograph first and the controls sit beside it. */}
       <div className="lg:col-start-2 lg:row-start-1 lg:self-start">
         {lead}
-        <h1 className="text-[26px] lg:text-[34px]">{title}</h1>
-        <p className="text-mute text-[13px] lg:text-[15px] leading-relaxed mt-1 lg:mt-3 lg:max-w-[40ch]">
+        <h1 className="text-title lg:text-headline">{title}</h1>
+        <p className="text-mute text-small lg:text-body leading-relaxed mt-1 lg:mt-3 lg:max-w-[40ch]">
           {hint}
         </p>
       </div>
@@ -289,14 +289,14 @@ export function PhotoCapture({
         {/* Inside the stack, not beside it: as a sibling grid item this shared a cell with
             the buttons and rendered on top of them. */}
         {problem && (
-          <p role="alert" className="text-[14px] leading-relaxed mb-3">
+          <p role="alert" className="text-small leading-relaxed mb-3">
             {problem}
           </p>
         )}
         {notice && (
           <p
             role="alert"
-            className="text-[13px] text-mute leading-relaxed mb-3"
+            className="text-small text-mute leading-relaxed mb-3"
           >
             {notice}
           </p>
@@ -389,7 +389,7 @@ export function PhotoCapture({
           </div>
         )}
 
-        <p className="text-[11px] text-mute leading-snug mt-5">
+        <p className="text-micro text-mute leading-snug mt-5">
           Only you ever see these. They&rsquo;re read for colouring and fit,
           then kept private — never shown to anyone else, never used to train
           anything.

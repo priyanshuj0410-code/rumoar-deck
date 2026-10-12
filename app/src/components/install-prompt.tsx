@@ -49,7 +49,7 @@ export function InstallPrompt() {
       <span className="mi text-[20px] text-peri mt-0.5" aria-hidden>
         install_mobile
       </span>
-      <div className="flex-1 text-sm leading-relaxed">
+      <div className="flex-1 text-small leading-relaxed">
         {event ? (
           <>
             <p>Install RUMOAR for full-screen access and offline wardrobe.</p>

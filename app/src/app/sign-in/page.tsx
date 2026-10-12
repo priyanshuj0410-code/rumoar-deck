@@ -15,8 +15,8 @@ export default async function SignInPage() {
         <Link href="/" className="k hit inline-block">
           RUMOAR
         </Link>
-        <h1 className="text-[32px] mt-4 leading-[1.1]">Your stylist, always on.</h1>
-        <p className="text-mute text-sm leading-relaxed mt-3 mb-8">
+        <h1 className="text-headline mt-4 leading-[1.1]">Your stylist, always on.</h1>
+        <p className="text-mute text-small leading-relaxed mt-3 mb-8">
           Sign in and your wardrobe follows you — phone, laptop, anywhere.
         </p>
 

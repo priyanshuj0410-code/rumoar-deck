@@ -34,7 +34,7 @@ export function TabBar() {
             href={item.href}
             onClick={() => haptics.tap()}
             aria-current={active ? "page" : undefined}
-            className={`flex flex-col items-center gap-[3px] px-3 py-[3px] text-[10px] font-medium
+            className={`flex flex-col items-center gap-[3px] px-3 py-[3px] text-micro font-medium
                         min-w-[64px] transition-colors ${active ? "text-ink" : "text-mute"}`}
           >
             <span className="mi text-[23px]" aria-hidden>
@@ -66,7 +66,7 @@ export function Rail() {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`flex flex-col items-center gap-1 w-[68px] py-3 text-[10px] font-medium
+            className={`flex flex-col items-center gap-1 w-[68px] py-3 text-micro font-medium
                         transition-colors ${active ? "text-ink bg-wash" : "text-mute hover:text-ink"}`}
           >
             <span className="mi text-[24px]" aria-hidden>
@@ -80,7 +80,7 @@ export function Rail() {
       <Link
         href="/app/settings"
         aria-current={pathname === "/app/settings" ? "page" : undefined}
-        className={`mt-auto flex flex-col items-center gap-1 w-[68px] py-3 text-[10px] font-medium
+        className={`mt-auto flex flex-col items-center gap-1 w-[68px] py-3 text-micro font-medium
                     transition-colors ${
                       pathname === "/app/settings" ? "text-ink bg-wash" : "text-mute hover:text-ink"
                     }`}

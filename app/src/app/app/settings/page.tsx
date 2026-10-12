@@ -9,34 +9,34 @@ export default async function SettingsPage() {
   return (
     <div className="px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10 max-w-[620px]">
       <p className="k">Settings</p>
-      <h1 className="text-[26px] mt-1">Your account</h1>
+      <h1 className="text-title mt-1">Your account</h1>
 
       <dl className="mt-8 border-t border-line">
         <div className="flex justify-between gap-6 py-4 border-b border-line">
-          <dt className="text-mute text-sm">Name</dt>
-          <dd className="text-sm">{profile?.display_name ?? "—"}</dd>
+          <dt className="text-mute text-small">Name</dt>
+          <dd className="text-small">{profile?.display_name ?? "—"}</dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
-          <dt className="text-mute text-sm">Email</dt>
-          <dd className="text-sm break-all">{user?.email ?? "—"}</dd>
+          <dt className="text-mute text-small">Email</dt>
+          <dd className="text-small break-all">{user?.email ?? "—"}</dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
-          <dt className="text-mute text-sm">Season</dt>
-          <dd className="text-sm text-right">
+          <dt className="text-mute text-small">Season</dt>
+          <dd className="text-small text-right">
             {profile?.analysis?.season ?? "—"}
           </dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
-          <dt className="text-mute text-sm">Colouring</dt>
-          <dd className="text-sm text-right">
+          <dt className="text-mute text-small">Colouring</dt>
+          <dd className="text-small text-right">
             {profile?.analysis
               ? `${profile.analysis.undertone} · ${profile.analysis.depth} · ${profile.analysis.contrast} contrast`
               : "—"}
           </dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
-          <dt className="text-mute text-sm">Metals</dt>
-          <dd className="text-sm text-right">
+          <dt className="text-mute text-small">Metals</dt>
+          <dd className="text-small text-right">
             {profile?.analysis?.metals ?? "—"}
           </dd>
         </div>
@@ -74,13 +74,13 @@ export default async function SettingsPage() {
                   role="img"
                   aria-label={colour.name}
                 />
-                <span className="text-[11px] leading-tight block mt-1">
+                <span className="text-micro leading-tight block mt-1">
                   {colour.name}
                 </span>
               </li>
             ))}
           </ul>
-          <p className="text-[11px] text-mute leading-snug mt-3">
+          <p className="text-micro text-mute leading-snug mt-3">
             Read from your intake photos
             {profile.analysed_at
               ? ` on ${new Date(profile.analysed_at).toLocaleDateString("en-IN")}`

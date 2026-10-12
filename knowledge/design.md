@@ -48,11 +48,27 @@ must be specified here first.
 | `--sans` | General Sans 400/500/600 | All body, labels, buttons |
 | `--mono` | Space Mono 400 | Eyebrows, prices, ticks, metadata |
 
-Scale (px): display 44 / 32 / 26 / 24 / 21 / 19 / 17 · body 15 (base) / 14 / 13.5 / 12.5 /
-12 · mono 15 / 12 / 11 / 10 / 9.
+**The type scale is closed: eight named sizes, 16px body, nothing else** ([RUM-16](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2); it was 21 text sizes from 9 to 68px). They are theme tokens in `globals.css` (`--text-*`), and the framework defaults (`text-sm`, `text-lg` and the rest) are reset so they cannot compile. Use the utility: `text-micro`, not `text-[11px]`.
 
-Display headings set `letter-spacing:-.01em` (`-.02em` at 44). The eyebrow style (`.k`) is
-mono 10px, `letter-spacing:.24em`, uppercase, `--mute`.
+| Token | px | Used for |
+|---|---|---|
+| `micro` | 11 | The `.k` eyebrow (mono, `.24em`, uppercase), tab and rail labels, swatch names, fine print |
+| `caption` | 12 | Mono prices and metadata, small form hints, the AI disclaimer |
+| `small` | 14 | Secondary text: hints, card names, suggestion chips, `.btn-sm`, back links, empty states |
+| `body` | 16 | The base (`body`, `.btn`, `.field`, so inputs never trigger iOS zoom), prose, intake labels |
+| `lead` | 20 | Streaming narration on desktop, error and state headings, short statements |
+| `title` | 26 | Section and step headings (display face) |
+| `headline` | 34 | Page headings on the content column (`@3xl`), step headings on desktop |
+| `display` | 52 | The one masthead per screen: the analysis season, the "Reading you" screen |
+
+Line height is inherited (1.5 from the framework base) unless a `leading-*` utility says otherwise; the code uses `leading-relaxed` (1.625) for prose, `leading-snug` (1.375) and `leading-tight` (1.25) for card names and headings, and `leading-[1.1]` or tighter for display lines. Tokens carry no line height, so replacing a size never moves a line box.
+
+Responsive pairs step along the table (`text-title @3xl:text-headline`). Icon glyphs (`.mi`) are sized with `text-[Npx]` and are not type: 16 to 34px in 14 steps today, a separate scale for a later ticket. The print surface (§ 7.2) uses absolute units and the editorial landing page has its own fluid scale in `landing.css`; neither is on this scale.
+
+Five families are in use across the product and the landing (three in the app, Instrument Serif and Inter on the landing). Whether to reduce them is an owner decision, not made here: [RUM-17](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7f0be952-45f9-462f-a56e-bcea067348e5).
+
+Display headings set `letter-spacing:-.01em`. The eyebrow style (`.k`) is
+mono `micro` (11px), `letter-spacing:.24em`, uppercase, `--mute`.
 
 Icons: **Material Symbols Rounded**, `wght 300`, `opsz 24`. No other icon set.
 
@@ -99,10 +115,10 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
 
 ## 2. Components
 
-- **Button** — `.btn`: full-height `--btnh`, `--ink` on white, weight 500, 15px, square.
-  `.ghost` = `--wash` on `--ink`. `.sm` = 38px, 13px, with a 44px hit area. Press: `scale(.975)`, `opacity .92`.
+- **Button**: `.btn`: full-height `--btnh`, `--ink` on white, weight 500, `body` (16px), square.
+  `.ghost` = `--wash` on `--ink`. `.sm` = 38px, `small` (14px), with a 44px hit area. Press: `scale(.975)`, `opacity .92`. Disabled: `opacity .45`, no pointer events.
 - **Card** (`.card`) — `--wash` surface, 1:1 thumb, meta block 11/12px padding; name at
-  13.5px/600, price in mono 12px `--mute`.
+  `small`/600, price in mono `caption` `--mute`.
 - **Tile** (`.wtile`) — wardrobe/selection tile. Selected state is `inset 0 0 0 2.5px
   var(--ink)` plus a 6% ink veil on the thumb and a filled 24px check at top-right. Never
   use colour to signal selection.
@@ -114,7 +130,7 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   `backdrop-filter: blur(22px) saturate(1.8)`. Never opaque.
 - **Toast** — ink block, bottom-anchored above the tab bar, `--peri` icon, auto-dismiss
   2.4s, spring transform in.
-- **Empty state** (`.emptymsg`) — 44/24px padding, centred, `--mute` 14px/1.6.
+- **Empty state** (`.emptymsg`): 44/24px padding, centred, `--mute` `small`/1.6.
 - **One primary action per screen.** The primary is whatever moves you forward *from the
   current state* — "Take photo" on an empty step becomes "Next" once a photo exists.
   Secondary actions are `.btn-ghost` — real buttons, since they are real alternatives —
@@ -125,7 +141,7 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   like it has nothing to do.
 - **Streaming read-out** — for any generation over ~3s. A pulsing 6px dot beside a mono
   status line naming the current phase, a display heading, and the model's own narration
-  streaming in at 17px with a 2px caret. Skeleton lines fill the gap before the first
+  streaming in at `body` (`lead` on desktop) with a 2px caret. Skeleton lines fill the gap before the first
   token. **A progress bar over silence is not an acceptable loading state** — if the work
   takes long enough to need an indicator, it takes long enough to owe the user something
   to read. **Pace the reveal client-side**: Gemini streams in very coarse chunks — often a
@@ -139,14 +155,14 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   the foot of the image; the palette runs as 20px chips down the top-right corner.
   Rationale collapses behind a "Why this works" disclosure. Anything generated from the
   user's own photo carries a line saying it is an impression, not real garments.
-- **Swatch grid** — 4-up square colour chips, no radius, name in 11px beneath. Each chip is
+- **Swatch grid**: 4-up square colour chips, no radius, name in `micro` beneath. Each chip is
   `role="img"` with the colour name as its label: colour alone must never be the only
   carrier of meaning. A swatch whose hex fails `#RRGGBB` validation is dropped rather than
   rendered, so a parse failure can't masquerade as a black recommendation.
 - **Confidence meter** — a 2px `--line` track with an `--ink` fill and the percentage in
   mono beside it. Used wherever the product states a machine judgement about the user; it
   is never decorative and never hidden when low.
-- **Intake instruction list** — numbered mono index, bold 13.5px label, `--mute` 13px hint.
+- **Intake instruction list**: numbered mono index, bold `small` label, `--mute` `small` hint.
   For steps the user performs away from the screen.
 - **Progress** — **one counter per screen.** Stage-level position is a segmented bar
   (2px × 24px per stage, `--ink` filled / `--line` empty) with no numerals; a numeric
@@ -213,7 +229,7 @@ at least as wide as the phone shows them.
   the right. DOM order stays the mobile order. There is no back link: the thumbnail tiles
   are the navigation, and a second way back only made the two disagree about which one
   meant "previous".
-- **Analysis** — a masthead (season at 68px left, confidence as its byline right), then a
+- **Analysis**: a masthead (season at `display`, 52px, left, confidence as its byline right; it was 68px until RUM-16), then a
   full-width colour band with named swatches and hex, then the readings in two columns
   (`columns-2`, `break-inside-avoid` per section).
 - **Styles** — one direction at a time, in the same two-pane machine: the look holds the
@@ -442,5 +458,7 @@ list.
 - **2026-08-07** — iOS Safari camera fixed and sign-in reordered ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). The preview attaches in a callback ref rather than an animation frame, Capture waits for a frame that can actually be grabbed, and a stalled camera says why. Google leads the sign-in; see [the email runbook](runbooks/email-delivery.md).
 
 - **2026-10-12**: P1 accessibility fixes from the design audit ([RUM-15](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f/)). `--mute` darkened from `#8C8B85` to `#706F6A`; `--control` added for input and chip borders while `--line` stays for dividers; every control under 44px gets a 44px hit area through `.hit`; the ratios in § 5 were recomputed (ink on paper is 17.88:1, volt on paper 5.29:1).
+
+- **2026-10-12**: P2 design gaps from the audit ([RUM-16](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2)). The type scale is closed at eight named sizes with a 16px body and the code migrated to them (`text-micro` to `text-display`; the analysis masthead went from 68px to 52px); `--err` and `--warn` added; hover, pressed, focus and disabled written down from the code; the glass value corrected to .72; `knowledge/contrast.py` added and every stated ratio checked against it (the wave-1 corrections hold). Two choices left to the owner: the five type families ([RUM-17](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7f0be952-45f9-462f-a56e-bcea067348e5)) and the tab bar over dark photography ([RUM-18](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c)).
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)

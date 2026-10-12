@@ -25,8 +25,8 @@ export function EmptyState({
       <span className="mi text-[30px] text-mute" aria-hidden>
         {icon}
       </span>
-      <p className="text-[17px] mt-4">{title}</p>
-      <p className="text-mute text-sm leading-relaxed mt-2">{body}</p>
+      <p className="text-body mt-4">{title}</p>
+      <p className="text-mute text-small leading-relaxed mt-2">{body}</p>
       {action && (
         <Link href={action.href} className="btn btn-sm mt-5">
           {action.label}

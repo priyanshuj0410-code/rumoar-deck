@@ -12,8 +12,8 @@ export default async function ShopPage() {
   return (
     <div className="px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10 max-w-[1120px]">
       <p className="k">Shop</p>
-      <h1 className="text-[26px] @3xl:text-[38px] mt-1">The keystones</h1>
-      <p className="text-mute text-sm leading-relaxed mt-2 max-w-[46ch]">
+      <h1 className="text-title @3xl:text-headline mt-1">The keystones</h1>
+      <p className="text-mute text-small leading-relaxed mt-2 max-w-[46ch]">
         Nine pieces, chosen so one of them finishes most of what you already own.
       </p>
 
@@ -47,10 +47,10 @@ export default async function ShopPage() {
                     )}
                   </div>
                   <div className="px-3 py-2.5">
-                    <b className="text-[13.5px] font-semibold block leading-tight">
+                    <b className="text-small font-semibold block leading-tight">
                       {product.name}
                     </b>
-                    <span className="font-mono text-[12px] text-mute mt-1 block">
+                    <span className="font-mono text-caption text-mute mt-1 block">
                       {formatINR(product.price_inr)}
                     </span>
                   </div>

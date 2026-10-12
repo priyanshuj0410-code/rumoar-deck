@@ -113,15 +113,15 @@ export function ShapeReading({
           </span>
         )}
         <div className="min-w-0">
-          <p className="text-[15px]">{match?.label ?? value}</p>
-          {note && <p className="text-sm leading-relaxed text-mute mt-1">{note}</p>}
+          <p className="text-body">{match?.label ?? value}</p>
+          {note && <p className="text-small leading-relaxed text-mute mt-1">{note}</p>}
         </div>
       </div>
 
       <button
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="hit flex items-center gap-1 text-[13px] text-mute hover:text-ink transition-colors mt-3"
+        className="hit flex items-center gap-1 text-small text-mute hover:text-ink transition-colors mt-3"
       >
         <span className="mi text-[18px]" aria-hidden>
           {open ? "expand_less" : "expand_more"}
@@ -139,7 +139,7 @@ export function ShapeReading({
                   <Glyph path={shape.path} active={isYours} />
                 </span>
                 <span
-                  className={`text-[11px] leading-tight block mt-1 ${
+                  className={`text-micro leading-tight block mt-1 ${
                     isYours ? "text-ink" : "text-mute"
                   }`}
                 >

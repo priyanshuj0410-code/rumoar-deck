@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toast && (
           <div
             key={toast.id}
-            className="bg-ink text-paper px-4 py-3 flex items-center gap-2.5 text-sm animate-toast
+            className="bg-ink text-paper px-4 py-3 flex items-center gap-2.5 text-small animate-toast
                        shadow-[0_18px_40px_-18px_rgba(23,23,27,0.6)]"
           >
             <span
