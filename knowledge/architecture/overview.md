@@ -1,7 +1,7 @@
 ---
 type: architecture
 title: RUMOAR Product Architecture
-description: How the RUMOAR product app is built and deployed: Next.js on Vercel, Supabase, Ollama Cloud, PWA with a Capacitor-ready adapter layer.
+description: "How the RUMOAR product app is built and deployed: Next.js on Vercel, Supabase, Ollama Cloud, PWA with a Capacitor-ready adapter layer."
 plane_issues:
   - RUM-1 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/c75cbaa1-6120-4fe4-af86-c5e51c93d169
   - RUM-2 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/e23f2378-0386-4801-be08-e0946564f8a9

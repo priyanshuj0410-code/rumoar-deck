@@ -1,7 +1,7 @@
 ---
 type: index
 title: RUMOAR Knowledge Repository
-description: Index of all persistent knowledge for RUMOAR: a men's fashion-accessories styling engine for India.
+description: "Index of all persistent knowledge for RUMOAR: a men's fashion-accessories styling engine for India."
 plane_issues:
   - RUM-19 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a36beac7-b766-4ef8-8b19-c5fb9740d2a5
 ---

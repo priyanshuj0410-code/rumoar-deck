@@ -1,6 +1,6 @@
 ---
 type: design-system
-title: RUMOAR Design System: "Engine"
+title: "RUMOAR Design System: \"Engine\""
 description: Canonical tokens, components, layout and motion rules for the RUMOAR product UI across mobile, tablet and desktop.
 plane_issues:
   - RUM-1 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/c75cbaa1-6120-4fe4-af86-c5e51c93d169
