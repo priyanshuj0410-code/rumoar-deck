@@ -8,6 +8,7 @@ plane_issues:
   - RUM-9 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7df04b78-6464-450a-89e0-d56ff89828e9
   - RUM-14 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5
   - RUM-15 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f
+  - RUM-18 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c
 ---
 
 # RUMOAR Design System — "Engine"
@@ -34,7 +35,7 @@ extend this file first, then build.
 | `--ok` | `#3E7D5A` | Success. 4.90:1 on paper, 4.41:1 on `--wash`: text on paper only, an icon or graphic (3:1) on wash. Not used in the code yet |
 | `--err` | `#B3261E` | Error: the icon of a failure message and the edge of an invalid field. 6.54:1 on paper, 5.89:1 on `--wash` |
 | `--warn` | `#8A5A12` | Warning: the icon of a caution message. 5.91:1 on paper, 5.32:1 on `--wash` |
-| `--glass` | `rgba(255,255,255,.66)` | Backdrop-blurred bars |
+| `--glass` | `rgba(255,255,255,.72)` | Backdrop-blurred bars. This is the CSS value; the doc said .66 until RUM-16 |
 
 Monochrome carries the interface; Voltage is a flash, never a fill. Never place `--peri`
 on `--paper` — it is a dark-surface accent only.
@@ -281,11 +282,11 @@ Honour `prefers-reduced-motion: reduce` — drop transforms and shimmer, keep op
 
 - Ink on paper is 17.88:1 and on `--wash` 16.10:1.
 - `--mute` is 5.03:1 on paper and 4.53:1 on `--wash`, so it is text-safe at any size on those
-  two surfaces, and on the glass bars over paper or wash content (4.86:1 or more). It is not
+  two surfaces, and on the glass bars over paper or wash content (4.89:1 or more). It is not
   text-safe on anything darker: on the `.skel` shimmer it is 4.37:1 down to 3.95:1, so a label
   on a skeleton is `--ink` (`.skel .k` enforces it), and on `--ink` it is 3.55:1, enough for a
   glyph such as the install prompt's dismiss icon but not for text. Never lower its alpha:
-  `text-mute/80` is 3.38:1 on paper. A bar floating over dark photography is not covered.
+  `text-mute/80` is 3.38:1 on paper. A bar floating over dark photography is not covered: at the CSS glass value (.72, aligned in RUM-16) `--mute` is 2.53:1 over black and 3.09:1 over #444, and about .95 white would be needed to hold 4.5:1, which is no longer glass. The options are with the owner: [RUM-18](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c).
 - `--volt` is 5.29:1 on paper and 4.76:1 on `--wash`, safe for links and focus rings.
 - `--err` is 6.54:1 on paper and 5.89:1 on `--wash`; `--warn` is 5.91:1 and 5.32:1. Both also hold 4.5:1 on the skeleton shimmer. `--ok` is 4.90:1 on paper but 4.41:1 on `--wash`, so success text goes on paper only.
 - Control boundaries need 3:1 against the surface beside them. `--control` is 3.42:1 on paper
