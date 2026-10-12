@@ -34,10 +34,14 @@ export function TabBar() {
             href={item.href}
             onClick={() => haptics.tap()}
             aria-current={active ? "page" : undefined}
-            className={`flex flex-col items-center gap-[3px] px-3 py-[3px] text-micro font-medium
-                        min-w-[64px] transition-colors ${active ? "text-ink" : "text-mute"}`}
+            className={`flex flex-col items-center gap-[3px] px-3 py-[3px] text-micro text-ink
+                        min-w-[64px] ${active ? "font-semibold" : "font-medium"}`}
           >
-            <span className="mi text-[23px]" aria-hidden>
+            <span
+              className="mi text-[23px]"
+              style={{ fontVariationSettings: `'FILL' ${active ? 1 : 0}, 'wght' ${active ? 600 : 300}, 'opsz' 24` }}
+              aria-hidden
+            >
               {item.icon}
             </span>
             {item.label}
