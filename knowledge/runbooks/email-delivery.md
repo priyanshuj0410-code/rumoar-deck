@@ -3,7 +3,8 @@ type: runbook
 title: Email delivery for RUMOAR sign-in
 description: Why magic links stop arriving after two per hour, and how to move Supabase Auth onto Resend SMTP.
 plane_issues:
-  - RUM-15 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/
+  - RUM-15 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f
+  - RUM-19 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a36beac7-b766-4ef8-8b19-c5fb9740d2a5
 ---
 
 # Email delivery
@@ -25,17 +26,17 @@ No amount of client-side throttling fixes this. The only fix is custom SMTP.
   path and should not look like the main one.
 - A 60-second cooldown after any send mirrors Supabase's own minimum interval, so a user
   cannot spend the quota by tapping twice.
-- The Apple button was removed — it was calling a provider that is not configured. Restore it
+- The Apple button was removed: it was calling a provider that is not configured. Restore it
   the moment Apple sign-in is enabled in the dashboard.
 
-## Moving to Resend — steps for the account owner
+## Moving to Resend: steps for the account owner
 
 Chosen over Postmark (no free tier), SES (needs a production-access request and its own
 console), SendGrid (free plan discontinued) and Brevo (weaker deliverability). Resend is free
 to 3,000/month and 100/day, and has a documented Supabase SMTP path.
 
 **Do all of this yourself. The API key goes from Resend's dashboard straight into Supabase's
-SMTP form and nowhere else — never into a chat, a commit, or an `.env` file.**
+SMTP form and nowhere else, never into a chat, a commit, or an `.env` file.**
 
 1. Sign up at <https://resend.com>. Free plan, no card.
 2. **Domains → Add Domain**, using a real domain you own. A `*.vercel.app` host cannot be
@@ -44,7 +45,7 @@ SMTP form and nowhere else — never into a chat, a commit, or an `.env` file.**
    - `MX` on `send` → the host it gives you, priority 10
    - `TXT` on `send` → `v=spf1 include:amazonses.com ~all`
    - `TXT` on `resend._domainkey` → the DKIM key
-   Do **not** put the SPF include on the apex domain — that is the usual way people break
+   Do **not** put the SPF include on the apex domain: that is the usual way people break
    their existing mail.
 4. Add DMARC yourself; Resend does not. `TXT` at `_dmarc.<domain>`:
    `v=DMARC1; p=none; rua=mailto:you@<domain>`
@@ -56,15 +57,15 @@ SMTP form and nowhere else — never into a chat, a commit, or an `.env` file.**
 
    | Field | Value |
    |---|---|
-   | Sender email | `login@<domain>` — must be on the verified domain |
+   | Sender email | `login@<domain>`, must be on the verified domain |
    | Sender name | `RUMOAR` |
    | Host | `smtp.resend.com` |
    | Port | `465` (`587` if 465 is blocked) |
-   | Username | `resend` — literally that word |
+   | Username | `resend`, literally that word |
    | Password | the `re_...` key |
 
 7. Authentication → **Rate Limits** → raise *emails per hour* from 2 to about 30 while on
-   Resend's free daily cap of 100. Leave the per-user minimum interval at 60s — the client
+   Resend's free daily cap of 100. Leave the per-user minimum interval at 60s: the client
    cooldown mirrors it, so change both together.
 8. Authentication → **URL Configuration**: Site URL `https://rumoar-app-alpha.vercel.app`,
    and add `https://rumoar-app-alpha.vercel.app/auth/callback**` to the redirect allow-list.

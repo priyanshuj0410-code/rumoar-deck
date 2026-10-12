@@ -5,6 +5,7 @@ description: Step-by-step for provisioning Supabase and deploying app/ as a seco
 plane_issues:
   - RUM-2 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/e23f2378-0386-4801-be08-e0946564f8a9
   - RUM-3 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/be88f126-e377-48c1-8dc2-e333ef4b6682
+  - RUM-19 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a36beac7-b766-4ef8-8b19-c5fb9740d2a5
 ---
 
 # Deploying the product app
@@ -33,7 +34,7 @@ New project → same Git repository → **Root Directory: `app/`**. Framework pr
 detected as Next.js.
 
 > **Trap, learned the hard way.** The repository-root `.vercelignore` is applied to
-> *every* Vercel project on this repo — including Git builds of `rumoar-app`, whose Root
+> *every* Vercel project on this repo, including Git builds of `rumoar-app`, whose Root
 > Directory is `app/`. Listing `app/` in that file deletes `package.json` before the build
 > and the deploy fails with "No Next.js version detected". Never ignore `app/` there.
 
@@ -51,20 +52,20 @@ Environment variables:
 | `OLLAMA_CHAT_MODEL` | optional, defaults to `gpt-oss:120b` |
 | `OLLAMA_VISION_MODEL` | optional, defaults to `qwen3-vl:235b-cloud` |
 
-Do **not** add `SUPABASE_SERVICE_ROLE_KEY` — the deployment never needs it, and adding it
+Do **not** add `SUPABASE_SERVICE_ROLE_KEY`: the deployment never needs it, and adding it
 turns a single server-side bug into a full data breach.
 
 ## 3. Verify after deploy
 
-- Sign in with email on desktop, then on a phone with the same address — the wardrobe
+- Sign in with email on desktop, then on a phone with the same address: the wardrobe
   must be identical.
 - Android Chrome: the install prompt appears; install and confirm the app opens
   full-screen with no browser chrome.
 - iOS Safari: Share → Add to Home Screen; confirm the icon is the R mark and the app
   clears the home indicator.
-- Turn on airplane mode and reload — the offline screen appears rather than a browser
+- Turn on airplane mode and reload: the offline screen appears rather than a browser
   error.
-- Resize desktop through 1120px — the tab bar gives way to the rail and the stylist
+- Resize desktop through 1120px: the tab bar gives way to the rail and the stylist
   column.
 
 ## Rolling back

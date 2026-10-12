@@ -1,11 +1,12 @@
 ---
 type: architecture
 title: RUMOAR Product Architecture
-description: How the RUMOAR product app is built and deployed — Next.js on Vercel, Supabase, Ollama Cloud, PWA with a Capacitor-ready adapter layer.
+description: How the RUMOAR product app is built and deployed: Next.js on Vercel, Supabase, Ollama Cloud, PWA with a Capacitor-ready adapter layer.
 plane_issues:
   - RUM-1 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/c75cbaa1-6120-4fe4-af86-c5e51c93d169
   - RUM-2 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/e23f2378-0386-4801-be08-e0946564f8a9
   - RUM-8 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/84ae3338-9fa7-43d9-9357-a990a582a734
+  - RUM-19 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a36beac7-b766-4ef8-8b19-c5fb9740d2a5
 ---
 
 # RUMOAR Product Architecture
@@ -18,7 +19,7 @@ man's wardrobe and taste, then recommends accessories he can actually buy.
 | Decision | Choice | Why |
 |---|---|---|
 | Framework | Next.js 15 (App Router, TypeScript) | Server routes for the model proxy, streaming UI, first-class on Vercel |
-| Hosting | Vercel — **separate project** from the deck | The deck at the repo root keeps its live URL untouched; the product owns its own domain |
+| Hosting | Vercel: **separate project** from the deck | The deck at the repo root keeps its live URL untouched; the product owns its own domain |
 | Data / auth / files | Supabase (Postgres + Auth + Storage + RLS) | One service for accounts, wardrobe rows and user images; RLS keeps a user's wardrobe private by construction |
 | Model | Gemini via a server route | One provider for conversation, wardrobe photo reading **and** image generation; the key never reaches the browser |
 | Packaging | Installable PWA, Capacitor-ready | One codebase for Android, iOS and desktop today; native shells are a config change, not a rewrite |
@@ -26,10 +27,10 @@ man's wardrobe and taste, then recommends accessories he can actually buy.
 
 ### Repository layout
 
-    index.html        the deck (generated) — untouched, its own Vercel project
+    index.html        the deck (generated), untouched, its own Vercel project
     build_deck.js     the deck source
-    rumoar-app.html   the original prototype — kept as reference, no longer deployed
-    app/              the product (Next.js) — its own Vercel project
+    rumoar-app.html   the original prototype, archived in place (design.md § 10), no longer deployed
+    app/              the product (Next.js), its own Vercel project
     knowledge/        this repository
 
 `app/` is deployed by pointing a second Vercel project at the `app/` root directory. The
@@ -59,19 +60,19 @@ because every user-owned table is protected by RLS.
 
 The product must work fully on Android, iOS and desktop. Three things make that true:
 
-1. **Responsive layout** — three breakpoints defined in [`design.md`](../design.md#3-layout).
+1. **Responsive layout**: three breakpoints defined in [`design.md`](../design.md#3-layout).
    Desktop is a real two-pane app, not a stretched phone.
-2. **PWA** — web app manifest, service worker (offline shell + cached wardrobe images),
+2. **PWA**: web app manifest, service worker (offline shell + cached wardrobe images),
    `apple-touch-icon` and `apple-mobile-web-app-*` meta for iOS installability, safe-area
    padding for the iOS home indicator and Android gesture bar.
-3. **Platform adapter layer** — `app/src/lib/platform/`. Every capability that differs
+3. **Platform adapter layer**: `app/src/lib/platform/`. Every capability that differs
    between web and native lives behind an interface: `camera`, `storage`, `share`,
    `notifications`, `haptics`. The web implementation ships today; adding Capacitor means
    adding a second implementation and a build flag, with zero changes to feature code.
 
 Known platform limits, handled explicitly rather than assumed away:
 
-- **Speech recognition** (the prototype's mic) is `webkitSpeechRecognition` — absent on
+- **Speech recognition** (the prototype's mic) is `webkitSpeechRecognition`, absent on
   iOS Safari and Firefox. The adapter feature-detects and falls back to text input; the
   mic button is hidden, never shown broken.
 - **Speech synthesis** voices differ per platform, so scripted onboarding audio is served
@@ -94,9 +95,9 @@ Known platform limits, handled explicitly rather than assumed away:
 
 Gemini's image model (Nano Banana 2) is used in three places, all through `/api/render`:
 
-1. **Onboarding reveal** — three shots generated from his own photo: him as he is on a
+1. **Onboarding reveal**: three shots generated from his own photo: him as he is on a
    neutral backdrop, him with the keystone accessory added, him with the full set.
-2. **PDP try-on** — "See it on me" composites a product onto his reference photo.
+2. **PDP try-on**: "See it on me" composites a product onto his reference photo.
 3. Both persist to the `looks` table and the private `looks` bucket.
 
 Two rules make this trustworthy rather than creepy:
@@ -108,12 +109,12 @@ Two rules make this trustworthy rather than creepy:
   fit and scale and is not a photograph of the real product on him.
 
 The reference photo is the first shot uploaded during onboarding, stored on
-`profiles.reference_photo_path`. Renders are cached per (user, kind, product, stage) — a
+`profiles.reference_photo_path`. Renders are cached per (user, kind, product, stage), so a
 repeat tap costs nothing.
 
 ## Open items
 
-- Payments/checkout is out of scope for v1 — the PDP's buy action records intent and
+- Payments/checkout is out of scope for v1: the PDP's buy action records intent and
   hands off; a real checkout is a separate decision.
 - Catalog is seeded from `assets/catalog/`; a supplier feed is a later concern.
 

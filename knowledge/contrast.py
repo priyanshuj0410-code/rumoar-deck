@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""WCAG 2.1 contrast and type-scale check for the RUMOAR product app.
+"""WCAG 2.1 contrast, type-scale, tab-bar, landing-font and dash check for the RUMOAR product app.
 
 Reads the real tokens from app/src/app/globals.css, so a change there cannot drift from the
 figures printed in knowledge/design.md. Every ratio the doc states is recomputed here and the
-doc must contain the computed figure, so a stale figure fails.
+doc must contain the computed figure, so a stale figure fails. It also fails on any en or em dash
+(U+2013, U+2014) in the docs and user-facing copy.
 
 Run: python3 knowledge/contrast.py     Exit status 1 on any failure.
 Targets: text 4.5, control boundaries, focus rings and meaningful graphics 3.
@@ -90,6 +91,12 @@ for name in ("err", "warn"):
 print("--- Glass bars (mute label over paper or wash content)")
 row("mute on glass over paper", tok["mute"], glass_paper, 4.5, stated=False)
 row("mute on glass over wash", tok["mute"], glass_wash, 4.5)
+print("--- Tab bar (ink labels and icons on glass over photography, RUM-18)")
+glass_black, glass_444 = over("#FFFFFF", alpha, "#000000"), over("#FFFFFF", alpha, "#444444")
+row("ink on glass over black, the darkest case", ink, glass_black, 4.5)
+row("ink on glass over #444444", ink, glass_444, 4.5)
+row("mute on glass over black (why the bar is not mute)", tok["mute"], glass_black, None)
+row("mute on glass over #444444 (why the bar is not mute)", tok["mute"], glass_444, None)
 print("--- Documented limits (not text-safe; the doc says so)")
 row("mute on skeleton shimmer, lighter", tok["mute"], skel_a, None)
 row("mute on skeleton shimmer, darker", tok["mute"], skel_b, None)
@@ -124,7 +131,41 @@ for base, _, files in os.walk(SRC):
                 continue
             for sz in re.findall(r"text-\[\d+(?:\.\d+)?px\]|\btext-(?:xs|sm|base|lg|xl|[2-9]xl)\b", cls):
                 stray.append(f"{os.path.relpath(path, ROOT)}: {sz}")
+nav = open(os.path.join(SRC, "components", "nav.tsx"), encoding="utf-8").read()
+tabbar = nav[nav.index("export function TabBar"):nav.index("export function Rail")]
+landing_css = open(os.path.join(ROOT, "app", "public", "landing.css"), encoding="utf-8").read()
+landing_html = open(os.path.join(ROOT, "app", "public", "landing.html"), encoding="utf-8").read()
+checks += [
+    ("tab bar labels and icons are ink, never mute", "text-ink" in tabbar and "text-mute" not in tabbar),
+    ("active tab icon is FILL 1 at wght 600", "'FILL' ${active ? 1 : 0}, 'wght' ${active ? 600 : 300}" in tabbar),
+    ("glass stays at .72", alpha == 0.72),
+    ("landing body is General Sans, not Inter", '--sans: "General Sans"' in landing_css and "Inter" not in landing_css + landing_html),
+    ("landing loads General Sans 400,500,600 from Fontshare", "f[]=general-sans@400,500,600" in landing_html),
+]
 checks.append((f"no stray text size outside the scale ({len(stray)} found; icon glyphs .mi are sized separately)", not stray))
+def user_facing(path, text):
+    if path.endswith((".ts", ".tsx")):
+        text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+        text = re.sub(r"(?<![:\"'\w])//[^\n]*", "", text)
+    return text
+
+
+dash_files = [os.path.join(ROOT, f) for f in ("README.md", "app/README.md", "app/public/landing.html", "app/public/landing.css", "app/public/landing.js")]
+for base, _, files in os.walk(os.path.join(ROOT, "knowledge")):
+    dash_files += [os.path.join(base, f) for f in files if f.endswith(".md")]
+for base, _, files in os.walk(SRC):
+    if os.path.relpath(base, SRC).startswith(os.path.join("app", "api")):
+        continue
+    dash_files += [os.path.join(base, f) for f in files if f.endswith((".ts", ".tsx"))]
+dashes = []
+for path in dash_files:
+    text = user_facing(path, open(path, encoding="utf-8").read())
+    for n, line in enumerate(text.split("\n"), 1):
+        if "\u2013" in line or "\u2014" in line:
+            dashes.append(f"{os.path.relpath(path, ROOT)}: {line.strip()[:70]}")
+checks.append((f"no en or em dash in docs or user-facing copy ({len(dashes)} found; model prompts in app/src/app/api are not user copy)", not dashes))
+for line in dashes[:10]:
+    print("      " + line)
 for line in stray[:10]:
     print("      " + line)
 for name, ok in checks:
