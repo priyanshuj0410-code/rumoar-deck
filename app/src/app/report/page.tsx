@@ -6,7 +6,7 @@ import { Controls } from "./controls";
 import { Sheet } from "./sheet";
 import "./print.css";
 
-export const metadata = { title: "Your report — RUMOAR" };
+export const metadata = { title: "Your report: RUMOAR" };
 
 export default async function ReportPage() {
   const profile = await getProfile();
@@ -31,7 +31,7 @@ export default async function ReportPage() {
             Your reading, on one page.
           </h1>
           <p className="text-mute text-small lg:text-body leading-relaxed mt-2 max-w-[52ch]">
-            Everything that changes what you buy, on a single side of A4 — the
+            Everything that changes what you buy, on a single side of A4: the
             palette at a size worth holding against cloth, and the fit rules
             that go with it.
           </p>

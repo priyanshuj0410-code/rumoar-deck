@@ -1,4 +1,4 @@
-# RUMOAR — the product app
+# RUMOAR: the product app
 
 Next.js 15 (App Router) + Supabase + Ollama Cloud. Installable PWA that runs fully on
 Android, iOS and desktop from one codebase.
@@ -38,7 +38,7 @@ project stays pointed at the repository root and keeps its URL.
 Environment variables to set in Vercel: `NEXT_PUBLIC_SUPABASE_URL`,
 `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `OLLAMA_API_KEY`, and optionally
 `OLLAMA_CHAT_MODEL` / `OLLAMA_VISION_MODEL`. `SUPABASE_SERVICE_ROLE_KEY` is only needed
-locally for seeding — do not add it to the deployment.
+locally for seeding. Do not add it to the deployment.
 
 ## Layout
 
@@ -46,7 +46,7 @@ locally for seeding — do not add it to the deployment.
       page.tsx          landing
       sign-in/          email OTP + Google + Apple
       onboarding/       the four-step call flow
-      app/              the product shell — stylist, wardrobe, saved, shop, settings
+      app/              the product shell: stylist, wardrobe, saved, shop, settings
       api/stylist       chat proxy (server holds the model key)
       api/vision        photo → wardrobe items
     src/components/     shell, nav, stylist, wardrobe capture, install prompt
@@ -57,7 +57,7 @@ locally for seeding — do not add it to the deployment.
 
 ## Cross-platform notes
 
-- `npm run icons` regenerates the PWA icon set. No image dependencies — the mark is drawn
+- `npm run icons` regenerates the PWA icon set. No image dependencies: the mark is drawn
   in code.
 - Nothing in `src/app` or `src/components` touches a browser capability directly; it all
   goes through `src/lib/platform`. That indirection is what makes a Capacitor shell a
@@ -67,5 +67,5 @@ locally for seeding — do not add it to the deployment.
 - Notifications are only offered on iOS once the app is installed to the Home Screen,
   because that is the only place iOS grants them.
 
-Canon lives in [`../knowledge`](../knowledge/README.md) — design system, architecture and
+Canon lives in [`../knowledge`](../knowledge/README.md): design system, architecture and
 data model.

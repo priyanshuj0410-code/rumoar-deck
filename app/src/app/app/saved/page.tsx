@@ -5,7 +5,7 @@ import { formatINR, type Product } from "@/lib/types";
 import { EmptyState, IconSubmit } from "@/components/states";
 import { toggleSavedLook } from "../actions";
 
-export const metadata = { title: "Saved — RUMOAR" };
+export const metadata = { title: "Saved: RUMOAR" };
 
 export default async function SavedPage() {
   const supabase = await createClient();
@@ -53,7 +53,7 @@ export default async function SavedPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={url}
-                      alt={`${look.title}${look.subtitle ? ` — ${look.subtitle}` : ""}`}
+                      alt={`${look.title}${look.subtitle ? `, ${look.subtitle}` : ""}`}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />

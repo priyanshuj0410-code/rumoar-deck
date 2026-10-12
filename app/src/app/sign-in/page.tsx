@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/lib/data";
 import { SignInForm } from "./sign-in-form";
 
-export const metadata = { title: "Sign in — RUMOAR" };
+export const metadata = { title: "Sign in: RUMOAR" };
 
 export default async function SignInPage() {
   if (await getUser()) redirect("/app");
@@ -17,7 +17,7 @@ export default async function SignInPage() {
         </Link>
         <h1 className="text-headline mt-4 leading-[1.1]">Your stylist, always on.</h1>
         <p className="text-mute text-small leading-relaxed mt-3 mb-8">
-          Sign in and your wardrobe follows you — phone, laptop, anywhere.
+          Sign in and your wardrobe follows you: phone, laptop, anywhere.
         </p>
 
         <Suspense fallback={<div className="h-[52px] skel" />}>

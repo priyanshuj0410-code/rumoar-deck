@@ -1,5 +1,5 @@
 /* ============================================================================
-   RUMOAR — landing page
+   RUMOAR: landing page
    Editorial surface. Its own visual language, separate from the product UI in
    knowledge/design.md: warm ground, serif display, rounded corners, soft shadow.
    Desktop-first; breakpoints step down.
@@ -16,7 +16,7 @@
   --card: #ffffff;
 
   --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sans: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   --radius: 0;
   --radius-lg: 0;
@@ -124,7 +124,7 @@ svg {
   font-size: clamp(1.9rem, 2.5vw, 2.5rem);
 }
 
-/* Italic is the accent in this system — there is no second colour. */
+/* Italic is the accent in this system: there is no second colour. */
 .statement em,
 .hero__title em {
   font-style: italic;
@@ -490,7 +490,7 @@ svg {
   color: var(--muted);
 }
 
-/* overlay variant — label sits on the photograph */
+/* overlay variant: label sits on the photograph */
 .card--overlay .card__image {
   aspect-ratio: 1 / 1.95;
 }

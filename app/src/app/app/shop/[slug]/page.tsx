@@ -11,7 +11,7 @@ type Params = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Params) {
   const { slug } = await params;
   const product = await getProduct(slug);
-  return { title: product ? `${product.name} — RUMOAR` : "RUMOAR" };
+  return { title: product ? `${product.name}: RUMOAR` : "RUMOAR" };
 }
 
 export default async function ProductPage({ params }: Params) {

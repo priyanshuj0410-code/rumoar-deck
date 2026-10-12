@@ -206,7 +206,7 @@ export function Sheet({
       </div>
 
       <p className="colophon">
-        Printers lie — the hex is the truth. {analysis.caveat} Read by RUMOAR on{" "}
+        Printers lie. The hex is the truth. {analysis.caveat} Read by RUMOAR on{" "}
         {issued}. rumoar-app-alpha.vercel.app
       </p>
     </div>

@@ -66,7 +66,7 @@ export function ReactionBar({
       if (on) {
         next.add(kind);
         if (kind === "save") toast("Saved to your looks");
-        if (kind === "dislike") toast("Noted — you'll see less of this");
+        if (kind === "dislike") toast("Noted. You'll see less of this");
         // A like and a dislike are one opinion, not two.
         if (kind === "like") next.delete("dislike");
         if (kind === "dislike") next.delete("like");
@@ -82,7 +82,7 @@ export function ReactionBar({
   async function onShare() {
     haptics.tap();
     const ok = await share.send({
-      title: `${title} — RUMOAR`,
+      title: `${title}: RUMOAR`,
       text: `${title}, styled for me by RUMOAR.`,
       url: typeof window !== "undefined" ? window.location.origin : undefined,
     });

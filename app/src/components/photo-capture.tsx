@@ -391,7 +391,7 @@ export function PhotoCapture({
 
         <p className="text-micro text-mute leading-snug mt-5">
           Only you ever see these. They&rsquo;re read for colouring and fit,
-          then kept private — never shown to anyone else, never used to train
+          then kept private. Never shown to anyone else, never used to train
           anything.
         </p>
       </div>

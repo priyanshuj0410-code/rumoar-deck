@@ -5,6 +5,7 @@ description: Postgres tables, storage buckets and row-level-security rules backi
 plane_issues:
   - RUM-3 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/be88f126-e377-48c1-8dc2-e333ef4b6682
   - RUM-4 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/3175d347-ab1f-49e2-9a62-f9353d1ad013
+  - RUM-19 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a36beac7-b766-4ef8-8b19-c5fb9740d2a5
 ---
 
 # RUMOAR Data Model
@@ -27,11 +28,11 @@ One row per account, keyed to `auth.users`.
 | `onboarding_stage` | `text` | `photos` → `analysis` → `styles` → `done` |
 | `reference_photo_path` | `text` | The photo every generated image is rendered from (`wardrobe` bucket) |
 | `photo_paths` | `text[]` | The full intake set in upload order; `[1]` is the front shot |
-| `analysis` | `jsonb` | Colour/contrast/season analysis — see below |
+| `analysis` | `jsonb` | Colour/contrast/season analysis, see below |
 | `analysed_at` | `timestamptz` | When the analysis last ran |
 
 `vibe`, `occasions` and `budget_band` are retained but no longer collected during
-onboarding — the photos answer those questions better than the form did. The stylist still
+onboarding: the photos answer those questions better than the form did. The stylist still
 reads them if they are ever populated.
 
 ### `profiles.analysis`
@@ -43,7 +44,7 @@ reads them if they are ever populated.
   "contrast": "low|medium|high",
   "chroma": "soft|muted|clear|bright",
   "season": "Deep Autumn",          // one of the twelve seasons
-  "season_confidence": 0.72,        // 0–1, surfaced in the UI
+  "season_confidence": 0.72,        // 0-1, surfaced in the UI
   "features": { "skin": "", "hair": "", "eyes": "" },
   "build":    { "frame": "", "proportions": "", "fit_notes": "" },
   "best_colours":  [{ "name": "Deep olive", "hex": "#3B4A2F", "why": "" }],
@@ -56,7 +57,7 @@ reads them if they are ever populated.
 
 Every field is re-validated server-side after the model returns: seasons must be one of
 the twelve, hex values must match `#RRGGBB` or the swatch is dropped, and confidence is
-clamped to 0–1. A malformed hex would otherwise render as a black chip and read as a
+clamped to 0-1. A malformed hex would otherwise render as a black chip and read as a
 deliberate recommendation.
 
 ### `style_suggestions`
@@ -66,7 +67,7 @@ Three directions generated from the analysis. Regenerating replaces the whole se
 |---|---|---|
 | `id` | `uuid` PK | |
 | `user_id` | `uuid` FK | |
-| `rank` | `int` | 0–2, display order |
+| `rank` | `int` | 0-2, display order |
 | `name` | `text` | "Quiet Utility" |
 | `one_liner` | `text` | |
 | `why_it_works` | `text` | Must reference the analysis, not generic flattery |
@@ -102,10 +103,10 @@ A styled outfit the stylist produced, with the pieces it used.
 | `title` | `text` | "Keystone" |
 | `subtitle` | `text` | |
 | `image_path` | `text` | Rendered look image |
-| `rating` | `int` | The reveal slider, 0–100 |
-| `item_refs` | `jsonb` | `[{type:'wardrobe'|'product', id, x, y}]` — `x`/`y` place the hotspot markers |
+| `rating` | `int` | The reveal slider, 0-100 |
+| `item_refs` | `jsonb` | `[{type:'wardrobe'|'product', id, x, y}]`, `x`/`y` place the hotspot markers |
 | `saved` | `boolean` | Drives the Saved tab |
-| `kind` | `text` | `reveal` / `tryon` / `other` — provenance of a generated image |
+| `kind` | `text` | `reveal` / `tryon` / `other`: provenance of a generated image |
 | `product_slug` | `text` | Which product a try-on rendered |
 | `stage` | `int` | 0/1/2 for the onboarding reveal, null otherwise |
 | `created_at` | `timestamptz` | |
@@ -142,7 +143,7 @@ counter, because the point is training signal for what to generate next.
 | `kind` | `text` | `like` / `dislike` / `save` / `share` |
 | `created_at` | `timestamptz` | |
 
-Unique on `(user_id, subject_type, subject_id, kind)` — liking twice is not twice the
+Unique on `(user_id, subject_type, subject_id, kind)`: liking twice is not twice the
 signal. `like` and `dislike` are mutually exclusive and the API deletes the opposite on
 write; `save` and `share` are independent of both.
 

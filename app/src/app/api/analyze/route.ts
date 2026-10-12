@@ -321,7 +321,7 @@ export async function POST(request: Request) {
       } catch (error) {
         const message =
           (error as Error).message === "timed_out"
-            ? "That took too long. Try again — it's usually quicker."
+            ? "That took too long. Try again. It's usually quicker."
             : "Couldn't read those photos. Try again in a moment.";
         send({ t: "error", message });
       } finally {

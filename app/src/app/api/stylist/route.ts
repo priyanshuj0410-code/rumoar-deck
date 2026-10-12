@@ -128,7 +128,7 @@ export async function POST(request: Request) {
     const status = error instanceof GeminiError ? error.status : 502;
     // The user's message is already persisted; record the failure so the thread reads honestly.
     const fallback =
-      "I couldn't reach my styling brain just then. Ask me again in a moment — your wardrobe is safe.";
+      "I couldn't reach my styling brain just then. Ask me again in a moment. Your wardrobe is safe.";
     const { data: saved } = await supabase
       .from("messages")
       .insert({ user_id: user.id, role: "assistant", content: fallback })

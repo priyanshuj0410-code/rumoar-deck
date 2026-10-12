@@ -106,7 +106,7 @@ export function SignInForm() {
         </button>
         {cooldown > 0 && (
           <p className="text-caption text-mute mt-3">
-            Nothing yet? You can send another in {cooldown}s — or use Google,
+            Nothing yet? You can send another in {cooldown}s, or use Google,
             which is instant.
           </p>
         )}

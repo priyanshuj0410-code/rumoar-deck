@@ -4,7 +4,7 @@ import { formatINR } from "@/lib/types";
 import { EmptyState, IconSubmit } from "@/components/states";
 import { toggleSavedProduct } from "../actions";
 
-export const metadata = { title: "Shop — RUMOAR" };
+export const metadata = { title: "Shop: RUMOAR" };
 
 export default async function ShopPage() {
   const [products, saved] = await Promise.all([getProducts(), getSavedProductIds()]);

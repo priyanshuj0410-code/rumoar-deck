@@ -1,7 +1,7 @@
 import { getProfile, getUser } from "@/lib/data";
 import { NotificationToggle } from "@/components/notification-toggle";
 
-export const metadata = { title: "Settings — RUMOAR" };
+export const metadata = { title: "Settings: RUMOAR" };
 
 export default async function SettingsPage() {
   const [profile, user] = await Promise.all([getProfile(), getUser()]);
@@ -14,16 +14,16 @@ export default async function SettingsPage() {
       <dl className="mt-8 border-t border-line">
         <div className="flex justify-between gap-6 py-4 border-b border-line">
           <dt className="text-mute text-small">Name</dt>
-          <dd className="text-small">{profile?.display_name ?? "—"}</dd>
+          <dd className="text-small">{profile?.display_name ?? "Not set"}</dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
           <dt className="text-mute text-small">Email</dt>
-          <dd className="text-small break-all">{user?.email ?? "—"}</dd>
+          <dd className="text-small break-all">{user?.email ?? "Not set"}</dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
           <dt className="text-mute text-small">Season</dt>
           <dd className="text-small text-right">
-            {profile?.analysis?.season ?? "—"}
+            {profile?.analysis?.season ?? "Not read yet"}
           </dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
@@ -31,13 +31,13 @@ export default async function SettingsPage() {
           <dd className="text-small text-right">
             {profile?.analysis
               ? `${profile.analysis.undertone} · ${profile.analysis.depth} · ${profile.analysis.contrast} contrast`
-              : "—"}
+              : "Not read yet"}
           </dd>
         </div>
         <div className="flex justify-between gap-6 py-4 border-b border-line">
           <dt className="text-mute text-small">Metals</dt>
           <dd className="text-small text-right">
-            {profile?.analysis?.metals ?? "—"}
+            {profile?.analysis?.metals ?? "Not read yet"}
           </dd>
         </div>
       </dl>
@@ -85,7 +85,7 @@ export default async function SettingsPage() {
             {profile.analysed_at
               ? ` on ${new Date(profile.analysed_at).toLocaleDateString("en-IN")}`
               : ""}
-            . Lighting affects this — treat it as a strong starting point, not a
+            . Lighting affects this, so treat it as a strong starting point, not a
             verdict.
           </p>
         </section>

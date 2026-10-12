@@ -3,7 +3,7 @@ import { AddWardrobeItem } from "@/components/add-wardrobe-item";
 import { EmptyState, IconSubmit } from "@/components/states";
 import { deleteWardrobeItem } from "../actions";
 
-export const metadata = { title: "Wardrobe — RUMOAR" };
+export const metadata = { title: "Wardrobe: RUMOAR" };
 
 export default async function WardrobePage() {
   const items = await getWardrobe();

@@ -9,7 +9,7 @@ const CHIPS = [
   "What works for a Jaipur wedding in 40°?",
   "Style my olive shirt for Friday drinks",
   "What's the one thing my wardrobe is missing?",
-  "Office, but not boring — what do I add?",
+  "Office, but not boring. What do I add?",
 ];
 
 type Props = {

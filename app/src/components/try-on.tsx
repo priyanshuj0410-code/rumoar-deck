@@ -37,7 +37,7 @@ export function TryOn({ slug, name }: { slug: string; name: string }) {
       } else {
         setMessage(
           json.error === "no_reference_photo"
-            ? "I need a photo of you first — add one in your wardrobe."
+            ? "I need a photo of you first. Add one in your wardrobe."
             : (json.message ?? "Couldn't render that just now."),
         );
         setState("error");

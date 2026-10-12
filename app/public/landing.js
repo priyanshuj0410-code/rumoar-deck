@@ -1,5 +1,5 @@
 /* ============================================================================
-   RUMOAR — landing page behaviour
+   RUMOAR: landing page behaviour
    Four things: sections fade up, the hero drifts on scroll, the nav gains a rule
    once the page moves, and the rails can be driven by their arrows. None of it is
    required for the page to be readable or usable.

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getLooks, getProfile, getWardrobe, signPaths } from "@/lib/data";
 
-export const metadata = { title: "Stylist — RUMOAR" };
+export const metadata = { title: "Stylist: RUMOAR" };
 
 /**
  * The content column at /app. On mobile the stylist covers this entirely (see AppShell);
@@ -57,7 +57,7 @@ export default async function TodayPage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={url}
-                    alt={`${look.title}${look.subtitle ? ` — ${look.subtitle}` : ""}`}
+                    alt={`${look.title}${look.subtitle ? `, ${look.subtitle}` : ""}`}
                     className="w-full h-full object-cover"
                   />
                 ) : (
