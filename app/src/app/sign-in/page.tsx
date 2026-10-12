@@ -12,7 +12,7 @@ export default async function SignInPage() {
   return (
     <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-[380px]">
-        <Link href="/" className="k">
+        <Link href="/" className="k hit inline-block">
           RUMOAR
         </Link>
         <h1 className="text-[32px] mt-4 leading-[1.1]">Your stylist, always on.</h1>

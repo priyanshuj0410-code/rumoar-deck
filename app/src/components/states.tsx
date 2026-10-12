@@ -87,7 +87,7 @@ export function IconSubmit({
       aria-pressed={active}
       aria-busy={pending}
       disabled={pending}
-      className={`transition-all duration-200 ${pending ? "opacity-40 scale-95" : "active:scale-90"} ${className}`}
+      className={`hit transition-all duration-200 ${pending ? "opacity-40 scale-95" : "active:scale-90"} ${className}`}
     >
       <span
         className="mi text-[17px]"

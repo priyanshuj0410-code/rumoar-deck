@@ -26,7 +26,7 @@ export default async function ProductPage({ params }: Params) {
     <div className="max-w-[980px] px-4 mx-auto @lg:px-6 @4xl:px-10 py-6 @4xl:py-10">
       <Link
         href="/app/shop"
-        className="inline-flex items-center gap-1.5 text-sm text-mute hover:text-ink transition-colors"
+        className="hit inline-flex items-center gap-1.5 text-sm text-mute hover:text-ink transition-colors"
       >
         <span className="mi text-[20px]" aria-hidden>
           arrow_back

@@ -96,7 +96,7 @@ export function Modal({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="mi text-[22px] text-mute hover:text-ink transition-colors -mr-1 -mt-0.5"
+            className="hit mi text-[22px] text-mute hover:text-ink transition-colors -mr-1 -mt-0.5"
           >
             close
           </button>
