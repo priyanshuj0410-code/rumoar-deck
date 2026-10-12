@@ -11,6 +11,8 @@
   --color-volt: #6152f0;
   --color-peri: #b3acef;
   --color-ok: #3e7d5a;
+  --color-err: #b3261e;
+  --color-warn: #8a5a12;
 
   --font-display: "Clash Display", "Space Grotesk", system-ui, sans-serif;
   --font-sans: "General Sans", system-ui, sans-serif;

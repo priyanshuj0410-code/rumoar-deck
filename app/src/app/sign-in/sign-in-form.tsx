@@ -160,7 +160,7 @@ export function SignInForm() {
 
       {error && (
         <p role="alert" className="text-small mt-5 flex items-start gap-2">
-          <span className="mi text-[18px]" aria-hidden>
+          <span className="mi text-[18px] text-err" aria-hidden>
             error
           </span>
           {error}

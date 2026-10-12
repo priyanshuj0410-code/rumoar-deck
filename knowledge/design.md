@@ -31,11 +31,15 @@ extend this file first, then build.
 | `--control` | `#8C8B85` | Border of any control identified by its edge: inputs, textareas, outlined chips. 3.42:1 on paper, 3.08:1 on `--wash` |
 | `--volt` | `#6152F0` | Voltage accent — links, focus rings, live/active state |
 | `--peri` | `#B3ACEF` | Periwinkle — accents *on dark only* (toast icon, waveform) |
-| `--ok` | `#3E7D5A` | Success |
+| `--ok` | `#3E7D5A` | Success. 4.90:1 on paper, 4.41:1 on `--wash`: text on paper only, an icon or graphic (3:1) on wash. Not used in the code yet |
+| `--err` | `#B3261E` | Error: the icon of a failure message and the edge of an invalid field. 6.54:1 on paper, 5.89:1 on `--wash` |
+| `--warn` | `#8A5A12` | Warning: the icon of a caution message. 5.91:1 on paper, 5.32:1 on `--wash` |
 | `--glass` | `rgba(255,255,255,.66)` | Backdrop-blurred bars |
 
 Monochrome carries the interface; Voltage is a flash, never a fill. Never place `--peri`
 on `--paper` — it is a dark-surface accent only.
+
+`--err` and `--warn` colour an icon (or an invalid field's edge) beside ink body text; they are never a fill and never the text colour, so a message still reads in greyscale and its contrast does not depend on them. Only the sign-in failure icon uses `--err` today.
 
 **Dark mode is out of scope for v1.** The brand is porcelain-and-ink; if added later it
 must be specified here first.
@@ -267,6 +271,7 @@ Honour `prefers-reduced-motion: reduce` — drop transforms and shimmer, keep op
   glyph such as the install prompt's dismiss icon but not for text. Never lower its alpha:
   `text-mute/80` is 3.38:1 on paper. A bar floating over dark photography is not covered.
 - `--volt` is 5.29:1 on paper and 4.76:1 on `--wash`, safe for links and focus rings.
+- `--err` is 6.54:1 on paper and 5.89:1 on `--wash`; `--warn` is 5.91:1 and 5.32:1. Both also hold 4.5:1 on the skeleton shimmer. `--ok` is 4.90:1 on paper but 4.41:1 on `--wash`, so success text goes on paper only.
 - Control boundaries need 3:1 against the surface beside them. `--control` is 3.42:1 on paper
   and 3.08:1 on `--wash`; `--line` is 1.23:1 and is for dividers only. `.field` and the
   stylist's suggestion chips use `--control`.
@@ -305,7 +310,7 @@ notices are a missing state, not a broken feature.
 | **One** | Read correctly in the singular. "1 pieces" is a bug. | count copy pluralises |
 | **Ideal** | The designed case. | — |
 | **Overflow** | Degrade by scroll or truncation, never by breaking the grid. Say what was dropped. | rails scroll; lists cap and label the cap |
-| **Error** | Plain language, what is safe, and two exits: retry and somewhere that works. Never a stack trace; carry the digest for support. | `error.tsx` |
+| **Error** | Plain language, what is safe, and two exits: retry and somewhere that works. Never a stack trace; carry the digest for support. The icon takes `--err`. | `error.tsx` |
 | **Invalid** | Say which field and why, next to the field, before submit where possible. | inline `role="alert"` |
 | **Success** | Confirm anything whose result is off-screen or too small to notice. | `useToast()` |
 
@@ -351,7 +356,7 @@ Rules this encodes:
 - **A caption plate, not a label across the picture.** The reading sits under the frame
   behind a hairline, in the mono eyebrow face.
 
-Failures (upload, session) keep `role="alert"` and ink body text. Findings like the above
+Failures (upload, session) keep `role="alert"` and ink body text; where they carry an icon it takes `--err`. Findings like the above
 are `role="status"` and mute. The screen must never blur the two.
 
 ### 7.1.1 Text arrives before pixels
