@@ -184,6 +184,22 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   where `getUserMedia` is unavailable or blocked it is the only one. Denial is explained
   in words with the alternative in the same breath, never a dead end.
 
+### Interaction states
+
+What the code does today ([RUM-16](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2)). Hover exists only where a pointer exists, and nothing is reachable by hover alone.
+
+| State | What happens | Where |
+|---|---|---|
+| Hover | Text and icon controls go `--mute` to `--ink` (150ms colour); suggestion chips fill `--wash`; an unselected tile draws a 1px `--mute` inset ring; nav and rail items go to `--ink`. `.btn` and `.btn-ghost` have no hover change: they answer the press | `hover:text-ink`, `hover:bg-wash`, `group-hover` |
+| Pressed | `.btn` scales to .975 at .92 opacity; on touch every `button`, `a` and `[role="button"]` scales to .985 | `.btn:active`, `@media (hover: none)` |
+| Focus | 2px `--volt` outline, 2px offset, on `:focus-visible`; never removed | `globals.css` base |
+| Selected | The `FILL` axis on icons, a 2.5px `--ink` inset on tiles; never colour alone | § 2 |
+| Disabled | `.btn:disabled`: opacity .45, no pointer events. A control that is busy keeps its label and drops to .40 opacity (reaction extras); a pending form is inert (`SubmitButton`, `IconSubmit`). Disabled controls are exempt from contrast, so the reason is always in words nearby | `.btn:disabled`, § 7 |
+| Error | `--err` icon (`error`, filled) beside ink text, `role="alert"`; an invalid field may take a 2px `--err` edge | sign-in form |
+| Warning | `--warn` icon (`warning`) beside ink text; `role="status"` unless it blocks | not used yet |
+
+Disabled and hover are never the only carrier of meaning, and the 44px hit area (§ 1) applies to every state.
+
 ## 3. Layout
 
 The phone frame from the prototype is **removed** in the product. Desktop is not the phone
