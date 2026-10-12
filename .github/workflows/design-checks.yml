@@ -1,0 +1,25 @@
+# Design checks (CLAUD-24): every pull request and every push to main recomputes the colour contrast
+# and the closed type scale against knowledge/design.md, and fails if the doc states a ratio the CSS
+# does not produce. The script uses only the standard library.
+name: Design checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  design-checks:
+    name: design-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Contrast and type-scale checks
+        run: python3 knowledge/contrast.py

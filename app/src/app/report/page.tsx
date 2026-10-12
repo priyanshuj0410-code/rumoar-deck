@@ -19,7 +19,7 @@ export default async function ReportPage() {
         <div className="no-print">
           <Link
             href="/onboarding"
-            className="hit inline-flex items-center gap-1.5 text-sm text-mute hover:text-ink transition-colors"
+            className="hit inline-flex items-center gap-1.5 text-small text-mute hover:text-ink transition-colors"
           >
             <span className="mi text-[20px]" aria-hidden>
               arrow_back
@@ -27,10 +27,10 @@ export default async function ReportPage() {
             Back
           </Link>
           <p className="k mt-5">Take it with you</p>
-          <h1 className="text-[28px] lg:text-[38px] mt-2">
+          <h1 className="text-title lg:text-headline mt-2">
             Your reading, on one page.
           </h1>
-          <p className="text-mute text-sm lg:text-[15px] leading-relaxed mt-2 max-w-[52ch]">
+          <p className="text-mute text-small lg:text-body leading-relaxed mt-2 max-w-[52ch]">
             Everything that changes what you buy, on a single side of A4 — the
             palette at a size worth holding against cloth, and the fit rules
             that go with it.

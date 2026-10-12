@@ -94,7 +94,7 @@ export function SignInForm() {
   if (status === "sent") {
     return (
       <div className="border border-line p-5">
-        <p className="text-sm leading-relaxed">
+        <p className="text-small leading-relaxed">
           Check <b>{email}</b> for a sign-in link. It opens straight into the
           app.
         </p>
@@ -105,7 +105,7 @@ export function SignInForm() {
           Use a different email
         </button>
         {cooldown > 0 && (
-          <p className="text-[12px] text-mute mt-3">
+          <p className="text-caption text-mute mt-3">
             Nothing yet? You can send another in {cooldown}s — or use Google,
             which is instant.
           </p>
@@ -159,8 +159,8 @@ export function SignInForm() {
       </form>
 
       {error && (
-        <p role="alert" className="text-sm mt-5 flex items-start gap-2">
-          <span className="mi text-[18px]" aria-hidden>
+        <p role="alert" className="text-small mt-5 flex items-start gap-2">
+          <span className="mi text-[18px] text-err" aria-hidden>
             error
           </span>
           {error}

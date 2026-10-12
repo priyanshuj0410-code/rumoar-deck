@@ -8,6 +8,9 @@ plane_issues:
   - RUM-9 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7df04b78-6464-450a-89e0-d56ff89828e9
   - RUM-14 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5
   - RUM-15 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f
+  - RUM-16 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2
+  - RUM-17 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7f0be952-45f9-462f-a56e-bcea067348e5
+  - RUM-18 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c
 ---
 
 # RUMOAR Design System — "Engine"
@@ -31,11 +34,15 @@ extend this file first, then build.
 | `--control` | `#8C8B85` | Border of any control identified by its edge: inputs, textareas, outlined chips. 3.42:1 on paper, 3.08:1 on `--wash` |
 | `--volt` | `#6152F0` | Voltage accent — links, focus rings, live/active state |
 | `--peri` | `#B3ACEF` | Periwinkle — accents *on dark only* (toast icon, waveform) |
-| `--ok` | `#3E7D5A` | Success |
-| `--glass` | `rgba(255,255,255,.66)` | Backdrop-blurred bars |
+| `--ok` | `#3E7D5A` | Success. 4.90:1 on paper, 4.41:1 on `--wash`: text on paper only, an icon or graphic (3:1) on wash. Not used in the code yet |
+| `--err` | `#B3261E` | Error: the icon of a failure message and the edge of an invalid field. 6.54:1 on paper, 5.89:1 on `--wash` |
+| `--warn` | `#8A5A12` | Warning: the icon of a caution message. 5.91:1 on paper, 5.32:1 on `--wash` |
+| `--glass` | `rgba(255,255,255,.72)` | Backdrop-blurred bars. This is the CSS value; the doc said .66 until RUM-16 |
 
 Monochrome carries the interface; Voltage is a flash, never a fill. Never place `--peri`
 on `--paper` — it is a dark-surface accent only.
+
+`--err` and `--warn` colour an icon (or an invalid field's edge) beside ink body text; they are never a fill and never the text colour, so a message still reads in greyscale and its contrast does not depend on them. Only the sign-in failure icon uses `--err` today.
 
 **Dark mode is out of scope for v1.** The brand is porcelain-and-ink; if added later it
 must be specified here first.
@@ -48,11 +55,27 @@ must be specified here first.
 | `--sans` | General Sans 400/500/600 | All body, labels, buttons |
 | `--mono` | Space Mono 400 | Eyebrows, prices, ticks, metadata |
 
-Scale (px): display 44 / 32 / 26 / 24 / 21 / 19 / 17 · body 15 (base) / 14 / 13.5 / 12.5 /
-12 · mono 15 / 12 / 11 / 10 / 9.
+**The type scale is closed: eight named sizes, 16px body, nothing else** ([RUM-16](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2); it was 21 text sizes from 9 to 68px). They are theme tokens in `globals.css` (`--text-*`), and the framework defaults (`text-sm`, `text-lg` and the rest) are reset so they cannot compile. Use the utility: `text-micro`, not `text-[11px]`.
 
-Display headings set `letter-spacing:-.01em` (`-.02em` at 44). The eyebrow style (`.k`) is
-mono 10px, `letter-spacing:.24em`, uppercase, `--mute`.
+| Token | px | Used for |
+|---|---|---|
+| `micro` | 11 | The `.k` eyebrow (mono, `.24em`, uppercase), tab and rail labels, swatch names, fine print |
+| `caption` | 12 | Mono prices and metadata, small form hints, the AI disclaimer |
+| `small` | 14 | Secondary text: hints, card names, suggestion chips, `.btn-sm`, back links, empty states |
+| `body` | 16 | The base (`body`, `.btn`, `.field`, so inputs never trigger iOS zoom), prose, intake labels |
+| `lead` | 20 | Streaming narration on desktop, error and state headings, short statements |
+| `title` | 26 | Section and step headings (display face) |
+| `headline` | 34 | Page headings on the content column (`@3xl`), step headings on desktop |
+| `display` | 52 | The one masthead per screen: the analysis season, the "Reading you" screen |
+
+Line height is inherited (1.5 from the framework base) unless a `leading-*` utility says otherwise; the code uses `leading-relaxed` (1.625) for prose, `leading-snug` (1.375) and `leading-tight` (1.25) for card names and headings, and `leading-[1.1]` or tighter for display lines. Tokens carry no line height, so replacing a size never moves a line box.
+
+Responsive pairs step along the table (`text-title @3xl:text-headline`). Icon glyphs (`.mi`) are sized with `text-[Npx]` and are not type: 16 to 34px in 14 steps today, a separate scale for a later ticket. The print surface (§ 7.2) uses absolute units and the editorial landing page has its own fluid scale in `landing.css`; neither is on this scale.
+
+Five families are in use across the product and the landing (three in the app, Instrument Serif and Inter on the landing). Whether to reduce them is an owner decision, not made here: [RUM-17](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7f0be952-45f9-462f-a56e-bcea067348e5).
+
+Display headings set `letter-spacing:-.01em`. The eyebrow style (`.k`) is
+mono `micro` (11px), `letter-spacing:.24em`, uppercase, `--mute`.
 
 Icons: **Material Symbols Rounded**, `wght 300`, `opsz 24`. No other icon set.
 
@@ -99,10 +122,10 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
 
 ## 2. Components
 
-- **Button** — `.btn`: full-height `--btnh`, `--ink` on white, weight 500, 15px, square.
-  `.ghost` = `--wash` on `--ink`. `.sm` = 38px, 13px, with a 44px hit area. Press: `scale(.975)`, `opacity .92`.
+- **Button**: `.btn`: full-height `--btnh`, `--ink` on white, weight 500, `body` (16px), square.
+  `.ghost` = `--wash` on `--ink`. `.sm` = 38px, `small` (14px), with a 44px hit area. Press: `scale(.975)`, `opacity .92`. Disabled: `opacity .45`, no pointer events.
 - **Card** (`.card`) — `--wash` surface, 1:1 thumb, meta block 11/12px padding; name at
-  13.5px/600, price in mono 12px `--mute`.
+  `small`/600, price in mono `caption` `--mute`.
 - **Tile** (`.wtile`) — wardrobe/selection tile. Selected state is `inset 0 0 0 2.5px
   var(--ink)` plus a 6% ink veil on the thumb and a filled 24px check at top-right. Never
   use colour to signal selection.
@@ -114,7 +137,7 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   `backdrop-filter: blur(22px) saturate(1.8)`. Never opaque.
 - **Toast** — ink block, bottom-anchored above the tab bar, `--peri` icon, auto-dismiss
   2.4s, spring transform in.
-- **Empty state** (`.emptymsg`) — 44/24px padding, centred, `--mute` 14px/1.6.
+- **Empty state** (`.emptymsg`): 44/24px padding, centred, `--mute` `small`/1.6.
 - **One primary action per screen.** The primary is whatever moves you forward *from the
   current state* — "Take photo" on an empty step becomes "Next" once a photo exists.
   Secondary actions are `.btn-ghost` — real buttons, since they are real alternatives —
@@ -125,7 +148,7 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   like it has nothing to do.
 - **Streaming read-out** — for any generation over ~3s. A pulsing 6px dot beside a mono
   status line naming the current phase, a display heading, and the model's own narration
-  streaming in at 17px with a 2px caret. Skeleton lines fill the gap before the first
+  streaming in at `body` (`lead` on desktop) with a 2px caret. Skeleton lines fill the gap before the first
   token. **A progress bar over silence is not an acceptable loading state** — if the work
   takes long enough to need an indicator, it takes long enough to owe the user something
   to read. **Pace the reveal client-side**: Gemini streams in very coarse chunks — often a
@@ -139,14 +162,14 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   the foot of the image; the palette runs as 20px chips down the top-right corner.
   Rationale collapses behind a "Why this works" disclosure. Anything generated from the
   user's own photo carries a line saying it is an impression, not real garments.
-- **Swatch grid** — 4-up square colour chips, no radius, name in 11px beneath. Each chip is
+- **Swatch grid**: 4-up square colour chips, no radius, name in `micro` beneath. Each chip is
   `role="img"` with the colour name as its label: colour alone must never be the only
   carrier of meaning. A swatch whose hex fails `#RRGGBB` validation is dropped rather than
   rendered, so a parse failure can't masquerade as a black recommendation.
 - **Confidence meter** — a 2px `--line` track with an `--ink` fill and the percentage in
   mono beside it. Used wherever the product states a machine judgement about the user; it
   is never decorative and never hidden when low.
-- **Intake instruction list** — numbered mono index, bold 13.5px label, `--mute` 13px hint.
+- **Intake instruction list**: numbered mono index, bold `small` label, `--mute` `small` hint.
   For steps the user performs away from the screen.
 - **Progress** — **one counter per screen.** Stage-level position is a segmented bar
   (2px × 24px per stage, `--ink` filled / `--line` empty) with no numerals; a numeric
@@ -163,6 +186,22 @@ toggle and bordered chip under 44px. Hit areas must not overlap, so keep neighbo
   capture as an equal, not a fallback** — on desktop it is usually the better path, and
   where `getUserMedia` is unavailable or blocked it is the only one. Denial is explained
   in words with the alternative in the same breath, never a dead end.
+
+### Interaction states
+
+What the code does today ([RUM-16](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2)). Hover exists only where a pointer exists, and nothing is reachable by hover alone.
+
+| State | What happens | Where |
+|---|---|---|
+| Hover | Text and icon controls go `--mute` to `--ink` (150ms colour); suggestion chips fill `--wash`; an unselected tile draws a 1px `--mute` inset ring; nav and rail items go to `--ink`. `.btn` and `.btn-ghost` have no hover change: they answer the press | `hover:text-ink`, `hover:bg-wash`, `group-hover` |
+| Pressed | `.btn` scales to .975 at .92 opacity; on touch every `button`, `a` and `[role="button"]` scales to .985 | `.btn:active`, `@media (hover: none)` |
+| Focus | 2px `--volt` outline, 2px offset, on `:focus-visible`; never removed | `globals.css` base |
+| Selected | The `FILL` axis on icons, a 2.5px `--ink` inset on tiles; never colour alone | § 2 |
+| Disabled | `.btn:disabled`: opacity .45, no pointer events. A control that is busy keeps its label and drops to .40 opacity (reaction extras); a pending form is inert (`SubmitButton`, `IconSubmit`). Disabled controls are exempt from contrast, so the reason is always in words nearby | `.btn:disabled`, § 7 |
+| Error | `--err` icon (`error`, filled) beside ink text, `role="alert"`; an invalid field may take a 2px `--err` edge | sign-in form |
+| Warning | `--warn` icon (`warning`) beside ink text; `role="status"` unless it blocks | not used yet |
+
+Disabled and hover are never the only carrier of meaning, and the 44px hit area (§ 1) applies to every state.
 
 ## 3. Layout
 
@@ -213,7 +252,7 @@ at least as wide as the phone shows them.
   the right. DOM order stays the mobile order. There is no back link: the thumbnail tiles
   are the navigation, and a second way back only made the two disagree about which one
   meant "previous".
-- **Analysis** — a masthead (season at 68px left, confidence as its byline right), then a
+- **Analysis**: a masthead (season at `display`, 52px, left, confidence as its byline right; it was 68px until RUM-16), then a
   full-width colour band with named swatches and hex, then the readings in two columns
   (`columns-2`, `break-inside-avoid` per section).
 - **Styles** — one direction at a time, in the same two-pane machine: the look holds the
@@ -245,12 +284,14 @@ Honour `prefers-reduced-motion: reduce` — drop transforms and shimmer, keep op
 
 - Ink on paper is 17.88:1 and on `--wash` 16.10:1.
 - `--mute` is 5.03:1 on paper and 4.53:1 on `--wash`, so it is text-safe at any size on those
-  two surfaces, and on the glass bars over paper or wash content (4.86:1 or more). It is not
+  two surfaces, and on the glass bars over paper or wash content (4.89:1 or more). It is not
   text-safe on anything darker: on the `.skel` shimmer it is 4.37:1 down to 3.95:1, so a label
   on a skeleton is `--ink` (`.skel .k` enforces it), and on `--ink` it is 3.55:1, enough for a
   glyph such as the install prompt's dismiss icon but not for text. Never lower its alpha:
-  `text-mute/80` is 3.38:1 on paper. A bar floating over dark photography is not covered.
+  `text-mute/80` is 3.38:1 on paper. A bar floating over dark photography is not covered: at the CSS glass value (.72, aligned in RUM-16) `--mute` is 2.53:1 over black and 3.09:1 over #444, and about .95 white would be needed to hold 4.5:1, which is no longer glass. The options are with the owner: [RUM-18](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c).
 - `--volt` is 5.29:1 on paper and 4.76:1 on `--wash`, safe for links and focus rings.
+- `--err` is 6.54:1 on paper and 5.89:1 on `--wash`; `--warn` is 5.91:1 and 5.32:1. Both also hold 4.5:1 on the skeleton shimmer. `--ok` is 4.90:1 on paper but 4.41:1 on `--wash`, so success text goes on paper only.
+- Run `python3 knowledge/contrast.py`: it recomputes every figure in this section from `globals.css`, fails if this doc states a different one, and checks the type scale.
 - Control boundaries need 3:1 against the surface beside them. `--control` is 3.42:1 on paper
   and 3.08:1 on `--wash`; `--line` is 1.23:1 and is for dividers only. `.field` and the
   stylist's suggestion chips use `--control`.
@@ -289,7 +330,7 @@ notices are a missing state, not a broken feature.
 | **One** | Read correctly in the singular. "1 pieces" is a bug. | count copy pluralises |
 | **Ideal** | The designed case. | — |
 | **Overflow** | Degrade by scroll or truncation, never by breaking the grid. Say what was dropped. | rails scroll; lists cap and label the cap |
-| **Error** | Plain language, what is safe, and two exits: retry and somewhere that works. Never a stack trace; carry the digest for support. | `error.tsx` |
+| **Error** | Plain language, what is safe, and two exits: retry and somewhere that works. Never a stack trace; carry the digest for support. The icon takes `--err`. | `error.tsx` |
 | **Invalid** | Say which field and why, next to the field, before submit where possible. | inline `role="alert"` |
 | **Success** | Confirm anything whose result is off-screen or too small to notice. | `useToast()` |
 
@@ -335,7 +376,7 @@ Rules this encodes:
 - **A caption plate, not a label across the picture.** The reading sits under the frame
   behind a hairline, in the mono eyebrow face.
 
-Failures (upload, session) keep `role="alert"` and ink body text. Findings like the above
+Failures (upload, session) keep `role="alert"` and ink body text; where they carry an icon it takes `--err`. Findings like the above
 are `role="status"` and mute. The screen must never blur the two.
 
 ### 7.1.1 Text arrives before pixels
@@ -442,5 +483,7 @@ list.
 - **2026-08-07** — iOS Safari camera fixed and sign-in reordered ([RUM-14](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5/)). The preview attaches in a callback ref rather than an animation frame, Capture waits for a frame that can actually be grabbed, and a stalled camera says why. Google leads the sign-in; see [the email runbook](runbooks/email-delivery.md).
 
 - **2026-10-12**: P1 accessibility fixes from the design audit ([RUM-15](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f/)). `--mute` darkened from `#8C8B85` to `#706F6A`; `--control` added for input and chip borders while `--line` stays for dividers; every control under 44px gets a 44px hit area through `.hit`; the ratios in § 5 were recomputed (ink on paper is 17.88:1, volt on paper 5.29:1).
+
+- **2026-10-12**: P2 design gaps from the audit ([RUM-16](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2)). The type scale is closed at eight named sizes with a 16px body and the code migrated to them (`text-micro` to `text-display`; the analysis masthead went from 68px to 52px); `--err` and `--warn` added; hover, pressed, focus and disabled written down from the code; the glass value corrected to .72; `knowledge/contrast.py` added and every stated ratio checked against it (the wave-1 corrections hold). Two choices left to the owner: the five type families ([RUM-17](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7f0be952-45f9-462f-a56e-bcea067348e5)) and the tab bar over dark photography ([RUM-18](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c)).
 
 See also: [Architecture overview](architecture/overview.md) · [Data model](schemas/data-model.md) · [Plane config](plane.config.md)

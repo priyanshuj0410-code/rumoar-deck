@@ -23,8 +23,8 @@ export default function AppError({
       <span className="mi text-[30px] text-mute" aria-hidden>
         error
       </span>
-      <h1 className="text-[21px] mt-4">That didn&rsquo;t load.</h1>
-      <p className="text-mute text-sm leading-relaxed mt-2">
+      <h1 className="text-lead mt-4">That didn&rsquo;t load.</h1>
+      <p className="text-mute text-small leading-relaxed mt-2">
         Something broke on our side. Your wardrobe and your analysis are safe.
       </p>
 
@@ -38,7 +38,7 @@ export default function AppError({
       </div>
 
       {error.digest && (
-        <p className="text-[11px] text-mute font-mono mt-4">Reference {error.digest}</p>
+        <p className="text-micro text-mute font-mono mt-4">Reference {error.digest}</p>
       )}
     </div>
   );

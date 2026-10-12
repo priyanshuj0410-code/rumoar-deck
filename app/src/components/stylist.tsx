@@ -91,7 +91,7 @@ export function Stylist({ initialMessages, products, name }: Props) {
     <div className="flex flex-col h-dvh lg:h-auto lg:flex-1 min-h-0 bg-paper">
       <header className="flex-none glass px-4 py-3 border-b border-line">
         <p className="k">Stylist</p>
-        <h2 className="text-[19px] mt-1">
+        <h2 className="text-lead mt-1">
           {name ? `Evening, ${name}` : "RUMOAR"}
         </h2>
       </header>
@@ -105,7 +105,7 @@ export function Stylist({ initialMessages, products, name }: Props) {
       >
         {empty && (
           <div className="my-auto">
-            <p className="text-mute text-sm leading-relaxed">
+            <p className="text-mute text-small leading-relaxed">
               Tell me where you&rsquo;re going and what the day looks like. I&rsquo;ll style it
               from what you already own.
             </p>
@@ -114,7 +114,7 @@ export function Stylist({ initialMessages, products, name }: Props) {
                 <button
                   key={chip}
                   onClick={() => send(chip)}
-                  className="hit text-left text-sm border border-control px-3 py-2.5 hover:bg-wash transition-colors"
+                  className="hit text-left text-small border border-control px-3 py-2.5 hover:bg-wash transition-colors"
                 >
                   {chip}
                 </button>
@@ -128,8 +128,8 @@ export function Stylist({ initialMessages, products, name }: Props) {
             <div
               className={
                 message.role === "user"
-                  ? "ml-auto max-w-[85%] bg-ink text-paper px-3.5 py-2.5 text-sm leading-relaxed"
-                  : "mr-auto max-w-[92%] bg-wash px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-line"
+                  ? "ml-auto max-w-[85%] bg-ink text-paper px-3.5 py-2.5 text-small leading-relaxed"
+                  : "mr-auto max-w-[92%] bg-wash px-3.5 py-2.5 text-small leading-relaxed whitespace-pre-line"
               }
             >
               {message.content}
@@ -161,10 +161,10 @@ export function Stylist({ initialMessages, products, name }: Props) {
                         )}
                       </div>
                       <div className="p-2.5">
-                        <b className="text-[13px] font-semibold block leading-tight">
+                        <b className="text-small font-semibold block leading-tight">
                           {product.name}
                         </b>
-                        <span className="font-mono text-[12px] text-mute">
+                        <span className="font-mono text-caption text-mute">
                           {formatINR(product.price_inr)}
                         </span>
                       </div>
@@ -230,7 +230,7 @@ export function Stylist({ initialMessages, products, name }: Props) {
             </span>
           </button>
         </form>
-        <p className="text-[11px] text-mute mt-2 leading-snug">
+        <p className="text-micro text-mute mt-2 leading-snug">
           RUMOAR is an AI stylist and can get things wrong. Prices and stock are shown from the
           catalogue, not from him.
         </p>

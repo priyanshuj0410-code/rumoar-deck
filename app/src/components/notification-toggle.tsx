@@ -17,20 +17,20 @@ export function NotificationToggle() {
       <h2 className="k">Notifications</h2>
 
       {needsInstall ? (
-        <p className="text-mute text-sm leading-relaxed mt-2">
+        <p className="text-mute text-small leading-relaxed mt-2">
           On iPhone, notifications only work once RUMOAR is added to your Home Screen. Add it,
           then come back here.
         </p>
       ) : state === "unsupported" ? (
-        <p className="text-mute text-sm leading-relaxed mt-2">
+        <p className="text-mute text-small leading-relaxed mt-2">
           This browser doesn&rsquo;t support notifications.
         </p>
       ) : state === "granted" ? (
-        <p className="text-mute text-sm leading-relaxed mt-2">
+        <p className="text-mute text-small leading-relaxed mt-2">
           On. RUMOAR will nudge you when a look is ready.
         </p>
       ) : state === "denied" ? (
-        <p className="text-mute text-sm leading-relaxed mt-2">
+        <p className="text-mute text-small leading-relaxed mt-2">
           Blocked in your browser settings. Re-enable them there to turn this back on.
         </p>
       ) : (
