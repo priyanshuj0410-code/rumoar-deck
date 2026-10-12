@@ -8,6 +8,8 @@ plane_issues:
   - RUM-9 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7df04b78-6464-450a-89e0-d56ff89828e9
   - RUM-14 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/448905c3-9fb6-45c6-b132-16e625a02da5
   - RUM-15 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/cf610892-5bf1-40de-8735-d6c97d8c1d8f
+  - RUM-16 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/4b671100-cf17-4328-a01e-8cb4f5a163f2
+  - RUM-17 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/7f0be952-45f9-462f-a56e-bcea067348e5
   - RUM-18 https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c
 ---
 
@@ -289,6 +291,7 @@ Honour `prefers-reduced-motion: reduce` — drop transforms and shimmer, keep op
   `text-mute/80` is 3.38:1 on paper. A bar floating over dark photography is not covered: at the CSS glass value (.72, aligned in RUM-16) `--mute` is 2.53:1 over black and 3.09:1 over #444, and about .95 white would be needed to hold 4.5:1, which is no longer glass. The options are with the owner: [RUM-18](https://app.plane.so/claude-pri/projects/0f74bf02-2d16-4c07-a0f7-af537f8cb725/issues/a4596786-8c7f-4bff-a1ea-615d5bdd3c4c).
 - `--volt` is 5.29:1 on paper and 4.76:1 on `--wash`, safe for links and focus rings.
 - `--err` is 6.54:1 on paper and 5.89:1 on `--wash`; `--warn` is 5.91:1 and 5.32:1. Both also hold 4.5:1 on the skeleton shimmer. `--ok` is 4.90:1 on paper but 4.41:1 on `--wash`, so success text goes on paper only.
+- Run `python3 knowledge/contrast.py`: it recomputes every figure in this section from `globals.css`, fails if this doc states a different one, and checks the type scale.
 - Control boundaries need 3:1 against the surface beside them. `--control` is 3.42:1 on paper
   and 3.08:1 on `--wash`; `--line` is 1.23:1 and is for dividers only. `.field` and the
   stylist's suggestion chips use `--control`.
